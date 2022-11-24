@@ -4,8 +4,8 @@ import { MissingPropertyError } from "../utils/error-messages";
 /**
  * Middleware function designed to only let valid User variables pass to the Router
  *
- * If any value is not set, an appropriate error is returned to the caller
- * informing of them of the missing variable
+ * If any attribute is not set, an appropriate error is returned to the caller
+ * informing of them of the missing attribute
  * 
  * If all fields are present, the body will look something like this:
  ```json
@@ -45,6 +45,39 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+
+/**
+ * Middleware function designed to only let valid MarketEntry variables pass to the Router
+ *
+ * If any attribute is not set, an appropriate error is returned to the caller
+ * informing of them of the missing attribute
+ * 
+ * If all fields are present, the body will look something like this:
+ ```json
+ {
+    "userId": 1,
+    "title": "string",
+    "content": "string"
+  }
+```
+ * An example of an error response would look like this:
+```json
+{
+    "error": "MissingProperty",
+    "detail": "property: 'title' is missing"
+}
+```
+ * another example of an error response:
+```json
+{
+    "error": "ValidationError",
+    "detail": "Foreign key '2' was not found"
+}
+```
+ * @param req
+ * @param res
+ * @param next
+ */
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.body?.userId;
   const title = req.body?.title;
