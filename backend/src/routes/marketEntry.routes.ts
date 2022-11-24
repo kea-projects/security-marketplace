@@ -32,10 +32,5 @@ router.get("/market-entry", async (_req: Request, res: Response) => {
   res.send(userList);
 });
 
-router.get("/read", async (_req, res) => {
-  const idk = await MarketEntry.findAll();
-
-  res.send(idk);
-});
 
 export { router as marketEntryRouter };
