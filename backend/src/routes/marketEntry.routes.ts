@@ -7,26 +7,23 @@ const router: Router = Router();
 
 router.post("/market-entry", cleanMarketEntryFields, async (req, res) => {
   const marketEntry = new MarketEntry({
+    userId: req.body.userId!,
     title: req.body.title!,
     content: req.body.content!,
   });
 
-  let error_obj = undefined;
-
   let result;
   try {
-    error_obj = await marketEntry.validate();
     result = await marketEntry.save();
   } catch (error) {
-    console.log(error.errors);
-    res.send(new ValidationError(error.errors[0].message));
+    if (error.errors) {
+      return res.status(422).send(new ValidationError(error.errors[0]));
+    } else {
+      return res.status(422).send(new ValidationError(`Foreign key '${marketEntry.userId}' was not found`));
+    }
   }
 
-  if (error_obj === null) {
-    res.status(202).send({ status: "success", body: marketEntry });
-  }
-
-  res.send(result);
+  return res.status(202).send(result);
 });
 
 router.get("/market-entry", async (_req, res) => {

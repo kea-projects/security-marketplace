@@ -1,7 +1,9 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/database.config";
+import { MarketEntry } from "./marketEntryModel";
 
 class User extends Model {
+  declare id: number;
   declare username: string;
   declare password: string;
   declare fullName: string;
@@ -30,4 +32,11 @@ User.init(
   }
 );
 
-export { User };
+const associateUserWithMarketEntry = () => {
+  User.hasMany(MarketEntry, {foreignKey: {
+    name: "marketEntryId",
+    field: "market_entry_id"
+  }});
+}
+
+export { User, associateUserWithMarketEntry };

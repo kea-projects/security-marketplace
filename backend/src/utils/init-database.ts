@@ -1,9 +1,12 @@
-import { MarketEntry } from "../models/marketEntryModel";
-import { User } from "../models/userModel";
+import { sequelize } from "../config/database.config";
+import { associateMarketEntryWithUser } from "../models/marketEntryModel";
+import { associateUserWithMarketEntry } from "../models/userModel";
 
 const initializeDb = () => {
-  User.sync({ alter: true });
-  MarketEntry.sync({ alter: true });
+  associateUserWithMarketEntry();
+  associateMarketEntryWithUser();
+  sequelize.sync({alter: true})
+
 };
 
 export { initializeDb };

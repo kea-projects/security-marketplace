@@ -46,17 +46,20 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
 };
 
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.body?.userId;
   const title = req.body?.title;
   const content = req.body?.content;
 
-  if (title !== undefined && content !== undefined) {
-    req.body = { title: title, content: content };
+  if (title !== undefined && content !== undefined && userId !== undefined) {
+    req.body = { title: title, content: content, userId: userId };
     next();
   } else {
     if (title === undefined) {
       res.status(422).send(new MissingPropertyError("title"));
     } else if (content === undefined) {
       res.status(422).send(new MissingPropertyError("content"));
+    } else if (userId === undefined) {
+      res.status(422).send(new MissingPropertyError("userId"));
     }
   }
 };
