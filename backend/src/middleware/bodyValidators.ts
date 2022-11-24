@@ -15,16 +15,16 @@ import { MissingPropertyError } from "../utils/error-messages";
     "fullName": "string"
   }
 ```
- * An example of an error response would look like this:
+ * An example of an error response would look like this with an HTTP status of 422:
 ```json
 {
     "error": "MissingProperty",
     "detail": "property: 'password' is missing"
 }
 ```
- * @param req
- * @param res
- * @param next
+ * @param req Express Request object
+ * @param res Express Response object
+ * @param next Express NextFunction object
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
   const username: string = req.body?.username;
@@ -45,7 +45,6 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-
 /**
  * Middleware function designed to only let valid MarketEntry variables pass to the Router
  *
@@ -60,23 +59,16 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
     "content": "string"
   }
 ```
- * An example of an error response would look like this:
+ * An example of an error response would look like this with an HTTP status of 422:
 ```json
 {
     "error": "MissingProperty",
     "detail": "property: 'title' is missing"
 }
 ```
- * another example of an error response:
-```json
-{
-    "error": "ValidationError",
-    "detail": "Foreign key '2' was not found"
-}
-```
- * @param req
- * @param res
- * @param next
+ * @param req Express Request object
+ * @param res Express Response object
+ * @param next Express NextFunction object
  */
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.body?.userId;
