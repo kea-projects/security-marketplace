@@ -3,6 +3,7 @@ import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
 import { marketEntryRouter } from "./routes/marketEntry.routes";
+import { authRouter } from "./routes/auth.routes";
 
 const app = express();
 app.use(express.json());
@@ -17,8 +18,9 @@ app.use(cors(corsOptions));
 
 initializeDb();
 // ---------------------Routers------------------------
-app.use(userRouter);
+app.use(authRouter);
 app.use(marketEntryRouter);
+app.use(userRouter);
 
 // ---------------------Default------------------------
 app.get("/test", (_req, res) => {
