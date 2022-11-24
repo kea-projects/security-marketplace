@@ -1,11 +1,12 @@
 import { Router } from "express";
+import { Request, Response } from "express";
 import { cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
 import { ValidationError } from "../utils/error-messages";
 
 const router: Router = Router();
 
-router.post("/user", cleanUserObjFields, async (req, res) => {
+router.post("/user", cleanUserObjFields, async (req: Request, res: Response) => {
   const user = new User({
     username: req.body.username!,
     password: req.body.password!,
@@ -30,15 +31,10 @@ router.post("/user", cleanUserObjFields, async (req, res) => {
   res.send(result);
 });
 
-router.get("/user", async (_req, res) => {
+router.get("/user", async (_req: Request, res: Response) => {
   const userList = await User.findAll();
   res.send(userList);
 });
 
-router.get("/read", async (_req, res) => {
-  const idk = await User.findAll();
-
-  res.send(idk);
-});
 
 export { router as userRouter };
