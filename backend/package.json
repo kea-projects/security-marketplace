@@ -1,0 +1,41 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "files": [
+    "/dist"
+  ],
+  "types": "./dist/__types__",
+  "engines": {
+    "node": ">=12.10.0"
+  },
+  "engineStrict": true,
+  "scripts": {
+    "build": "ts-node ./tasks/run-build.ts",
+    "build:dev": "ts-node --project ./tsconfig-dev.json ./tasks/run-build.ts -d",
+    "start": "node ./dist/index.js",
+    "start:dev": "nodemon -e .ts -w ./src/ --exec  'ts-node --project ./tsconfig-dev.json --logError ./src/index.ts'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "*"
+  },
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.14",
+    "@types/node": "^14.14.31",
+    "@types/uuid": "^9.0.0",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jose": "^4.11.1",
+    "sequelize": "^6.25.8",
+    "sqlite3": "^5.1.2",
+    "uuid": "^9.0.0"
+  }
+}
