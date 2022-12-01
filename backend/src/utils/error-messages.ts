@@ -15,14 +15,14 @@ class MissingPropertyError extends BaseError {
 }
 
 class ValidationError extends BaseError {
-  constructor(error: string) {
-    super("ValidationError", error);
+  constructor(detail: string) {
+    super("ValidationError", detail);
   }
 }
 
 class InternalServerError extends BaseError {
-  constructor(error: string = "An unknown error has occurred.") {
-    super("InternalServerError", error);
+  constructor(detail: string = "An unknown error has occurred.") {
+    super("InternalServerError", detail);
   }
 }
 

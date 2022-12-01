@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
 import { ValidationError } from "../utils/error-messages";
+import { validateUuidFromParams } from "../utils/path-param-validators";
 
 const router: Router = Router();
 
@@ -36,5 +37,20 @@ router.get("/user", async (_req: Request, res: Response) => {
   res.send(userList);
 });
 
+router.get("/user/:id", async (req: Request, res: Response) => {
+  const userId = validateUuidFromParams("id", req, res);
+  if (userId !== true) return;
+
+  console.log(`User Id: ${userId}`);
+
+  const userList = await User.findAll({
+    where: {
+      id: userId,
+    },
+  });
+  console.log("UserList is: ", userList);
+
+  res.send(userList);
+});
 
 export { router as userRouter };
