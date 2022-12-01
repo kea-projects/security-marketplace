@@ -36,11 +36,11 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
     next();
   } else {
     if (username === undefined) {
-      res.status(422).send(new MissingPropertyError("username"));
+      res.status(400).send(new MissingPropertyError("username"));
     } else if (password === undefined) {
-      res.status(422).send(new MissingPropertyError("password"));
+      res.status(400).send(new MissingPropertyError("password"));
     } else if (fullName === undefined) {
-      res.status(422).send(new MissingPropertyError("fullName"));
+      res.status(400).send(new MissingPropertyError("fullName"));
     }
   }
 };
@@ -80,11 +80,11 @@ const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction)
     next();
   } else {
     if (title === undefined) {
-      res.status(422).send(new MissingPropertyError("title"));
+      res.status(400).send(new MissingPropertyError("title"));
     } else if (content === undefined) {
-      res.status(422).send(new MissingPropertyError("content"));
+      res.status(400).send(new MissingPropertyError("content"));
     } else if (userId === undefined) {
-      res.status(422).send(new MissingPropertyError("userId"));
+      res.status(400).send(new MissingPropertyError("userId"));
     }
   }
 };
