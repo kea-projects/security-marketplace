@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+import { MarketEntry } from "../models/marketEntryModel";
+import { User } from "../models/userModel";
 import { MissingPropertyError } from "../utils/error-messages";
 
 /**
@@ -27,22 +29,21 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
-  const username: string = req.body?.username;
-  const password: string = req.body?.password;
-  const fullName: string = req.body?.fullName;
+  const { username, password, fullName } = req.body!;
 
-  if (username !== undefined && password !== undefined && fullName !== undefined) {
-    req.body = { username: username, password: password, fullName: fullName };
-    next();
-  } else {
-    if (username === undefined) {
-      res.status(400).send(new MissingPropertyError("username"));
-    } else if (password === undefined) {
-      res.status(400).send(new MissingPropertyError("password"));
-    } else if (fullName === undefined) {
-      res.status(400).send(new MissingPropertyError("fullName"));
-    }
+  if (!username) {
+    res.status(400).send(new MissingPropertyError("username"));
   }
+
+  if (!password) {
+    res.status(400).send(new MissingPropertyError("password"));
+  }
+  if (!fullName) {
+    res.status(400).send(new MissingPropertyError("fullName"));
+  }
+  req.body = {}
+  req.body.user = new User({ username, password, fullName });
+  return next();
 };
 
 /**
@@ -71,22 +72,21 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
  * @param next Express NextFunction object
  */
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
-  const userId: string = req.body?.userId;
-  const title: string = req.body?.title;
-  const content: string = req.body?.content;
+  const { title, content, userId} = req.body;
 
-  if (title !== undefined && content !== undefined && userId !== undefined) {
-    req.body = { title: title, content: content, userId: userId };
-    next();
-  } else {
-    if (title === undefined) {
-      res.status(400).send(new MissingPropertyError("title"));
-    } else if (content === undefined) {
-      res.status(400).send(new MissingPropertyError("content"));
-    } else if (userId === undefined) {
-      res.status(400).send(new MissingPropertyError("userId"));
-    }
+  if (!title) {
+    res.status(400).send(new MissingPropertyError("username"));
   }
+
+  if (!content) {
+    res.status(400).send(new MissingPropertyError("password"));
+  }
+  if (!userId) {
+    res.status(400).send(new MissingPropertyError("fullName"));
+  }
+  req.body = {}
+  req.body.listing = new MarketEntry({title, content, userId})
+  next();
 };
 
 export { cleanUserObjFields, cleanMarketEntryFields };

@@ -3,33 +3,22 @@ import { Request, Response } from "express";
 import { cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
 import { ValidationError } from "../utils/error-messages";
-import { validateUuidFromParams } from "../utils/path-param-validators";
+import { validateUuidFromParams } from "../middleware/path-param-validators";
 
 const router: Router = Router();
 
 router.post("/user", cleanUserObjFields, async (req: Request, res: Response) => {
-  const user = new User({
-    username: req.body.username!,
-    password: req.body.password!,
-    fullName: req.body.fullName!,
-  });
+  const user: User = req.body.user;
 
-  let is_valid = undefined;
-
-  let result;
   try {
-    is_valid = await user.validate();
-    result = await user.save();
+    await user.validate();
+    const result = await user.save();
+    // TODO: Filter out user_id and password
+    return res.send(result);
   } catch (error) {
     console.log(error.errors);
-    res.send(new ValidationError(error.errors[0].message));
+    return res.send(new ValidationError(error.errors[0].message));
   }
-
-  if (is_valid === null) {
-    res.status(202).send({ status: "success", body: user });
-  }
-
-  res.send(result);
 });
 
 router.get("/user", async (_req: Request, res: Response) => {
@@ -37,12 +26,12 @@ router.get("/user", async (_req: Request, res: Response) => {
   res.send(userList);
 });
 
-router.get("/user/:id", async (req: Request, res: Response) => {
-  const userId = validateUuidFromParams("id", req, res);
-  if (userId !== true) return;
+router.get("/user/:id", validateUuidFromParams, async (req: Request, res: Response) => {
+  const userId = req.body.id;
 
   console.log(`User Id: ${userId}`);
 
+  // TODO: Make work the request
   const userList = await User.findAll({
     where: {
       id: userId,
