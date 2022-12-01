@@ -71,9 +71,9 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
  * @param next Express NextFunction object
  */
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.body?.userId;
-  const title = req.body?.title;
-  const content = req.body?.content;
+  const userId: string = req.body?.userId;
+  const title: string = req.body?.title;
+  const content: string = req.body?.content;
 
   if (title !== undefined && content !== undefined && userId !== undefined) {
     req.body = { title: title, content: content, userId: userId };

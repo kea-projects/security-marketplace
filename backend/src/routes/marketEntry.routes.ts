@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { cleanMarketEntryFields } from "../middleware/bodyValidators";
 import { MarketEntry } from "../models/marketEntryModel";
-import { ValidationError } from "../utils/error-messages";
+import { InternalServerError, ValidationError } from "../utils/error-messages";
 import { Request, Response } from "express";
 
 const router: Router = Router();
@@ -18,9 +18,9 @@ router.post("/market-entry", cleanMarketEntryFields, async (req: Request, res: R
     result = await marketEntry.save();
   } catch (error) {
     if (error.errors) {
-      return res.status(422).send(new ValidationError(error.errors[0]));
+      return res.status(400).send(new ValidationError(error.errors[0]));
     } else {
-      return res.status(422).send(new ValidationError(`Foreign key '${marketEntry.userId}' was not found`));
+      return res.status(400).send(new ValidationError(`Foreign key '${marketEntry.userId}' was not found.`));
     }
   }
 
@@ -28,8 +28,13 @@ router.post("/market-entry", cleanMarketEntryFields, async (req: Request, res: R
 });
 
 router.get("/market-entry", async (_req: Request, res: Response) => {
-  const userList = await MarketEntry.findAll();
-  res.send(userList);
+  try {
+    const userList: MarketEntry[] = await MarketEntry.findAll();
+    return res.status(200).send(userList);
+  } catch {
+    console.error("An error occurred retrieving the lost of market entries");
+    return res.status(500).send(new InternalServerError())
+  }
 });
 
 

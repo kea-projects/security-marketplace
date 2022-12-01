@@ -20,4 +20,10 @@ class ValidationError extends BaseError {
   }
 }
 
-export { MissingPropertyError, ValidationError };
+class InternalServerError extends BaseError {
+  constructor(error: string = "An unknown error has occurred.") {
+    super("InternalServerError", error);
+  }
+}
+
+export { MissingPropertyError, ValidationError, InternalServerError};
