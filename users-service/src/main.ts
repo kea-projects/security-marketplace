@@ -19,12 +19,12 @@ initializeDb();
 app.use(userRouter);
 
 // ---------------------Default------------------------
-app.get("/test", (_req, res) => {
-  res.send({ hello: "WORLD!" });
-});
-
 // Reject all non defined paths
-app.all("*", (_req, res) => {
+app.all("*", (req, res) => {
+  console.log(`Invalid request: ${req.method} ${req.url}.`);
+  console.log(`Request body: ${JSON.stringify(req.body)}`);
+  console.log("Rejecting request.");
+
   res.status(401).send();
 });
 

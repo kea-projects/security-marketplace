@@ -50,4 +50,16 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   return next();
 };
 
-export { cleanUserObjFields };
+const cleanUserImageUrlObj = (req: Request, res: Response, next: NextFunction) => {
+  const { pictureUrl } = req.body!;
+
+  if (!pictureUrl) {
+    return res.status(400).send(new MissingPropertyError("pictureUrl"));
+  }
+
+  req.body = {};
+  req.body.pictureUrl = pictureUrl;
+  return next();
+};
+
+export { cleanUserObjFields, cleanUserImageUrlObj };
