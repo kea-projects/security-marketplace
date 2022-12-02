@@ -2,18 +2,21 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import { cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
-import { ValidationError } from "../utils/error-messages";
+import { InternalServerError, ValidationError, NotFoundError } from "../utils/error-messages";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
+import { validate as isValidUuid } from "uuid";
 
 const router: Router = Router();
 
 router.post("/user", cleanUserObjFields, async (req: Request, res: Response) => {
-  const user: User = req.body.user;
+  const user = req.body.user;
+  if (!isValidUuid(user.userId)) {
+    return res.status(400).send(new ValidationError(`Provided UUID: '${user.userId}' is not a valid UUIDv4.`));
+  }
 
   try {
     await user.validate();
     const result = await user.save();
-    // TODO: Filter out user_id and password
     return res.send(result);
   } catch (error) {
     console.log(error.errors);
@@ -24,28 +27,29 @@ router.post("/user", cleanUserObjFields, async (req: Request, res: Response) => 
 router.get("/user", async (_req: Request, res: Response) => {
   try {
     const userList: User[] = await User.findAll();
-    return res.status(200).send({ userList });
+    return res.status(200).send(userList);
   } catch (error) {
-    const userList: User[] = [];
-    console.error("An error has occured: ", error);
-    return res.status(200).send({ userList });
+    console.log("Error occurred while getting user: ", error);
+    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
   }
 });
 
 router.get("/user/:id", validateUuidFromParams, async (req: Request, res: Response) => {
-  const userId = req.body.id;
+  const userId = req.params.id;
 
   console.log(`User Id: ${userId}`);
 
-  // TODO: Make work the request
-  const userList = await User.findAll({
-    where: {
-      id: userId,
-    },
-  });
-  console.log("UserList is: ", userList);
-
-  res.send(userList);
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      return res.status(200).send(user);
+    } else {
+      return res.status(404).send(new NotFoundError(`User with id: ${userId} was not found in the database.`));
+    }
+  } catch (error) {
+    console.log("Error occurred while getting user: ", error);
+    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+  }
 });
 
 export { router as userRouter };

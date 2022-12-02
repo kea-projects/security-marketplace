@@ -33,20 +33,20 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   const { userId, email, name, pictureUrl } = req.body!;
 
   if (!userId) {
-    res.status(400).send(new MissingPropertyError("userId"));
+    return res.status(400).send(new MissingPropertyError("userId"));
   }
   if (!email) {
-    res.status(400).send(new MissingPropertyError("email"));
+    return res.status(400).send(new MissingPropertyError("email"));
   }
   if (!name) {
-    res.status(400).send(new MissingPropertyError("name"));
+    return res.status(400).send(new MissingPropertyError("name"));
   }
 
   req.body = {};
   if (pictureUrl) {
-    req.body.user = new User({ email, name, pictureUrl });
+    req.body.user = new User({ userId, email, name, pictureUrl });
   } else {
-    req.body.user = new User({ email, name });
+    req.body.user = new User({ userId, email, name });
   }
   return next();
 };
@@ -60,9 +60,10 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
  * If all fields are present, the body will look something like this:
  ```json
  {
-    "userId": 1,
-    "title": "string",
-    "content": "string"
+    "name": "string",
+    "description": "string",
+    "imageUrl": "string",
+    "createdBy": "UUIDv4"
   }
 ```
  * An example of an error response would look like this with an HTTP status of 422:

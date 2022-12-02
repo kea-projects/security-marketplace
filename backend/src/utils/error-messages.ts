@@ -26,4 +26,10 @@ class InternalServerError extends BaseError {
   }
 }
 
-export { MissingPropertyError, ValidationError, InternalServerError};
+class NotFoundError extends BaseError {
+  constructor(detail: string) {
+    super("NotFoundError", detail);
+  }
+}
+
+export { MissingPropertyError, ValidationError, InternalServerError, NotFoundError };

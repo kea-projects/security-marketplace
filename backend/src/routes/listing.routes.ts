@@ -7,11 +7,7 @@ import { Request, Response } from "express";
 const router: Router = Router();
 
 router.post("/market-entry", cleanListingObjFields, async (req: Request, res: Response) => {
-  const listing = new Listing({
-    userId: req.body.userId!,
-    title: req.body.title!,
-    content: req.body.content!,
-  });
+  const listing: Listing = req.body.listing
 
   let result;
   try {
