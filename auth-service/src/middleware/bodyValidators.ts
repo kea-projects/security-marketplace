@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/userModel";
 import { MissingPropertyError } from "../utils/error-messages";
 
 /**
@@ -27,8 +26,8 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param res Express Response object
  * @param next Express NextFunction object
  */
-const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
-  const { username, password, fullName } = req.body!;
+const validateSignupRequestBody = (req: Request, res: Response, next: NextFunction) => {
+  const { username, password } = req.body!;
 
   if (!username) {
     res.status(400).send(new MissingPropertyError("username"));
@@ -37,12 +36,10 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   if (!password) {
     res.status(400).send(new MissingPropertyError("password"));
   }
-  if (!fullName) {
-    res.status(400).send(new MissingPropertyError("fullName"));
-  }
-  req.body = {};
-  req.body.user = new User({ username, password, fullName });
-  return next();
+  req.body = { username, password };
+  next();
 };
 
-export { cleanUserObjFields };
+const validateLoginRequestBody = validateSignupRequestBody;
+
+export { validateSignupRequestBody, validateLoginRequestBody };

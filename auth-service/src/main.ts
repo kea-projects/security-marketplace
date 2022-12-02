@@ -1,7 +1,9 @@
+import chalk from "chalk";
 import cors from "cors";
+import "dotenv/config";
 import express from "express";
+import { initializeDb } from "./database/database.service";
 import { authRouter } from "./routes/auth.routes";
-import { initializeDb } from "./utils/init-database";
 
 const app = express();
 app.use(express.json());
@@ -14,7 +16,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-initializeDb();
 // ---------------------Routers------------------------
 app.use("/auth", authRouter);
 
@@ -25,6 +26,13 @@ app.all("*", (_req, res) => {
 
 // -------------------App-Launch-----------------------
 const PORT: number = Number(process.env.APP_PORT) || 5000;
-app.listen(PORT, () => {
-  console.log(`Auth Service is running on port: ${PORT}`);
+app.listen(PORT, async () => {
+  if (!(await initializeDb())) {
+    console.log(
+      new Date().toISOString() + chalk.redBright(` [ERROR] SHUTTING DOWN due to issues with the database connection`!)
+    );
+    return process.exit(1);
+  }
+  console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Auth Server has started on port: ${PORT}`));
+  return;
 });
