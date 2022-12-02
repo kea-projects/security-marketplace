@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Role } from "../../interfaces";
+import { IBase, Role } from "../../interfaces";
 
 // const connectionString = `postgres://${getEnvVar("AUTH_POSTGRES_USER")}:${getEnvVar("AUTH_POSTGRES_PASSWORD")}@${getEnvVar(
 //   "AUTH_POSTGRES_HOST"
@@ -9,11 +9,18 @@ import { Role } from "../../interfaces";
 //   logging: false,
 // });
 
-export class AuthUser extends Model {
+export interface IAuthUser extends IBase {
+  id: string;
+  username: string;
+  password: string;
+  role: Role;
+}
+
+export class AuthUser extends Model implements IAuthUser {
   declare id: string;
   declare username: string;
   declare password: string;
-  declare fullName: string;
+  declare role: Role;
 }
 export const AuthUserInit = (sequelize: Sequelize) => {
   AuthUser.init(
