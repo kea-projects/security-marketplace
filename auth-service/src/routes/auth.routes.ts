@@ -7,6 +7,30 @@ import { TokenService } from "../services/token.service";
 
 const router: Router = Router();
 
+router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  const foundUser = await AuthUserService.findOneByUsername(username);
+  if (!foundUser) {
+    res.status(401).send({ message: "Unauthorized" });
+    return;
+  }
+  if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
+    res.status(401).send({ message: "Unauthorized" });
+    return;
+  }
+  let tokens;
+  try {
+    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.role);
+  } catch {}
+  if (!tokens) {
+    res
+      .status(500)
+      .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+    return;
+  }
+  res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+});
+
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (await AuthUserService.findOneByUsername(username)) {
@@ -26,54 +50,6 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
   }
   res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
   return;
-});
-
-router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  const foundUser = await AuthUserService.findOneByUsername(username);
-  if (!foundUser) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  let tokens;
-  try {
-    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.role);
-  } catch {}
-  if (!tokens) {
-    res
-      .status(500)
-      .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
-    return;
-  }
-  res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
-});
-
-router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  const foundUser = await AuthUserService.findOneByUsername(username);
-  if (!foundUser) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  let tokens;
-  try {
-    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.role);
-  } catch {}
-  if (!tokens) {
-    res
-      .status(500)
-      .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
-    return;
-  }
-  res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
 });
 
 router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => {

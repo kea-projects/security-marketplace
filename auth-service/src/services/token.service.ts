@@ -40,6 +40,7 @@ export class TokenService {
     return false;
   }
 
+  // TODO - discuss potential functionality of deleting all tokens if someone tries to authenticate with an invalid token of that user
   static async deleteAllOfUser(username: string): Promise<void> {
     const tokens = await this.findAllByUsername(username);
     const idList = tokens.map((token) => token.tokenId);

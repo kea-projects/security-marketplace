@@ -11,8 +11,8 @@ app.use(express.json());
 app.use(logger);
 // -----------------------CORS-------------------------
 const corsOptions = {
-  origin: "*",
-  methods: ["POST"],
+  origin: "*", // TODO - discuss the the cors rules
+  methods: ["GET", "POST"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -23,7 +23,7 @@ app.use("/auth", authRouter);
 
 // Reject all non defined paths
 app.all("*", (_req, res) => {
-  res.status(401).send();
+  res.status(401).send({ message: "Unauthorized" });
 });
 
 // -------------------App-Launch-----------------------

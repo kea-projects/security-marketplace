@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getEnvVar } from "../config/config.service";
+import { Role } from "../interfaces";
 
 const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
 /**
@@ -11,6 +12,7 @@ const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
  */
 const canAccessRoleUser = (req: Request, res: Response, next: NextFunction) => {
   // validate that the request contains the jwt access token
+
   if (!req.headers || !req.headers.authorization) {
     return res.status(401).send({ message: "Unauthorized" });
   }
@@ -19,10 +21,9 @@ const canAccessRoleUser = (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    if (!(decodedToken?.role === "admin" || decodedToken?.role === "user")) {
+    if (decodedToken?.role === Role.admin || decodedToken?.role === Role.user) {
       return next();
     }
-    return next();
   } catch (error) {
     console.log(
       new Date().toISOString() +
@@ -48,7 +49,7 @@ const canAccessRoleAdmin = (req: Request, res: Response, next: NextFunction) => 
   try {
     const token = req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    if (decodedToken?.role === "admin") {
+    if (decodedToken?.role === Role.admin) {
       return next();
     }
   } catch (error) {

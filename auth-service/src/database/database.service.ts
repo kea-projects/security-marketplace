@@ -9,6 +9,7 @@ import { TokenInit } from "./models/token.model";
 let sequelize: Sequelize;
 
 async function initializeDb(): Promise<boolean> {
+  // TODO - switch to variable-based config instead of connection string. Connection strings may potentially be stored in plain text when connecting to the database
   const connectionString = `postgres://${getEnvVar("AUTH_POSTGRES_USER")}:${getEnvVar(
     "AUTH_POSTGRES_PASSWORD"
   )}@${getEnvVar("AUTH_POSTGRES_HOST")}:${getEnvVar("AUTH_POSTGRES_PORT")}/${getEnvVar("AUTH_POSTGRES_DATABASE")}`;

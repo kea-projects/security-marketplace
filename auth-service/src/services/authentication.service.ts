@@ -35,7 +35,6 @@ export class AuthenticationService {
     username: string,
     role: Role
   ): Promise<{ accessToken: string; refreshToken: string } | null> {
-    // TODO - implement refresh tokens + token whitelist
     const refreshExpirationDate = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // 1 day ahead
     const accessExpirationDate = Math.floor(Date.now() / 1000) + 60 * 15; // 15 minutes ahead
     const refreshToken = jwt.sign({ sub: username, role, exp: refreshExpirationDate }, secret);
