@@ -24,7 +24,6 @@ Listing.init(
     name: {
       type: DataTypes.STRING(150),
       allowNull: false,
-      // unique: true, // TODO: ?
       field: "name",
     },
     description: {
@@ -34,8 +33,7 @@ Listing.init(
     },
     imageUrl: {
       type: DataTypes.STRING(500),
-      allowNull: false, // TODO: ?
-      // unique: true, // TODO: ?
+      allowNull: false, // TODO: argue
       field: "image_url",
     },
     createdBy: {

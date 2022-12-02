@@ -57,7 +57,7 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
   }
 });
 
-router.patch("/users/:id/picture", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
+router.patch("/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
     const userId = req.params.id;
     const pictureUrl = req.body.pictureUrl;
 
