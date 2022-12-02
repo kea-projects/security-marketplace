@@ -16,12 +16,14 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
   }
   const createdUser = await AuthUserService.create({ username, password });
   if (createdUser) {
-    res.send({ accessToken: AuthenticationService.createAccessToken(createdUser.username, createdUser.role) });
-    return;
-  } else {
-    res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
-    return;
+    const tokens = await AuthenticationService.createAccessToken(createdUser.username, createdUser.role);
+    if (tokens) {
+      res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+      return;
+    }
   }
+  res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
+  return;
 });
 
 router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
@@ -35,7 +37,19 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
     res.status(401).send({ message: "Unauthorized" });
     return;
   }
-  res.send({ accessToken: AuthenticationService.createAccessToken(foundUser.username, foundUser.role) });
+  let tokens;
+  try {
+    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.role);
+  } catch {}
+  if (!tokens) {
+    res
+      .status(500)
+      .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+    return;
+  }
+  res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
 });
+
+// TODO - accessToken middleware, logout and invalidate-all routes
 
 export { router as authRouter };

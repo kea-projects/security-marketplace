@@ -4,6 +4,7 @@ import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
 import { AuthenticationService } from "../services/authentication.service";
 import { AuthUser, AuthUserInit } from "./models/auth-user.model";
+import { TokenInit } from "./models/token.model";
 
 let sequelize: Sequelize;
 
@@ -75,6 +76,7 @@ async function initializeDb(): Promise<boolean> {
 function loadDbModels(sequelize: Sequelize): void {
   // Define all Models
   AuthUserInit(sequelize);
+  TokenInit(sequelize);
   // Define all Associations
 }
 
