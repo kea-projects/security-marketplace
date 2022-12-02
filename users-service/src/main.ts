@@ -2,8 +2,6 @@ import express from "express";
 import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
-import { listingRouter } from "./routes/listing.routes";
-import { authRouter } from "./routes/auth.routes";
 
 const app = express();
 app.use(express.json());
@@ -18,8 +16,6 @@ app.use(cors(corsOptions));
 
 initializeDb();
 // ---------------------Routers------------------------
-app.use(authRouter);
-app.use(listingRouter);
 app.use(userRouter);
 
 // ---------------------Default------------------------

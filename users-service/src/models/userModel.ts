@@ -1,6 +1,5 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/database.config";
-import { Listing } from "./listingModel";
 
 class User extends Model {
   declare userId: typeof DataTypes.UUIDV4;
@@ -43,13 +42,5 @@ User.init(
   }
 );
 
-const associateUserWithListing = () => {
-  User.hasMany(Listing, {
-    foreignKey: {
-      name: "createdBy",
-      field: "created_by",
-    },
-  });
-};
 
-export { User, associateUserWithListing };
+export { User };
