@@ -80,4 +80,4 @@ function loadDbModels(sequelize: Sequelize): void {
   // Define all Associations
 }
 
-export { initializeDb };
+export { initializeDb, sequelize };
