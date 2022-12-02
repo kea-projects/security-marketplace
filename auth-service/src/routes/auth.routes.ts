@@ -51,5 +51,13 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
 });
 
 // TODO - accessToken middleware, logout and invalidate-all routes
+// Examples of validating that the user has X role.
+// router.get("/test/user", canAccessRoleUser, async (req: Request, res: Response) => {
+//   res.send({ message: "You have user access" });
+// });
+
+// router.get("/test/admin", canAccessRoleAdmin, async (req: Request, res: Response) => {
+//   res.send({ message: "You have admin access" });
+// });
 
 export { router as authRouter };
