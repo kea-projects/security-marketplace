@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { sequelize } from "../database/database.service";
 import { AuthUser, IAuthUser } from "../database/models/auth-user.model";
-import { SignupRequestDto } from "../interfaces";
+import { Role, SignupRequestDto } from "../interfaces";
 import { AuthenticationService } from "./authentication.service";
 
 export class AuthUserService {
@@ -16,15 +16,23 @@ export class AuthUserService {
       let result: IAuthUser | null = null;
       result = await AuthUser.create({ username: params.username, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
+      const accessToken = await AuthenticationService.createAccessToken(result.username, Role.admin);
       try {
         // TODO - uncomment the below fetch statement once users service is implemented
-        // await fetch(`${getEnvVar("USERS_SERVICE_URL", true)}`, {
+        // const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", true)}`, {
         //   method: "POST",
+        //   headers: new Headers({
+        //     Authorization: `Bearer ${accessToken?.accessToken}`,
+        //   }),
+        //   // TODO - the users service request body has to be updated
         //   body: JSON.stringify({
         //     userId: result.userId,
         //     username: result.username,
         //   }),
         // });
+        // if (response.status !== 200) {
+        //   throw new Error("The users service has responded with status code 200 to the create user request");
+        // }
       } catch (error) {
         console.log(
           new Date().toISOString() +
