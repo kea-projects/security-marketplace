@@ -1,13 +1,23 @@
+import chalk from "chalk";
 import { AuthUser, IAuthUser } from "../database/models/auth-user.model";
 import { SignupRequestDto } from "../interfaces";
 
 export class AuthUserService {
-  static findOne(username: string): Promise<IAuthUser | null> {
-    return AuthUser.findOne({ where: { username: username } });
+  static findOneByUsername(username: string): Promise<IAuthUser | null> {
+    return AuthUser.findOne({ where: { username } });
   }
 
-  static create(params: SignupRequestDto): Promise<IAuthUser> {
+  static findOneByUsernameAndPassword(username: string, password: string): Promise<IAuthUser | null> {
+    return AuthUser.findOne({ where: { username, password } });
+  }
+
+  static async create(params: SignupRequestDto): Promise<IAuthUser | null> {
     // TODO - call usersService to create the matching user object. If the request fails, the authUSer creation should be reverted
-    return AuthUser.create({ ...params });
+    try {
+      return AuthUser.create({ ...params });
+    } catch (error) {
+      console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create an auth user!`, error.stack));
+      return null;
+    }
   }
 }

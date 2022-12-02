@@ -7,20 +7,28 @@ const router: Router = Router();
 
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  console.log("data", { username, password });
-  if (await AuthUserService.findOne(username)) {
+  if (await AuthUserService.findOneByUsername(username)) {
     // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
     res.status(409).send({
       message: "The email is already in use",
     });
   }
   const createdUser = await AuthUserService.create({ username, password });
-  res.send({ accessToken: AuthenticationService.createAccessToken(createdUser.username) });
+  if (createdUser) {
+    res.send({ accessToken: AuthenticationService.createAccessToken(createdUser.username) });
+  } else {
+    res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
+  }
 });
 
-router.post("/login", validateLoginRequestBody, (req: Request, res: Response) => {
-  // TODO: Make signup happen
-  res.send({ notImplementedYet: "/auth/login", body: req.body });
+router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  const foundUser = await AuthUserService.findOneByUsernameAndPassword(username, password);
+  if (!foundUser) {
+    res.status(401).send({ message: "Unauthorized" });
+    return;
+  }
+  res.send({ accessToken: AuthenticationService.createAccessToken(foundUser.username) });
 });
 
 export { router as authRouter };
