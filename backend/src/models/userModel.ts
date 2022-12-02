@@ -6,14 +6,13 @@ class User extends Model {
   declare userId: typeof DataTypes.UUIDV4;
   declare email: string;
   declare name: string;
-  declare pictureUrl: string;
+  declare pictureUrl: string | undefined;
 }
 
 User.init(
   {
     userId: {
       type: DataTypes.UUIDV4,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
       primaryKey: true,
@@ -32,7 +31,8 @@ User.init(
     },
     pictureUrl: {
       type: DataTypes.STRING(500),
-      allowNull: false,
+      allowNull: true,
+      // unique: true // TODO: ?
       field: "picture_url",
     },
   },

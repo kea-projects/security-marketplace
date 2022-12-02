@@ -30,18 +30,14 @@ Listing.init(
     },
     description: {
       type: DataTypes.STRING(1000),
-      // allowNull: false // TODO: ?
+      allowNull: false, // TODO: ?
       field: "description",
     },
     imageUrl: {
       type: DataTypes.STRING(500),
-      // allowNull: false // TODO: ?
-      // unique: true // TODO: ?
+      allowNull: false, // TODO: ?
+      // unique: true, // TODO: ?
       field: "image_url",
-    },
-    content: {
-      type: DataTypes.STRING,
-      allowNull: false,
     },
   },
   {

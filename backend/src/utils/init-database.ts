@@ -1,11 +1,14 @@
 import { sequelize } from "../config/database.config";
-import { associateMarketEntryWithUser } from "../models/listingModel";
-import { associateUserWithMarketEntry } from "../models/userModel";
+import { associateListingWithUser } from "../models/listingModel";
+import { associateUserWithListing } from "../models/userModel";
 
-const initializeDb = () => {
-  associateUserWithMarketEntry();
-  associateMarketEntryWithUser();
-  sequelize.sync({ alter: true });
+const initializeDb = async () => {
+  console.log("Initializing database ...");
+  associateUserWithListing();
+  associateListingWithUser();
+  await sequelize.sync({ alter: true });
+  console.log("DB initialization complete.");
+  
 };
 
 export { initializeDb };

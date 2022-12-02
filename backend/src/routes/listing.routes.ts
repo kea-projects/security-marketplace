@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { cleanMarketEntryFields } from "../middleware/bodyValidators";
+import { cleanListingObjFields } from "../middleware/bodyValidators";
 import { Listing } from "../models/listingModel";
 import { InternalServerError, ValidationError } from "../utils/error-messages";
 import { Request, Response } from "express";
 
 const router: Router = Router();
 
-router.post("/market-entry", cleanMarketEntryFields, async (req: Request, res: Response) => {
+router.post("/market-entry", cleanListingObjFields, async (req: Request, res: Response) => {
   const listing = new Listing({
     userId: req.body.userId!,
     title: req.body.title!,

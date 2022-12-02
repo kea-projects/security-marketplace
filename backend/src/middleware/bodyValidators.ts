@@ -12,16 +12,17 @@ import { MissingPropertyError } from "../utils/error-messages";
  * If all fields are present, the body will look something like this:
  ```json
  {
-    "username": "string",
-    "password": "string",
-    "fullName": "string"
+    "userId": "UUIDv4"
+    "email": "string",
+    "name": "string",
+    "pictureUrl": "string"
   }
 ```
  * An example of an error response would look like this with an HTTP status of 422:
 ```json
 {
     "error": "MissingProperty",
-    "detail": "property: 'password' is missing"
+    "detail": "property: 'email' is missing"
 }
 ```
  * @param req Express Request object
@@ -29,20 +30,24 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
-  const { username, password, fullName } = req.body!;
+  const { userId, email, name, pictureUrl } = req.body!;
 
-  if (!username) {
-    res.status(400).send(new MissingPropertyError("username"));
+  if (!userId) {
+    res.status(400).send(new MissingPropertyError("userId"));
+  }
+  if (!email) {
+    res.status(400).send(new MissingPropertyError("email"));
+  }
+  if (!name) {
+    res.status(400).send(new MissingPropertyError("name"));
   }
 
-  if (!password) {
-    res.status(400).send(new MissingPropertyError("password"));
-  }
-  if (!fullName) {
-    res.status(400).send(new MissingPropertyError("fullName"));
-  }
   req.body = {};
-  req.body.user = new User({ username, password, fullName });
+  if (pictureUrl) {
+    req.body.user = new User({ email, name, pictureUrl });
+  } else {
+    req.body.user = new User({ email, name });
+  }
   return next();
 };
 
@@ -71,22 +76,25 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
  * @param res Express Response object
  * @param next Express NextFunction object
  */
-const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
-  const { title, content, userId } = req.body;
+const cleanListingObjFields = (req: Request, res: Response, next: NextFunction) => {
+  const { name, description, imageUrl, createdBy } = req.body;
 
-  if (!title) {
-    res.status(400).send(new MissingPropertyError("username"));
+  if (!name) {
+    res.status(400).send(new MissingPropertyError("name"));
+  }
+  if (!description) {
+    res.status(400).send(new MissingPropertyError("description"));
+  }
+  if (!imageUrl) {
+    res.status(400).send(new MissingPropertyError("imageUrl"));
+  }
+  if (!createdBy) {
+    res.status(400).send(new MissingPropertyError("createdBy"));
   }
 
-  if (!content) {
-    res.status(400).send(new MissingPropertyError("password"));
-  }
-  if (!userId) {
-    res.status(400).send(new MissingPropertyError("fullName"));
-  }
   req.body = {};
-  req.body.listing = new Listing({ title, content, userId });
+  req.body.listing = new Listing({ name, description, imageUrl, createdBy });
   next();
 };
 
-export { cleanUserObjFields, cleanMarketEntryFields };
+export { cleanUserObjFields, cleanListingObjFields };
