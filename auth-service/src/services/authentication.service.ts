@@ -9,6 +9,23 @@ const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
 
 export class AuthenticationService {
   /**
+   * Extracts the JWT token out of the request.
+   * @param req the express request reference.
+   * @returns the token or null if it can't get it.
+   */
+  static getTokenFromRequest(req: any): string | null {
+    try {
+      return req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
+    } catch (error) {
+      console.log(
+        new Date().toISOString() +
+          chalk.redBright(` [ERROR] An error has occurred while extracting the access token!`, error.stack)
+      );
+      return null;
+    }
+  }
+
+  /**
    * Creates a access and refresh token pair. Returns
    * @param username
    * @param role
@@ -31,7 +48,7 @@ export class AuthenticationService {
     if (savedToken) {
       return { accessToken, refreshToken };
     }
-    console.log(new Date().toISOString() + chalk.redBright(` [WARN] The created token is null!`));
+    console.log(new Date().toISOString() + chalk.yellowBright(` [WARN] The created token is null!`));
     return null;
   }
 

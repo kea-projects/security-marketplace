@@ -18,11 +18,7 @@ const canAccessRoleUser = (req: Request, res: Response, next: NextFunction) => {
   // Validate the token and the associated role
   try {
     const token = req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
-    console.log("token", token);
-
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    console.log("decoded", decodedToken);
-
     if (!(decodedToken?.role === "admin" || decodedToken?.role === "user")) {
       return next();
     }
@@ -51,15 +47,8 @@ const canAccessRoleAdmin = (req: Request, res: Response, next: NextFunction) => 
   // Validate the token and the associated role
   try {
     const token = req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
-    console.log("token", token);
-
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    console.log("decoded", decodedToken);
-
-    console.log("yeety1");
-
     if (decodedToken?.role === "admin") {
-      console.log("yeety2");
       return next();
     }
   } catch (error) {

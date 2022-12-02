@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 import { IToken, Token } from "../database/models/token.model";
 
 export class TokenService {
@@ -24,12 +25,19 @@ export class TokenService {
     }
   }
 
-  static async deleteByToken(token: string): Promise<void> {
+  static async deleteByToken(token: string): Promise<boolean> {
     try {
-      await Token.destroy({ where: [{ accessToken: token }, { refreshToken: token }] });
+      const result = await Token.destroy({ where: { [Op.or]: [{ accessToken: token }, { refreshToken: token }] } });
+      if (result == 0) {
+        console.log(
+          new Date().toISOString() + chalk.yellowBright(` [WARN] No tokens were removed when deleteByToken was called!`)
+        );
+      }
+      return result > 0;
     } catch (error) {
       console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a token pair`, error.stack));
     }
+    return false;
   }
 
   static async deleteAllOfUser(username: string): Promise<void> {
