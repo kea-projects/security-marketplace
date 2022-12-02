@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
+import { AuthenticationService } from "../services/authentication.service";
 import { AuthUser, AuthUserInit } from "./models/auth-user.model";
 
 let sequelize: Sequelize;
@@ -34,8 +35,8 @@ async function initializeDb(): Promise<boolean> {
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: Boolean(getEnvVar("AUTH_POSTGRES_DROP", false)) || false,
-      alter: Boolean(getEnvVar("AUTH_POSTGRES_SYNC", false)) || false,
+      force: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
+      alter: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
     });
     console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The schema has been synced`));
   } catch (error) {
@@ -46,10 +47,14 @@ async function initializeDb(): Promise<boolean> {
   // Populate the database
   if (getEnvVar("AUTH_POSTGRES_POPULATE")) {
     try {
-      await AuthUser.bulkCreate([
-        { username: "user@example.com", password: "abcDEF123" },
-        { username: "admin@example.com", password: "abcDEF123", role: Role.admin },
-      ]);
+      const hashedPassword = await AuthenticationService.encodePassword("abcDEF123");
+      await AuthUser.bulkCreate(
+        [
+          { username: "user@example.com", password: hashedPassword },
+          { username: "admin@example.com", password: hashedPassword, role: Role.admin },
+        ],
+        { updateOnDuplicate: ["username", "password"], returning: true }
+      );
       console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The auth database has been populated`));
     } catch (error) {
       console.log(

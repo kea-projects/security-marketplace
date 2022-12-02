@@ -12,23 +12,30 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
     res.status(409).send({
       message: "The email is already in use",
     });
+    return;
   }
   const createdUser = await AuthUserService.create({ username, password });
   if (createdUser) {
-    res.send({ accessToken: AuthenticationService.createAccessToken(createdUser.username) });
+    res.send({ accessToken: AuthenticationService.createAccessToken(createdUser.username, createdUser.role) });
+    return;
   } else {
     res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
+    return;
   }
 });
 
 router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  const foundUser = await AuthUserService.findOneByUsernameAndPassword(username, password);
+  const foundUser = await AuthUserService.findOneByUsername(username);
   if (!foundUser) {
     res.status(401).send({ message: "Unauthorized" });
     return;
   }
-  res.send({ accessToken: AuthenticationService.createAccessToken(foundUser.username) });
+  if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
+    res.status(401).send({ message: "Unauthorized" });
+    return;
+  }
+  res.send({ accessToken: AuthenticationService.createAccessToken(foundUser.username, foundUser.role) });
 });
 
 export { router as authRouter };
