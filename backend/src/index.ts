@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
-import { marketEntryRouter } from "./routes/marketEntry.routes";
+import { listingRouter } from "./routes/marketEntry.routes";
 import { authRouter } from "./routes/auth.routes";
 
 const app = express();
@@ -19,7 +19,7 @@ app.use(cors(corsOptions));
 initializeDb();
 // ---------------------Routers------------------------
 app.use(authRouter);
-app.use(marketEntryRouter);
+app.use(listingRouter);
 app.use(userRouter);
 
 // ---------------------Default------------------------

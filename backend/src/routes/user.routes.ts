@@ -22,8 +22,14 @@ router.post("/user", cleanUserObjFields, async (req: Request, res: Response) => 
 });
 
 router.get("/user", async (_req: Request, res: Response) => {
-  const userList = await User.findAll();
-  res.send(userList);
+  try {
+    const userList: User[] = await User.findAll();
+    return res.status(200).send({ userList });
+  } catch (error) {
+    const userList: User[] = [];
+    console.error("An error has occured: ", error);
+    return res.status(200).send({ userList });
+  }
 });
 
 router.get("/user/:id", validateUuidFromParams, async (req: Request, res: Response) => {

@@ -1,28 +1,39 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/database.config";
-import { MarketEntry } from "./marketEntryModel";
+import { Listing } from "./listingModel";
 
 class User extends Model {
-  declare id: number;
-  declare username: string;
-  declare password: string;
-  declare fullName: string;
+  declare userId: typeof DataTypes.UUIDV4;
+  declare email: string;
+  declare name: string;
+  declare pictureUrl: string;
 }
 
 User.init(
   {
-    username: {
-      type: DataTypes.STRING,
+    userId: {
+      type: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
+      primaryKey: true,
+      field: "user_id",
     },
-    password: {
-      type: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING(256),
       allowNull: false,
+      unique: true,
+      field: "email",
     },
-    fullName: {
-      type: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING(120),
       allowNull: false,
+      field: "name",
+    },
+    pictureUrl: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+      field: "picture_url",
     },
   },
   {
@@ -32,11 +43,13 @@ User.init(
   }
 );
 
-const associateUserWithMarketEntry = () => {
-  User.hasMany(MarketEntry, {foreignKey: {
-    name: "marketEntryId",
-    field: "market_entry_id"
-  }});
-}
+const associateUserWithListing = () => {
+  User.hasMany(Listing, {
+    foreignKey: {
+      name: "createdBy",
+      field: "created_by",
+    },
+  });
+};
 
-export { User, associateUserWithMarketEntry };
+export { User, associateUserWithListing };

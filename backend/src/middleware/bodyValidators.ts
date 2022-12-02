@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { MarketEntry } from "../models/marketEntryModel";
+import { Listing } from "../models/listingModel";
 import { User } from "../models/userModel";
 import { MissingPropertyError } from "../utils/error-messages";
 
@@ -41,7 +41,7 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   if (!fullName) {
     res.status(400).send(new MissingPropertyError("fullName"));
   }
-  req.body = {}
+  req.body = {};
   req.body.user = new User({ username, password, fullName });
   return next();
 };
@@ -72,7 +72,7 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
  * @param next Express NextFunction object
  */
 const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction) => {
-  const { title, content, userId} = req.body;
+  const { title, content, userId } = req.body;
 
   if (!title) {
     res.status(400).send(new MissingPropertyError("username"));
@@ -84,8 +84,8 @@ const cleanMarketEntryFields = (req: Request, res: Response, next: NextFunction)
   if (!userId) {
     res.status(400).send(new MissingPropertyError("fullName"));
   }
-  req.body = {}
-  req.body.listing = new MarketEntry({title, content, userId})
+  req.body = {};
+  req.body.listing = new Listing({ title, content, userId });
   next();
 };
 

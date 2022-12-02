@@ -7,7 +7,6 @@ specifiers:
   '@types/uuid': ^9.0.0
   cors: ^2.8.5
   express: ^4.18.2
-  jose: ^4.11.1
   nodemon: ^2.0.20
   sequelize: ^6.25.8
   sqlite3: ^5.1.2
@@ -18,7 +17,6 @@ specifiers:
 dependencies:
   cors: 2.8.5
   express: 4.18.2
-  jose: 4.11.1
   sequelize: 6.25.8_sqlite3@5.1.2
   sqlite3: 5.1.2
   uuid: 9.0.0
@@ -870,10 +868,6 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: false
     optional: true
-
-  /jose/4.11.1:
-    resolution: {integrity: sha512-YRv4Tk/Wlug8qicwqFNFVEZSdbROCHRAC6qu/i0dyNKr5JQdoa2pIGoS04lLO/jXQX7Z9omoNewYIVIxqZBd9Q==}
-    dev: false
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
