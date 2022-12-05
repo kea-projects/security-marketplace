@@ -27,7 +27,7 @@ app.all("*", (_req, res) => {
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(process.env.APP_PORT) || 8080;
+const PORT: number = Number(process.env.AUTH_PORT) || 8080;
 app.listen(PORT, async () => {
   if (!(await initializeDb())) {
     console.log(
