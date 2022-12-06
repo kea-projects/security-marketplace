@@ -20,6 +20,24 @@ export const users = [
     role: Role.user,
   },
   {
+    userId: "76966dc7-9248-4766-92c8-3ff10cca9409",
+    username: "user4@example.com",
+    password: "$2b$10$yp2Q4gt7fiPN5kF5MIRekO2CzruNer9WV6A1MzmyhdZIVW46ogeuy",
+    role: Role.user,
+  },
+  {
+    userId: "d1fad36a-3141-4425-a3a5-b650446943df",
+    username: "user5@example.com",
+    password: "$2b$10$yp2Q4gt7fiPN5kF5MIRekO2CzruNer9WV6A1MzmyhdZIVW46ogeuy",
+    role: Role.user,
+  },
+  {
+    userId: "bd471418-4ea4-4415-964a-4ed9df0867de",
+    username: "user6@example.com",
+    password: "$2b$10$yp2Q4gt7fiPN5kF5MIRekO2CzruNer9WV6A1MzmyhdZIVW46ogeuy",
+    role: Role.user,
+  },
+  {
     userId: "9e3988ba-2b27-4474-82a3-30a52968f4ac",
     username: "admin@example.com",
     password: "$2b$10$yp2Q4gt7fiPN5kF5MIRekO2CzruNer9WV6A1MzmyhdZIVW46ogeuy",
