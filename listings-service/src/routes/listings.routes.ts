@@ -1,5 +1,7 @@
 import chalk from "chalk";
 import { Request, Response, Router } from "express";
+import multer from "multer";
+import { multerConfig } from "../config/multer.config";
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
@@ -7,6 +9,10 @@ import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthenticationService } from "../services/authentication.service";
 import { CommentsService } from "../services/comments.service";
 import { ListingsService } from "../services/listings.service";
+
+// Multer setup for file upload handling
+const upload = multer(multerConfig);
+const uploadSingleImage = upload.single("file");
 
 const router: Router = Router();
 
@@ -129,6 +135,35 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
     console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a listing by id!`));
     return res.status(403).send({ message: "Forbidden" });
   }
+});
+
+router.post("/file", (req: Request, res: Response) => {
+  uploadSingleImage(req, res, function (err) {
+    try {
+      // Handle file upload errors
+      if (err) {
+        console.log(new Date().toISOString() + chalk.yellow(` [WARN] An invalid file was uploaded: ${err.message}`));
+        if (err.message == "Invalid mime type") {
+          return res.status(400).send({ message: "You can only upload files of type png, jpg, and jpeg" });
+        }
+        if (err.message === "Too many files") {
+          return res.status(400).send({ message: "You can only upload one file" });
+        }
+        if (err.message === "Unexpected field") {
+          return res.status(400).send({ message: "The field key has to be 'file'" });
+        }
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
+      return res.send({ message: "Done" });
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
+        error
+      );
+    }
+    return res.status(403).send({ message: "Forbidden" });
+  });
 });
 
 export { router as listingsRouter };
