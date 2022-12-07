@@ -1,7 +1,9 @@
 import chalk from "chalk";
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
+import { comments } from "./comments.constant";
 import { listings } from "./listings.constant";
+import { Comment, CommentInit } from "./models/comment.model";
 import { Listing, ListingInit } from "./models/listing.model";
 
 let sequelize: Sequelize;
@@ -48,7 +50,11 @@ async function initializeDb(): Promise<boolean> {
   if (getEnvVar("MAIN_POSTGRES_POPULATE")) {
     try {
       await Listing.bulkCreate([...listings], {
-        updateOnDuplicate: ["name", "description", "imageUrl", "createdBy", "isPublic"],
+        updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
+        returning: true,
+      });
+      await Comment.bulkCreate([...comments], {
+        updateOnDuplicate: ["commentId", "name", "email", "comment", "createdBy", "commentedOn", "createdAt"],
         returning: true,
       });
       console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The main database has been populated`));
@@ -71,6 +77,7 @@ async function initializeDb(): Promise<boolean> {
 function loadDbModels(sequelize: Sequelize): void {
   // Define all Models
   ListingInit(sequelize);
+  CommentInit(sequelize);
   // Define all Associations
 }
 
