@@ -41,6 +41,10 @@ export const ListingInit = (sequelize: Sequelize) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      isPublic: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
     },
     {
       sequelize: sequelize,

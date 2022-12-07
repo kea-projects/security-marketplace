@@ -48,7 +48,7 @@ async function initializeDb(): Promise<boolean> {
   if (getEnvVar("MAIN_POSTGRES_POPULATE")) {
     try {
       await Listing.bulkCreate([...listings], {
-        updateOnDuplicate: ["name", "description", "imageUrl", "createdBy"],
+        updateOnDuplicate: ["name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
       });
       console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The main database has been populated`));

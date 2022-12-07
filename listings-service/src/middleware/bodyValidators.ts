@@ -28,17 +28,20 @@ import { MissingPropertyError, ValidationError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const validateUpdateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy } = req.body!;
+  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
   if (createdBy && !isValidUuid(createdBy)) {
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-  req.body = { name, description, imageUrl, createdBy };
+  if (createdBy && typeof isPublic !== "boolean" && isPublic !== "true" && isPublic != "false") {
+    return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
+  }
+  req.body = { name, description, imageUrl, createdBy, isPublic };
   next();
   return;
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy } = req.body!;
+  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
   if (!name) {
     return res.status(400).send(new MissingPropertyError("name"));
   }
@@ -53,7 +56,12 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
   } else if (!isValidUuid(createdBy)) {
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-  req.body = { name, description, imageUrl, createdBy };
+  if (isPublic === undefined) {
+    return res.status(400).send(new MissingPropertyError("isPublic"));
+  } else if (typeof isPublic !== "boolean" && isPublic !== "true" && isPublic !== "false") {
+    return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
+  }
+  req.body = { name, description, imageUrl, createdBy, isPublic };
   next();
   return;
 };

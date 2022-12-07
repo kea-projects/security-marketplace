@@ -3,6 +3,7 @@ export class UpdateListingRequest {
   description?: string;
   imageUrl?: string;
   createdBy?: string;
+  isPublic?: boolean;
 }
 
 export class CreateListingRequest {
@@ -10,4 +11,5 @@ export class CreateListingRequest {
   description!: string;
   imageUrl!: string;
   createdBy!: string;
+  isPublic!: boolean;
 }
