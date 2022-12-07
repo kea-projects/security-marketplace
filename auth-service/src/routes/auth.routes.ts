@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Request, Response, Router } from "express";
 import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/bodyValidators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
@@ -59,7 +60,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
 router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => {
   const accessToken = AuthenticationService.getTokenFromRequest(req);
   if (!accessToken) {
-    res.status(401).send({ message: "Unauthorized" });
+    return res.status(401).send({ message: "Unauthorized" });
   }
   const result = await TokenService.deleteByToken(accessToken!);
   if (result) {
@@ -68,14 +69,52 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
   return res.status(401).send({ message: "Unauthorized" });
 });
 
-// TODO - accessToken middleware, logout and invalidate-all routes
-// Examples of validating that the user has X role.
-// router.get("/test/user", canAccessRoleUser, async (req: Request, res: Response) => {
-//   res.send({ message: "You have user access" });
-// });
-
-// router.get("/test/admin", canAccessRoleAdmin, async (req: Request, res: Response) => {
-//   res.send({ message: "You have admin access" });
-// });
+router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req: Request, res: Response) => {
+  try {
+    // Remove old access token pair
+    try {
+      const accessToken = AuthenticationService.getTokenFromRequest(req);
+      if (!accessToken) {
+        return res.status(401).send({ message: "Unauthorized" });
+      }
+      const result = await TokenService.deleteByToken(accessToken!);
+      if (!result) {
+        console.log(new Date().toISOString() + chalk.yellowBright(` [WARN] Failed to delete a token pair!`));
+        return res.status(401).send({ message: "Unauthorized" });
+      }
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while deleting a token!`),
+        error
+      );
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    // Create new access token pair
+    const { username, password } = req.body;
+    const foundUser = await AuthUserService.findOneByUsername(username);
+    if (!foundUser) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    let tokens;
+    try {
+      tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.userId, foundUser.role);
+    } catch {}
+    if (!tokens) {
+      console.log(new Date().toISOString() + chalk.yellowBright(` [WARN] Failed to create new access token pair!`));
+      return res
+        .status(500)
+        .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+    }
+    return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+  } catch (error) {
+    console.log(
+      new Date().toISOString() + chalk.redBright(` [ERROR] An error has occurred refreshing a token!`, error.stack)
+    );
+  }
+  return res.status(401).send({ message: "Unauthorized" });
+});
 
 export { router as authRouter };
