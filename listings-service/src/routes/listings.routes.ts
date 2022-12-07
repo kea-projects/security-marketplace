@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { Request, Response, Router } from "express";
 import { Role } from "../interfaces";
-import { validateUpdateListingRequestBody } from "../middleware/bodyValidators";
+import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthenticationService } from "../services/authentication.service";
@@ -47,5 +47,14 @@ router.patch(
     }
   }
 );
+
+router.post("", canAccessRoleUser, validateCreateListingRequestBody, async (req: Request, res: Response) => {
+  try {
+    return res.send(await ListingsService.create(req.body));
+  } catch (error) {
+    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create a listing!`));
+    return res.status(403).send({ message: "Forbidden" });
+  }
+});
 
 export { router as listingsRouter };
