@@ -333,20 +333,20 @@ export const listings = [
     name: "Plectopterus gambensis",
     description: "Goose, spur-winged",
     imageUrl: "http://dummyimage.com/124x100.png/ff4444/ffffff",
-    createdBy: "00000000-0000-0000-0000-000000000000",
+    createdBy: "bd471418-4ea4-4415-964a-4ed9df0867de",
   },
   {
     listingId: "e40603ee-eddb-4b12-a5d9-6594034ed3a3",
     name: "Colobus guerza",
     description: "Colobus, white-mantled",
     imageUrl: "http://dummyimage.com/157x100.png/dddddd/000000",
-    createdBy: "00000000-0000-0000-0000-000000000000",
+    createdBy: "bd471418-4ea4-4415-964a-4ed9df0867de",
   },
   {
     listingId: "59d846b7-abb8-4d40-9a34-8b214acb7f65",
     name: "Varanus salvator",
     description: "Water monitor",
     imageUrl: "http://dummyimage.com/195x100.png/dddddd/000000",
-    createdBy: "00000000-0000-0000-0000-000000000000",
+    createdBy: "bd471418-4ea4-4415-964a-4ed9df0867de",
   },
 ];
