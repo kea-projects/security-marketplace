@@ -26,4 +26,8 @@ export class ListingsService {
   static async create(data: CreateListingRequest): Promise<IListing> {
     return await Listing.create({ ...data });
   }
+
+  static async delete(listingId: string): Promise<number> {
+    return await Listing.destroy({ where: { listingId } });
+  }
 }

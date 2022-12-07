@@ -57,4 +57,36 @@ router.post("", canAccessRoleUser, validateCreateListingRequestBody, async (req:
   }
 });
 
+router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
+  try {
+    const foundListing = await ListingsService.findOne(req.params.id);
+    const token = AuthenticationService.getTokenFromRequest(req);
+
+    if (token?.role != Role.admin && token?.sub != foundListing?.createdBy) {
+      console.log(
+        new Date().toISOString() +
+          chalk.yellowBright(` [WARN] User with id ${token?.sub} tried to delete a listing of another user!`)
+      );
+      return res.status(403).send({ message: "Forbidden" });
+    }
+    const result = await ListingsService.delete(req.params.id);
+    if (result === 0) {
+      console.log(
+        new Date().toISOString() + chalk.yellowBright(` [WARN] Failed to delete a listing with id ${req.params.id}!`)
+      );
+      return res.status(403).send({ message: "Forbidden" });
+    }
+    if (result !== 1) {
+      console.log(
+        new Date().toISOString() + chalk.yellowBright(` [WARN] Deleted more than one listing with id ${req.params.id}!`)
+      );
+    }
+    console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Deleted listing with id ${req.params.id}!`));
+    return res.status(202).send({ message: "Deleted" });
+  } catch (error) {
+    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a listing by id!`));
+    return res.status(403).send({ message: "Forbidden" });
+  }
+});
+
 export { router as listingsRouter };
