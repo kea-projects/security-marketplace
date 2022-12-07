@@ -21,6 +21,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.223.0",
     "@types/jsonwebtoken": "^8.5.9",
     "bcrypt": "^5.1.0",
     "chalk": "^4.1.2",
@@ -40,7 +41,7 @@
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
     "@types/multer": "^1.4.7",
-    "@types/node": "^14.14.31",
+    "@types/node": "^14.18.34",
     "@types/uuid": "^9.0.0",
     "nodemon": "^2.0.20",
     "sequelize-cli": "^6.5.2",

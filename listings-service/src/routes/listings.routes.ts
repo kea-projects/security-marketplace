@@ -8,6 +8,7 @@ import { validateUuidFromParams } from "../middleware/path-param-validators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthenticationService } from "../services/authentication.service";
 import { CommentsService } from "../services/comments.service";
+import { FilesService } from "../services/files.service";
 import { ListingsService } from "../services/listings.service";
 
 // Multer setup for file upload handling
@@ -137,8 +138,8 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
   }
 });
 
-router.post("/file", (req: Request, res: Response) => {
-  uploadSingleImage(req, res, function (err) {
+router.put("/file", async (req: Request, res: Response) => {
+  uploadSingleImage(req, res, async function (err) {
     try {
       // Handle file upload errors
       if (err) {
@@ -154,8 +155,10 @@ router.post("/file", (req: Request, res: Response) => {
         }
         return res.status(403).send({ message: "Forbidden" });
       }
+      console.log(req.file);
 
-      return res.send({ message: "Done" });
+      const result = await FilesService.uploadFile(req.file?.buffer as Buffer, req.file?.originalname as string);
+      return res.send({ url: result.url });
     } catch (error) {
       console.log(
         new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
