@@ -26,14 +26,14 @@ export function ProfilePage() {
     const getGridItems = (entries: MarketEntry[] = [], isLoading = false) => {
         return entries.map((entry, index) => {
             return (
-                <Center key={index}>
+                <Center key={index} height="15vh" boxShadow="md" rounded="md">
                     {isLoading ? (
-                        <Skeleton height="50px" width="100%" />
+                        <Skeleton height="100%" width="100%" rounded="md" />
                     ) : (
-                        <HStack background="primary" rounded="xl" spacing="0" padding="5px">
-                            <Container background="accent.500" rounded="2xl">
+                        <HStack background="primary" height="100%" width="100%" rounded="md" spacing="0" padding="0">
+                            <Container background="accent.500" height="100%" width="fit-content" rounded="md">
                                 {!isLoading && (
-                                    <Text noOfLines={2} fontSize="2xl">
+                                    <Text noOfLines={2} fontSize="xl">
                                         {entry.title}
                                     </Text>
                                 )}

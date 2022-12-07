@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Center, SimpleGrid } from '@chakra-ui/react';
+import { SimpleGrid, Container } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
 import { UserBadge } from '../components/UserBadge';
@@ -24,7 +24,7 @@ export function UsersPage() {
     const getGridItems = (users: User[] = [], isLoading = false) => {
         return users.map((user, index) => {
             return (
-                <Center key={index}>
+                <Container key={index}>
                     {/* TODO: link to individual profile page */}
                     <Link to="/profile">
                         <UserBadge
@@ -34,7 +34,7 @@ export function UsersPage() {
                             showFull={true}
                         />
                     </Link>
-                </Center>
+                </Container>
             );
         });
     };

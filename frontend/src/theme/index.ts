@@ -28,3 +28,13 @@ export const theme = extendTheme({
         }),
     },
 });
+
+/* 
+Teo Theme
+
+Red: #E63946 action options aka buttons and links
+light: #F1FAEE background 
+light-blue: #A8DADC highlighted background like for a post or container
+blue: #457B9D navbar and secondary action items
+dark-blue: #1D3557 Second navbar or searchbars. Dark blue can also be the text color most places. Would test tho
+*/
