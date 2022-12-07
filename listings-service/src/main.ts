@@ -4,7 +4,7 @@ import "dotenv/config";
 import express from "express";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
-import { authRouter } from "./routes/auth.routes";
+import { listingsRouter } from "./routes/listings.routes";
 
 const app = express();
 app.use(express.json());
@@ -19,7 +19,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ---------------------Routers------------------------
-app.use("/auth", authRouter);
+app.use("/listings", listingsRouter);
 
 // Reject all non defined paths
 app.all("*", (_req, res) => {
@@ -27,7 +27,7 @@ app.all("*", (_req, res) => {
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(process.env.AUTH_PORT) || 8080;
+const PORT: number = Number(process.env.LISTINGS_PORT) || 8081;
 app.listen(PORT, async () => {
   if (!(await initializeDb())) {
     console.log(
@@ -35,6 +35,6 @@ app.listen(PORT, async () => {
     );
     return process.exit(1);
   }
-  console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Auth Server has started on port: ${PORT}`));
+  console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Listings Server has started on port: ${PORT}`));
   return;
 });

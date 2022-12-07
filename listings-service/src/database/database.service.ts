@@ -1,17 +1,16 @@
 import chalk from "chalk";
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
-import { AuthUser, AuthUserInit } from "./models/auth-user.model";
-import { TokenInit } from "./models/token.model";
-import { users } from "./users.contants";
+import { listings } from "./listings.constant";
+import { Listing, ListingInit } from "./models/listing.model";
 
 let sequelize: Sequelize;
 
 async function initializeDb(): Promise<boolean> {
   // TODO - switch to variable-based config instead of connection string. Connection strings may potentially be stored in plain text when connecting to the database
-  const connectionString = `postgres://${getEnvVar("AUTH_POSTGRES_USER")}:${getEnvVar(
-    "AUTH_POSTGRES_PASSWORD"
-  )}@${getEnvVar("AUTH_POSTGRES_HOST")}:${getEnvVar("AUTH_POSTGRES_PORT")}/${getEnvVar("AUTH_POSTGRES_DATABASE")}`;
+  const connectionString = `postgres://${getEnvVar("MAIN_POSTGRES_USER")}:${getEnvVar(
+    "MAIN_POSTGRES_PASSWORD"
+  )}@${getEnvVar("MAIN_POSTGRES_HOST")}:${getEnvVar("MAIN_POSTGRES_PORT")}/${getEnvVar("MAIN_POSTGRES_DATABASE")}`;
 
   sequelize = new Sequelize(connectionString, {
     logging: false,
@@ -36,8 +35,8 @@ async function initializeDb(): Promise<boolean> {
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
-      alter: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
+      force: getEnvVar("MAIN_POSTGRES_SYNC", false) === "true",
+      alter: getEnvVar("MAIN_POSTGRES_SYNC", false) === "true",
     });
     console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The schema has been synced`));
   } catch (error) {
@@ -46,16 +45,16 @@ async function initializeDb(): Promise<boolean> {
     return false;
   }
   // Populate the database
-  if (getEnvVar("AUTH_POSTGRES_POPULATE")) {
+  if (getEnvVar("MAIN_POSTGRES_POPULATE")) {
     try {
-      await AuthUser.bulkCreate(users, {
-        updateOnDuplicate: ["userId", "username", "password", "role"],
+      await Listing.bulkCreate([...listings], {
+        updateOnDuplicate: ["name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
       });
-      console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The auth database has been populated`));
+      console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The main database has been populated`));
     } catch (error) {
       console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to populate the auth database!`, error.stack)
+        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to populate the main database!`, error.stack)
       );
     }
   }
@@ -71,8 +70,7 @@ async function initializeDb(): Promise<boolean> {
  */
 function loadDbModels(sequelize: Sequelize): void {
   // Define all Models
-  AuthUserInit(sequelize);
-  TokenInit(sequelize);
+  ListingInit(sequelize);
   // Define all Associations
 }
 

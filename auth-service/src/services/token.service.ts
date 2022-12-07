@@ -5,6 +5,7 @@ import { IToken, Token } from "../database/models/token.model";
 
 export class TokenService {
   static async findByToken(token: string): Promise<IToken | null> {
+    // TODO - think about why [Op.or]: is not used
     return Token.findOne({ where: [{ accessToken: token }, { refreshToken: token }] });
   }
 
