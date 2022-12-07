@@ -1,41 +1,41 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { IBase } from "../../interfaces";
 
-export interface IListing extends IBase {
-  listingId?: string;
+export interface IComment extends IBase {
+  commentId?: string;
   name: string;
-  description: string;
-  imageUrl: string;
+  email: string;
+  comment: string;
   createdBy: string;
-  isPublic: boolean;
+  commentedOn: string;
 }
 
-export class Listing extends Model implements IListing {
-  declare listingId?: string | undefined;
+export class Comment extends Model implements IComment {
+  declare commentId?: string | undefined;
   declare name: string;
-  declare description: string;
-  declare imageUrl: string;
+  declare email: string;
+  declare comment: string;
   declare createdBy: string;
-  declare isPublic: boolean;
+  declare commentedOn: string;
 }
-export const ListingInit = (sequelize: Sequelize) => {
-  Listing.init(
+export const CommentInit = (sequelize: Sequelize) => {
+  Comment.init(
     {
-      listingId: {
+      commentId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true,
       },
       name: {
-        type: DataTypes.STRING(150),
+        type: DataTypes.STRING(120),
         allowNull: false,
       },
-      description: {
-        type: DataTypes.STRING(1000),
+      email: {
+        type: DataTypes.STRING(256),
         allowNull: false,
       },
-      imageUrl: {
+      comment: {
         type: DataTypes.STRING(500),
         allowNull: false,
       },
@@ -43,15 +43,15 @@ export const ListingInit = (sequelize: Sequelize) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      isPublic: {
-        type: DataTypes.BOOLEAN,
+      commentedOn: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
     },
     {
       sequelize: sequelize,
-      modelName: "Listing",
-      tableName: "listings",
+      modelName: "Comment",
+      tableName: "comments",
       timestamps: true,
     }
   );

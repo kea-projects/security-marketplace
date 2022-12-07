@@ -4,6 +4,7 @@ import "dotenv/config";
 import express from "express";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
+import { commentsRouter } from "./routes/comments.routes";
 import { listingsRouter } from "./routes/listings.routes";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(cors(corsOptions));
 
 // ---------------------Routers------------------------
 app.use("/listings", listingsRouter);
+app.use("/comments", commentsRouter);
 
 // Reject all non defined paths
 app.all("*", (_req, res) => {

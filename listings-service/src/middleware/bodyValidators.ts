@@ -66,4 +66,25 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
   return;
 };
 
-export { validateUpdateListingRequestBody, validateCreateListingRequestBody };
+const validateCreateCommentRequestBody = (req: Request, res: Response, next: NextFunction) => {
+  const { name, email, comment, createdBy, commentedOn } = req.body!;
+  if (!name) {
+    return res.status(400).send(new MissingPropertyError("name"));
+  }
+  if (!email) {
+    return res.status(400).send(new MissingPropertyError("email"));
+  }
+  if (!comment) {
+    return res.status(400).send(new MissingPropertyError("comment"));
+  }
+  if (!commentedOn) {
+    return res.status(400).send(new MissingPropertyError("commentedOn"));
+  } else if (!isValidUuid(commentedOn)) {
+    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
+  }
+  req.body = { name, email, comment, createdBy, commentedOn };
+  next();
+  return;
+};
+
+export { validateUpdateListingRequestBody, validateCreateListingRequestBody, validateCreateCommentRequestBody };
