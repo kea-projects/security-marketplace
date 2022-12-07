@@ -48,7 +48,10 @@ async function initializeDb(): Promise<boolean> {
   // Populate the database
   if (getEnvVar("AUTH_POSTGRES_POPULATE")) {
     try {
-      await AuthUser.bulkCreate(users, { updateOnDuplicate: ["userId", "username", "password"], returning: true });
+      await AuthUser.bulkCreate(users, {
+        updateOnDuplicate: ["userId", "username", "password", "role"],
+        returning: true,
+      });
       console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The auth database has been populated`));
     } catch (error) {
       console.log(

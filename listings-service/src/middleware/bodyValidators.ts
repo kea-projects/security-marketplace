@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { MissingPropertyError } from "../utils/error-messages";
+import { validate as isValidUuid } from "uuid";
+import { MissingPropertyError, ValidationError } from "../utils/error-messages";
 
 /**
  * Middleware function designed to only let valid User variables pass to the Router
@@ -26,20 +27,35 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param res Express Response object
  * @param next Express NextFunction object
  */
-const validateSignupRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { username, password } = req.body!;
-
-  if (!username) {
-    res.status(400).send(new MissingPropertyError("username"));
+const validateUpdateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
+  const { name, description, imageUrl, createdBy } = req.body!;
+  if (createdBy && !isValidUuid(createdBy)) {
+    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-
-  if (!password) {
-    res.status(400).send(new MissingPropertyError("password"));
-  }
-  req.body = { username, password };
+  req.body = { name, description, imageUrl, createdBy };
   next();
+  return;
 };
 
-const validateLoginRequestBody = validateSignupRequestBody;
+const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
+  const { name, description, imageUrl, createdBy } = req.body!;
+  if (!name) {
+    return res.status(400).send(new MissingPropertyError("name"));
+  }
+  if (!description) {
+    return res.status(400).send(new MissingPropertyError("description"));
+  }
+  if (!imageUrl) {
+    return res.status(400).send(new MissingPropertyError("imageUrl"));
+  }
+  if (!createdBy) {
+    return res.status(400).send(new MissingPropertyError("createdBy"));
+  } else if (!isValidUuid(createdBy)) {
+    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
+  }
+  req.body = { name, description, imageUrl, createdBy };
+  next();
+  return;
+};
 
-export { validateSignupRequestBody, validateLoginRequestBody };
+export { validateUpdateListingRequestBody, validateCreateListingRequestBody };
