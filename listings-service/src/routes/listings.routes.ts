@@ -24,12 +24,33 @@ router.get("", async (req: Request, res: Response) => {
 });
 
 router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) => {
-  const foundListing = await ListingsService.findOne(req.params.id);
-  if (!foundListing) {
-    res.status(404).send({ message: "Listing not found" });
-  } else {
-    res.send(foundListing);
+  try {
+    const foundListing = await ListingsService.findOne(req.params.id);
+    if (!foundListing) {
+      res.status(404).send({ message: "Listing not found" });
+    } else {
+      const token = AuthenticationService.getTokenFromRequest(req);
+
+      if (token && token.role != Role.admin) {
+        if (foundListing.createdBy === token.userId) {
+          return res.send(foundListing);
+        }
+        console.log(
+          new Date().toISOString() +
+            chalk.yellowBright(` [WARN] User with id ${token?.sub} tried to access a listing of another user!`)
+        );
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
+      return res.send(foundListing);
+    }
+  } catch (error) {
+    console.log(
+      new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get a listing with id: ${req.params.id}`),
+      error
+    );
   }
+  return res.status(403).send({ message: "Forbidden" });
 });
 
 router.patch(
