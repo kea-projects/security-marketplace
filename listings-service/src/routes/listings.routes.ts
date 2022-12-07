@@ -155,8 +155,6 @@ router.put("/file", async (req: Request, res: Response) => {
         }
         return res.status(403).send({ message: "Forbidden" });
       }
-      console.log(req.file);
-
       const result = await FilesService.uploadFile(req.file?.buffer as Buffer, req.file?.originalname as string);
       return res.send({ url: result.url });
     } catch (error) {

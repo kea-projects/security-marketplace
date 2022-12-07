@@ -28,8 +28,6 @@ export class FilesService {
         endpoint: `https://${clusterId}.linodeobjects.com`,
       });
       const anonymizedFilename = this.anonymizeFilename(filename);
-      console.log({ clusterId, bucketId, accessKey, secretKey, anonymizedFilename });
-
       const uploadResult = await s3.send(
         new PutObjectCommand({
           Bucket: bucketId,
