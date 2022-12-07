@@ -5,6 +5,7 @@ import { validateCreateListingRequestBody, validateUpdateListingRequestBody } fr
 import { validateUuidFromParams } from "../middleware/path-param-validators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthenticationService } from "../services/authentication.service";
+import { CommentsService } from "../services/comments.service";
 import { ListingsService } from "../services/listings.service";
 
 const router: Router = Router();
@@ -42,7 +43,17 @@ router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) =
         return res.status(403).send({ message: "Forbidden" });
       }
 
-      return res.send(foundListing);
+      try {
+        const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+        return res.send({ listing: foundListing, comments });
+      } catch (error) {
+        console.log(
+          new Date().toISOString() +
+            chalk.redBright(` [ERROR] Failed to get comments for listing with id: ${req.params.id}`),
+          error
+        );
+        return res.status(403).send({ message: "Forbidden" });
+      }
     }
   } catch (error) {
     console.log(
