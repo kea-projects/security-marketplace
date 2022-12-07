@@ -20,7 +20,7 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
   }
   let tokens;
   try {
-    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.role);
+    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.userId, foundUser.role);
   } catch {}
   if (!tokens) {
     res
@@ -42,7 +42,11 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
   }
   const createdUser = await AuthUserService.create({ username, password });
   if (createdUser) {
-    const tokens = await AuthenticationService.createAccessToken(createdUser.username, createdUser.role);
+    const tokens = await AuthenticationService.createAccessToken(
+      createdUser.username,
+      createdUser.userId,
+      createdUser.role
+    );
     if (tokens) {
       res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
       return;

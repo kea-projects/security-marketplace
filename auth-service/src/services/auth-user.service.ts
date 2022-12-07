@@ -16,7 +16,7 @@ export class AuthUserService {
       let result: IAuthUser | null = null;
       result = await AuthUser.create({ username: params.username, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
-      const accessToken = await AuthenticationService.createAccessToken(result.username, Role.admin);
+      const accessToken = await AuthenticationService.createAccessToken(result.username, result.userId, Role.admin);
       try {
         // TODO - uncomment the below fetch statement once users service is implemented
         // const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", true)}`, {
