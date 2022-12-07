@@ -16,6 +16,12 @@ router.post("", canAccessRoleUser, validateCreateCommentRequestBody, async (req:
       if (!foundListing) {
         return res.status(404).send({ message: "Listing not found" });
       }
+      if (!foundListing.isPublic && foundListing.createdBy !== (token?.userId as string)) {
+        console.log(
+          new Date().toISOString() + chalk.yellow(` [WARN] User tried to comment on another users private listing!`)
+        );
+        return res.status(404).send({ message: "Listing not found" });
+      }
     } catch (error) {
       console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to find listing for a comment!`), error);
       return res.status(403).send({ message: "Forbidden" });
