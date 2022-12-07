@@ -7,6 +7,7 @@ export interface IListing extends IBase {
   description: string;
   imageUrl: string;
   createdBy: string;
+  isPublic: boolean;
 }
 
 export class Listing extends Model implements IListing {
@@ -15,6 +16,7 @@ export class Listing extends Model implements IListing {
   declare description: string;
   declare imageUrl: string;
   declare createdBy: string;
+  declare isPublic: boolean;
 }
 export const ListingInit = (sequelize: Sequelize) => {
   Listing.init(
