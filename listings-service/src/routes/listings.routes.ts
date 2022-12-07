@@ -9,8 +9,18 @@ import { ListingsService } from "../services/listings.service";
 
 const router: Router = Router();
 
-router.get("", async (_req: Request, res: Response) => {
-  return res.send(await ListingsService.findAll());
+router.get("", async (req: Request, res: Response) => {
+  try {
+    const token = AuthenticationService.getTokenFromRequest(req);
+
+    if (token && token.role != Role.admin) {
+      return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
+    }
+    return res.send(await ListingsService.findAll());
+  } catch (error) {
+    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get all listings!`), error);
+    return res.status(403).send({ message: "Forbidden" });
+  }
 });
 
 router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) => {

@@ -1,9 +1,14 @@
+import { Op } from "sequelize";
 import { IListing, Listing } from "../database/models/listing.model";
 import { CreateListingRequest, UpdateListingRequest } from "./listing.dto";
 
 export class ListingsService {
   static async findAll(): Promise<IListing[]> {
     return Listing.findAll();
+  }
+
+  static async findByCreatedByOrPublic(createdBy: string): Promise<IListing[]> {
+    return Listing.findAll({ where: { [Op.or]: [{ createdBy }, { isPublic: true }] } });
   }
 
   static async findOne(id: string): Promise<IListing | null> {
