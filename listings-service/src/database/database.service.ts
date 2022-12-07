@@ -13,7 +13,7 @@ async function initializeDb(): Promise<boolean> {
   )}@${getEnvVar("MAIN_POSTGRES_HOST")}:${getEnvVar("MAIN_POSTGRES_PORT")}/${getEnvVar("MAIN_POSTGRES_DATABASE")}`;
 
   sequelize = new Sequelize(connectionString, {
-    logging: true,
+    logging: false,
   });
   // Check the connection
   try {

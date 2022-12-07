@@ -40,14 +40,9 @@ router.patch(
         return res.status(403).send({ message: "Forbidden" });
       }
 
-      //return res.send(await ListingsService.update(req.params.id, req.body));
-      const isUpdated = await ListingsService.update(req.params.id, req.body);
-      console.log("done with update");
-
-      return res.send(await ListingsService.findOne(req.params.id));
+      return res.send(await ListingsService.update(req.params.id, req.body));
     } catch (error) {
       console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get a listing by id!`));
-
       return res.status(403).send({ message: "Forbidden" });
     }
   }

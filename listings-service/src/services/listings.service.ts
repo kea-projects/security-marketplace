@@ -10,7 +10,7 @@ export class ListingsService {
     return Listing.findOne({ where: { listingId: id } });
   }
 
-  static async update(id: string, data: UpdateListingRequest) {
+  static async update(id: string, data: UpdateListingRequest): Promise<IListing | null> {
     const foundListing = await Listing.findOne({ where: { listingId: id } });
     if (!foundListing) {
       return null;
@@ -20,7 +20,6 @@ export class ListingsService {
         foundListing[key] = data[key];
       }
     }
-    await foundListing.save();
-    return true;
+    return await foundListing.save();
   }
 }
