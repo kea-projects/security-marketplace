@@ -31,15 +31,16 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
   const { name, description, isPublic } = req.body!;
   if (isPublic === undefined) {
     return res.status(400).send(new MissingPropertyError("isPublic"));
-    // TODO - lowercase the isPublic
-    // TODO - check for 0 and 1
-    // TODO - do the !!isPublic
-  } else if (typeof isPublic !== "boolean" && isPublic !== "true" && isPublic !== "false") {
-    return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
+  } else if (
+    typeof isPublic === "boolean" ||
+    (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
+  ) {
+    const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
+    req.body = { name, description, isPublic: convertedIsPublic };
+    next();
+    return;
   }
-  req.body = { name, description, isPublic };
-  next();
-  return;
+  return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
