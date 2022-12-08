@@ -11,7 +11,7 @@ import { MissingPropertyError, ValidationError } from "../utils/error-messages";
  * If all fields are present, the body will look something like this:
  ```json
  {
-    "username": "string",
+    "email": "string",
     "password": "string",
     "fullName": "string"
   }
@@ -28,42 +28,41 @@ import { MissingPropertyError, ValidationError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const validateUpdateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
-  if (createdBy && !isValidUuid(createdBy)) {
-    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
+  const { name, description, isPublic } = req.body!;
+  if (isPublic === undefined) {
+    return res.status(400).send(new MissingPropertyError("isPublic"));
+  } else if (
+    typeof isPublic === "boolean" ||
+    (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
+  ) {
+    const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
+    req.body = { name, description, isPublic: convertedIsPublic };
+    next();
+    return;
   }
-  if (createdBy && typeof isPublic !== "boolean" && isPublic !== "true" && isPublic != "false") {
-    return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
-  }
-  req.body = { name, description, imageUrl, createdBy, isPublic };
-  next();
-  return;
+  return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
+  const { name, description, isPublic } = req.body!;
   if (!name) {
     return res.status(400).send(new MissingPropertyError("name"));
   }
   if (!description) {
     return res.status(400).send(new MissingPropertyError("description"));
   }
-  if (!imageUrl) {
-    return res.status(400).send(new MissingPropertyError("imageUrl"));
-  }
-  if (!createdBy) {
-    return res.status(400).send(new MissingPropertyError("createdBy"));
-  } else if (!isValidUuid(createdBy)) {
-    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
-  }
   if (isPublic === undefined) {
     return res.status(400).send(new MissingPropertyError("isPublic"));
-  } else if (typeof isPublic !== "boolean" && isPublic !== "true" && isPublic !== "false") {
-    return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
+  } else if (
+    typeof isPublic === "boolean" ||
+    (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
+  ) {
+    const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
+    req.body = { name, description, isPublic: convertedIsPublic };
+    next();
+    return;
   }
-  req.body = { name, description, imageUrl, createdBy, isPublic };
-  next();
-  return;
+  return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
 };
 
 const validateCreateCommentRequestBody = (req: Request, res: Response, next: NextFunction) => {

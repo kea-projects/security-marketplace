@@ -9,6 +9,6 @@ export const getEnvVar = (varName: string, exitOnMissing: boolean = true) => {
     }
     return null;
   } else {
-    return process.env[varName];
+    return process.env[varName] as string;
   }
 };
