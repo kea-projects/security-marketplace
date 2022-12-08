@@ -70,6 +70,8 @@ router.put(
   /*validateToken, */ isOwnIdValidator,
   async (req: Request, res: Response) => {
     // TODO: csrf token, this is a form!
+    console.log("body", req.body);
+    const token = req.body.token;
     uploadSingleImage(req, res, async (err: any) => {
       if (err) {
         log.warn(`An invalid file was uploaded: ${err.message}`);
@@ -86,7 +88,7 @@ router.put(
           .status(500)
           .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
       }
-      const userId = req.body.token.userId;
+      const userId = token.userId;
       const fileName = req.file!.originalname;
       const fileBuffer = req.file!.buffer;
       const pictureUrl = FilesService.getResourceUrl(userId, fileName);
