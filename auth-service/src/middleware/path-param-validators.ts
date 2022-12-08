@@ -5,7 +5,6 @@ import { validate as isValidUuid } from "uuid";
 const validateUuidFromParams = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
-  
   if (!id) {
     return res.status(400).send(new ValidationError("UUID was not provided."));
   }
@@ -13,7 +12,7 @@ const validateUuidFromParams = (req: Request, res: Response, next: NextFunction)
   if (!isValidUuid(id)) {
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-  
+
   return next();
 };
 

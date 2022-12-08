@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "./dist/index.js",
+  "main": "./dist/main.js",
   "files": [
     "/dist"
   ],
@@ -14,38 +14,36 @@
     "build": "ts-node ./tasks/run-build.ts",
     "build:dev": "ts-node --project ./tsconfig-dev.json ./tasks/run-build.ts -d",
     "start": "node ./dist/main.js",
-    "start:dev": "nodemon -e .ts -w ./src/ --exec  'ts-node --project ./tsconfig-dev.json --logError ./src/main.ts'"
+    "start:dev": "nodemon -e .ts -w ./src/ --exec  'ts-node --project ./tsconfig-dev.json --logError ./src/main.ts'",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
     "name": "*"
   },
   "license": "GPL-3.0",
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.223.0",
-    "bcrypt": "^5.1.0",
-    "chalk": "^4.1.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^8.5.1",
-    "multer": "^1.4.5-lts.1",
-    "pg": "^8.8.0",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.25.8",
-    "sqlite3": "^5.1.2",
-    "uuid": "^9.0.0"
-  },
   "devDependencies": {
-    "@types/jsonwebtoken": "^8.5.9",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
     "@types/multer": "^1.4.7",
-    "@types/node": "^14.18.34",
+    "@types/node": "^14.14.31",
     "@types/uuid": "^9.0.0",
     "nodemon": "^2.0.20",
     "sequelize-cli": "^6.5.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.223.0",
+    "chalk": "^4.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "multer": "1.4.5-lts.1",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.25.8",
+    "sqlite3": "^5.1.2",
+    "uuid": "^9.0.0"
   }
 }

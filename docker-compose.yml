@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  users-service:
+    container_name: users-service
+    build:
+      context: .
+      dockerfile: ./configs/users-service/users-service.Dockerfile

@@ -6,8 +6,8 @@ specifiers:
   '@types/node': ^14.14.31
   '@types/uuid': ^9.0.0
   cors: ^2.8.5
+  dotenv: ^16.0.3
   express: ^4.18.2
-  jose: ^4.11.1
   nodemon: ^2.0.20
   sequelize: ^6.25.8
   sqlite3: ^5.1.2
@@ -17,8 +17,8 @@ specifiers:
 
 dependencies:
   cors: 2.8.5
+  dotenv: 16.0.3
   express: 4.18.2
-  jose: 4.11.1
   sequelize: 6.25.8_sqlite3@5.1.2
   sqlite3: 5.1.2
   uuid: 9.0.0
@@ -504,6 +504,11 @@ packages:
     engines: {node: '>=0.3.1'}
     dev: true
 
+  /dotenv/16.0.3:
+    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
+    engines: {node: '>=12'}
+    dev: false
+
   /dottie/2.0.2:
     resolution: {integrity: sha512-fmrwR04lsniq/uSr8yikThDTrM7epXHBAAjH9TbeH3rEA8tdCO7mRzB9hdmdGyJCxF8KERo9CITcm3kGuoyMhg==}
     dev: false
@@ -870,10 +875,6 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: false
     optional: true
-
-  /jose/4.11.1:
-    resolution: {integrity: sha512-YRv4Tk/Wlug8qicwqFNFVEZSdbROCHRAC6qu/i0dyNKr5JQdoa2pIGoS04lLO/jXQX7Z9omoNewYIVIxqZBd9Q==}
-    dev: false
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
