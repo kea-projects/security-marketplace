@@ -73,6 +73,7 @@ export class AuthenticationService {
    */
   static async encodePassword(password: string): Promise<string> {
     const saltOrRounds = 10;
+    // TODO - add a pepper to the password
     return await bcrypt.hash(password, saltOrRounds);
   }
 
