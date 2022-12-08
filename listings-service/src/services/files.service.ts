@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import chalk from "chalk";
 import { getEnvVar } from "../config/config.service";
 
@@ -55,6 +55,51 @@ export class FilesService {
   }
 
   /**
+   * Deletes a file from the Linode S3 bucket. Doesn't matter if the file exists or not.
+   * @param filename the name of the file to be deleted.
+   * @returns true if successfully deleted. Doesn't matter if the file exists or not.
+   * @throws InvalidAccessKeyIdError | DeleteFailedError
+   */
+  static async deleteFile(filename: string): Promise<boolean> {
+    const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
+    const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
+    const accessKey = getEnvVar("LINODE_STORAGE_ACCESS_KEY", true) as string;
+    const secretKey = getEnvVar("LINODE_STORAGE_SECRET_KEY", true) as string;
+
+    try {
+      const s3 = new S3Client({
+        region: clusterId,
+        credentials: {
+          accessKeyId: accessKey,
+          secretAccessKey: secretKey,
+        },
+        endpoint: `https://${clusterId}.linodeobjects.com`,
+      });
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: bucketId,
+          Key: filename,
+        })
+      );
+      console.log(
+        new Date().toISOString() + chalk.greenBright(` [INFO] File deleted from linode storage. Filename: ${filename}`)
+      );
+
+      return true;
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a file from Linode Object storage`),
+        error
+      );
+      if (error.name === "InvalidAccessKeyId") {
+        throw new Error("InvalidAccessKeyIdError");
+      } else {
+        throw new Error("DeleteFailedError");
+      }
+    }
+  }
+
+  /**
    * Returns a listingId with the file extension attached.
    * @param listingId a UUID.
    * @param filename the original file name with the extension.
@@ -79,5 +124,9 @@ export class FilesService {
     const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
     const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
     return `https://${bucketId}.${clusterId}.linodeobjects.com/${this.getFilename(listingId, filename)}`;
+  }
+
+  static extractFilenameFromUrl(url: string): string {
+    return url.replace(/.*\//gm, "");
   }
 }
