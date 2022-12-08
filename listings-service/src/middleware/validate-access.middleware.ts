@@ -3,39 +3,62 @@ import { NextFunction, Request, Response } from "express";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
 
+const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
+  // validate that the request contains the jwt access token
+  if (!req.headers || !req.headers.authorization) {
+    throw new Error("Authorization token missing from header");
+  }
+
+  // Call Auth Service and validate the token
+  try {
+    const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL", false)}/validate`, {
+      method: "POST",
+      headers: new Headers({
+        Authorization: req.headers.authorization,
+      }),
+    });
+    if (response.status === 200) {
+      const body = await response.json();
+      return { ...body.token };
+    }
+    throw new Error("Authorization token is invalid");
+  } catch (error) {
+    new Date().toISOString() +
+      chalk.redBright(` [ERROR] An unknown error has occurred while validating an access token!`, error.stack);
+    throw new Error("An unknown error has occurred while validating an access token");
+  }
+};
+
+/**
+ * Middleware\
+ * Verify that the token is valid if it is present.
+ * @returns 401: Unauthorized if validation fails or sets the token to request body
+ */
+const canAccessAnonymous = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.headers && req.headers.authorization) {
+    try {
+      const token = await validateToken(req);
+      req.body.token = token;
+    } catch (error) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+  }
+  return next();
+};
+
 /**
  * Middleware\
  * Verify if the user has the required role or admin role in their valid jwt token.\
- * It will return 401: Unauthorized if validation fails
+ * @returns 401: Unauthorized if validation fails or sets the token to request body
  */
 const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction) => {
-  // validate that the request contains the jwt access token
-  if (!req.headers || !req.headers.authorization) {
-    return res.status(401).send({ message: "Unauthorized" });
-  }
-
-  // Call Auth Service and validate the token
   try {
-    const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL", false)}/validate`, {
-      method: "POST",
-      headers: new Headers({
-        Authorization: req.headers.authorization,
-      }),
-    });
-    if (response.status === 200) {
-      const body = await response.json();
-      if (body.token.role === Role.admin || body.token.role === Role.user) {
-        req.body.token = body.token;
-        return next();
-      }
+    const token = await validateToken(req);
+    if (token.role === Role.admin || token.role === Role.user) {
+      req.body.token = token;
+      return next();
     }
-    console.log(new Date().toISOString() + chalk.yellow(` [WARN] Validation of an access token failed`));
-    return res.status(401).send({ message: "Unauthorized" });
   } catch (error) {
-    console.log(
-      new Date().toISOString() +
-        chalk.redBright(` [ERROR] An error has occurred while validating an access token!`, error.stack)
-    );
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
@@ -43,37 +66,18 @@ const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction
 /**
  * Middleware\
  * Verify if the user has the required role or admin role in their valid jwt token.\
- * It will return 401: Unauthorized if validation fails
+ * @returns 401: Unauthorized if validation fails or sets the token to request body
  */
 const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  // validate that the request contains the jwt access token
-  if (!req.headers || !req.headers.authorization) {
-    return res.status(401).send({ message: "Unauthorized" });
-  }
-
-  // Call Auth Service and validate the token
   try {
-    const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL", false)}/validate`, {
-      method: "POST",
-      headers: new Headers({
-        Authorization: req.headers.authorization,
-      }),
-    });
-    if (response.status === 200) {
-      const body = await response.json();
-      if (body.token.role === Role.admin) {
-        req.body.token = body.token;
-        return next();
-      }
+    const token = await validateToken(req);
+    if (token.role === Role.admin) {
+      req.body.token = token;
+      return next();
     }
-    return res.status(401).send({ message: "Unauthorized" });
   } catch (error) {
-    console.log(
-      new Date().toISOString() +
-        chalk.redBright(` [ERROR] An error has occurred while validating an access token!`, error.stack)
-    );
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
 
-export { canAccessRoleUser, canAccessRoleAdmin };
+export { canAccessRoleUser, canAccessRoleAdmin, canAccessAnonymous };

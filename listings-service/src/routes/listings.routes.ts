@@ -6,7 +6,7 @@ import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/mult
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
-import { canAccessRoleUser } from "../middleware/validate-access.middleware";
+import { canAccessAnonymous, canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthenticationService } from "../services/authentication.service";
 import { CommentsService } from "../services/comments.service";
 import { FilesService } from "../services/files.service";
@@ -20,9 +20,9 @@ const uploadLargeRequest = multerLargeRequest.single("file");
 
 const router: Router = Router();
 
-router.get("", async (req: Request, res: Response) => {
+router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
   try {
-    const token = AuthenticationService.getTokenFromRequest(req);
+    const token = req.body?.token;
     if (!token) {
       return res.send(await ListingsService.findByIsPublic());
     }
