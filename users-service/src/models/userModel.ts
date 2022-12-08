@@ -31,7 +31,6 @@ User.init(
     pictureUrl: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      /* unique: true?, */
       field: "picture_url",
     },
   },

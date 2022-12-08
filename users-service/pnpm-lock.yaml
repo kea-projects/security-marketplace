@@ -6,6 +6,7 @@ specifiers:
   '@types/node': ^14.14.31
   '@types/uuid': ^9.0.0
   cors: ^2.8.5
+  dotenv: ^16.0.3
   express: ^4.18.2
   nodemon: ^2.0.20
   sequelize: ^6.25.8
@@ -16,6 +17,7 @@ specifiers:
 
 dependencies:
   cors: 2.8.5
+  dotenv: 16.0.3
   express: 4.18.2
   sequelize: 6.25.8_sqlite3@5.1.2
   sqlite3: 5.1.2
@@ -501,6 +503,11 @@ packages:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
     engines: {node: '>=0.3.1'}
     dev: true
+
+  /dotenv/16.0.3:
+    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /dottie/2.0.2:
     resolution: {integrity: sha512-fmrwR04lsniq/uSr8yikThDTrM7epXHBAAjH9TbeH3rEA8tdCO7mRzB9hdmdGyJCxF8KERo9CITcm3kGuoyMhg==}

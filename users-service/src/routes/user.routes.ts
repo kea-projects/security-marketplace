@@ -19,7 +19,7 @@ router.get("/users", async (_req: Request, res: Response) => {
   }
 });
 
-// TODO: check that the id is the same as the userId in the token
+// Logged in
 router.get("/users/:id", validateUuidFromParams, async (req: Request, res: Response) => {
   const userId = req.params.id;
 
@@ -59,12 +59,13 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
   }
 });
 
-// TODO: Check that id userId is the same as the token's userId
-// TODO: Validate pictureUrl
-router.patch( "/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
+
+// TODO: admin can change any :id pictures
+// TODO: users can only update their own pictures
+router.put( "/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
     const userId = req.params.id;
     const pictureUrl = req.body.pictureUrl;
-
+    // TODO: csrf token, this is a form!
     try {
       const user: User | null = await User.findByPk(userId);
       if (user) {
