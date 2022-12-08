@@ -1,5 +1,6 @@
-import * as dotenv from "dotenv"
-dotenv.config({path: "./.env"})
+import * as dotenv from "dotenv";
+import { log } from "../utils/logger";
+dotenv.config({ path: "./.env" });
 
 const getEnv = (varName: string): string | null => {
   if (!process.env[varName]) {
@@ -10,12 +11,12 @@ const getEnv = (varName: string): string | null => {
 };
 
 const getEnvOrExit = (varName: string): string => {
-    if (!process.env[varName]) {
-        console.log(`[ERROR] ${varName} is missing from environment variables, exiting...`);
-        process.exit(0);
-    } else {
-      return process.env[varName]!;
-    }
+  if (!process.env[varName]) {
+    log.error(`${varName} is missing from environment variables, exiting...`);
+    process.exit(1);
+  } else {
+    return process.env[varName]!;
+  }
 };
-  
-export { getEnv, getEnvOrExit }
+
+export { getEnv, getEnvOrExit };

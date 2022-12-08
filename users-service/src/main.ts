@@ -3,6 +3,7 @@ import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
 import { getEnvOrExit } from "./config/secrets";
+import { log } from "./utils/logger";
 
 const app = express();
 app.use(express.json());
@@ -22,9 +23,9 @@ app.use(userRouter);
 // ---------------------Default------------------------
 // Reject all non defined paths
 app.all("*", (req: Request, res: Response) => {
-  console.info(`Invalid request: ${req.method} ${req.url}.`);
-  console.info(`Request body: ${JSON.stringify(req.body)}`);
-  console.info("Rejecting request.");
+  log.info(`Invalid request: ${req.method} ${req.url}.`);
+  log.info(`Request body: ${JSON.stringify(req.body)}`);
+  log.info("Rejecting request.");
 
   res.status(401).send();
 });
@@ -35,7 +36,7 @@ const PORT: number = Number(getEnvOrExit("APP_PORT") || 5000);
 const main = async () => {
   await initializeDb();
   app.listen(PORT, () => {
-    console.log(`Backend App is running on port: ${PORT}`);
+    log.info(`Backend App is running on port: ${PORT}`);
   });
 };
 

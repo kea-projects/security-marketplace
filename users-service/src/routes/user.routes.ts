@@ -1,10 +1,12 @@
-import { Router } from "express";
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { cleanUserImageUrlObj, cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
-import { InternalServerError, ValidationError, NotFoundError, UnauthorizedError } from "../utils/error-messages";
+import { InternalServerError, ValidationError, NotFoundError, BadRequestError } from "../utils/error-messages";
 import { paramUuidValidator, isOwnIdValidator } from "../middleware/path-param-validators";
-import { validate as isValidUuid } from "uuid";
+import { validate as isValidUuid, v4 as uuidv4 } from "uuid";
+import { uploadSingleImage } from "../config/multer.config";
+import { log } from "../utils/logger";
+import { FilesService } from "../utils/file-uploader";
 
 const router: Router = Router();
 
@@ -14,7 +16,7 @@ router.get("/users", async (_req: Request, res: Response) => {
     const userList: User[] = await User.findAll();
     return res.status(200).send(userList);
   } catch (error) {
-    console.log("Error occurred while getting user: ", error);
+    log.info(`Error occurred while getting user:  ${error}`);
     return res.status(500).send(new InternalServerError(`Unable to reach database.`));
   }
 });
@@ -31,7 +33,7 @@ router.get("/users/:id", paramUuidValidator, async (req: Request, res: Response)
       return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
     }
   } catch (error) {
-    console.log("Error occurred while getting user: ", error);
+    log.error("Error occurred while getting user: ${error}");
     return res.status(500).send(new InternalServerError(`Unable to reach database.`));
   }
 });
@@ -49,10 +51,10 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
     return res.status(201).send(result);
   } catch (error) {
     if (error.errors) {
-      console.log(error);
+      log.error(error);
       return res.status(400).send(new ValidationError(error.errors[0]));
     } else {
-      console.error("An error occurred retrieving the lost of market entries: ", error);
+      log.error(`An error occurred retrieving the lost of market entries: ${error}`);
       return res.status(500).send(new InternalServerError());
     }
   }
@@ -60,25 +62,58 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
 
 // TODO: admin can change any :id pictures
 // TODO: users can only update their own pictures
-router.put("/users/:id/pictures", paramUuidValidator, cleanUserImageUrlObj, /*validateToken, */ isOwnIdValidator, async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const pictureUrl = req.body.pictureUrl;
-  // TODO: csrf token, this is a form!
+router.put(
+  "/users/:id/pictures",
+  paramUuidValidator,
+  cleanUserImageUrlObj,
+  /*validateToken, */ isOwnIdValidator,
+  async (req: Request, res: Response) => {
+    // TODO: csrf token, this is a form!
+    uploadSingleImage(req, res, async (err: any) => {
+      if (err) {
+        log.warn(`An invalid file was uploaded: ${err.message}`);
+        if (err.message == "Invalid mime type") {
+          return res.status(400).send(new BadRequestError("You can only upload files of type png, jpg, and jpeg"));
+        }
+        if (err.message === "Too many files") {
+          return res.status(400).send(new BadRequestError("You can only upload one file"));
+        }
+        if (err.message === "Unexpected field") {
+          return res.status(400).send(new BadRequestError("The field key has to be 'file'"));
+        }
+        return res
+          .status(500)
+          .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
+      }
+      const userId = req.body.token.userId;
+      const fileName = req.file!.originalname;
+      const fileBuffer = req.file!.buffer;
+      const pictureUrl = FilesService.getResourceUrl(userId, fileName);
+      const user: User | null = await User.findByPk(userId);
 
-  try {
-    const user: User | null = await User.findByPk(userId);
-    if (user) {
-      // TODO: make url upload happen
-      user.set({ pictureUrl });
-      user.save();
-      return res.status(202).send(user);
-    } else {
-      return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
-    }
-  } catch (error) {
-    console.log("Error occurred while getting user: ", error);
-    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+      if (!user) {
+        log.warn(`User with id: ${userId} not found!.`);
+        return res.status(404).send(new NotFoundError(`User with id: ${userId} not found!.`));
+      }
+
+      try {
+        const uploadedPicture = FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
+        if (!uploadedPicture) throw new Error("Failed to upload the file");
+      } catch (error) {
+        log.error(`An unknown error has occurred while uploading file, error: ${error}`);
+        return res.status(500).send(new InternalServerError("An unknown error has occurred while uploading file"));
+      }
+
+      try {
+        user.set({ pictureUrl });
+        user.save();
+        return res.status(202).send(user);
+      } catch (error) {
+        log.error(`Error occurred while updating the user's image url: ${error}`);
+        return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+      }
+    });
   }
-});
+);
 
 export { router as userRouter };

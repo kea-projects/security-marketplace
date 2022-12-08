@@ -1,10 +1,17 @@
+import { exit } from "process";
 import { SequelizeSingleton } from "../config/database.config";
+import { log } from "./logger";
 
 const initializeDb = async () => {
-  console.info("Initializing database ...");
+  log.info("Initializing database ...");
 
-  await SequelizeSingleton.getInstance().sync({ alter: true });
-  console.info("Database initialization complete.");
+  try {
+    await SequelizeSingleton.getInstance().sync({ alter: true });
+  } catch (error) {
+    log.error(`Unable to connect to database! error: ${error.original}`)
+    exit(2)
+  }
+  log.info("Database initialization complete.");
 };
 
 export { initializeDb };
