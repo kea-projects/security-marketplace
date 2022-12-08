@@ -129,7 +129,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
       const { name, description, isPublic } = req.body;
       const token = req.body?.token;
       if (!token || !token?.userId) {
-        res.status(403).send({ message: "Forbidden" });
+        return res.status(403).send({ message: "Forbidden" });
       }
       try {
         const listingId = uuidv4();
