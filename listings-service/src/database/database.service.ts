@@ -1,6 +1,9 @@
 import chalk from "chalk";
+import * as fs from "fs";
+import * as path from "path";
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
+import { FilesService } from "../services/files.service";
 import { comments } from "./comments.constant";
 import { listings } from "./listings.constant";
 import { Comment, CommentInit } from "./models/comment.model";
@@ -49,6 +52,30 @@ async function initializeDb(): Promise<boolean> {
   // Populate the database
   if (getEnvVar("MAIN_POSTGRES_POPULATE")) {
     try {
+      if (getEnvVar("MAIN_LINODE_POPULATE", false)) {
+        console.log(
+          new Date().toISOString() + chalk.greenBright(` [INFO] Populating Linode object storage, may take a minute`)
+        );
+
+        // The file that will be uploaded to Linode
+        const documentBuffer = fs.readFileSync(path.join(__dirname, "/assets/image.jpg"));
+        // Upload a file for each listing
+        let count = 0;
+        for (const listing of listings) {
+          const uploadedFile = await FilesService.uploadFile(
+            documentBuffer,
+            FilesService.getFilename(listing.listingId, "image.jpg"),
+            true
+          );
+          listing.imageUrl = uploadedFile.url;
+          count++;
+          if (Math.floor((count / listings.length) * 100) % 10 === 0) {
+            console.log(
+              new Date().toISOString() + chalk.cyan(`[VERBOSE] ${Math.floor((count / listings.length) * 100)}%`)
+            );
+          }
+        }
+      }
       await Listing.bulkCreate([...listings], {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,

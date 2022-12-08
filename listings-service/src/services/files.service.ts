@@ -11,7 +11,7 @@ export class FilesService {
    * @returns signed URL link that allows access to the file for 10 minutes.
    * @throws InvalidAccessKeyIdError | UploadFailedError
    */
-  static async uploadFile(dataBuffer: Buffer, filename: string): Promise<{ url: string }> {
+  static async uploadFile(dataBuffer: Buffer, filename: string, silentLog = false): Promise<{ url: string }> {
     const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
     const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
     const accessKey = getEnvVar("LINODE_STORAGE_ACCESS_KEY", true) as string;
@@ -37,7 +37,9 @@ export class FilesService {
       if (uploadResult.$metadata.httpStatusCode != 200) {
         throw new Error("UploadFailedError");
       } else {
-        console.log(new Date().toISOString() + chalk.greenBright(` [INFO] New file uploaded: ${filename}`));
+        if (!silentLog) {
+          console.log(new Date().toISOString() + chalk.greenBright(` [INFO] New file uploaded: ${filename}`));
+        }
         return { url: `https://${bucketId}.${clusterId}.linodeobjects.com/${filename}` };
       }
     } catch (error) {
