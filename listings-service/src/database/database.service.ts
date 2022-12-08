@@ -50,9 +50,9 @@ async function initializeDb(): Promise<boolean> {
     return false;
   }
   // Populate the database
-  if (getEnvVar("MAIN_POSTGRES_POPULATE")) {
+  if (getEnvVar("MAIN_POSTGRES_POPULATE", false) === "true") {
     try {
-      if (getEnvVar("MAIN_LINODE_POPULATE", false)) {
+      if (getEnvVar("MAIN_LINODE_POPULATE", false) === "true") {
         console.log(
           new Date().toISOString() + chalk.greenBright(` [INFO] Populating Linode object storage, may take a minute`)
         );
