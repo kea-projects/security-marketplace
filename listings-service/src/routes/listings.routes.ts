@@ -23,7 +23,9 @@ const router: Router = Router();
 router.get("", async (req: Request, res: Response) => {
   try {
     const token = AuthenticationService.getTokenFromRequest(req);
-    // TODO - handle anonymous users only public listings
+    if (!token) {
+      return res.send(await ListingsService.findByIsPublic());
+    }
     if (token && token.role != Role.admin) {
       return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
     }
