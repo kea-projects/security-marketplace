@@ -22,7 +22,6 @@ class SequelizeSingleton {
           logging: log_flag,
         }
       );
-
       log.info("Sequelize connection created.");
     }
 
