@@ -197,6 +197,14 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
       );
     }
     console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Deleted listing with id ${req.params.id}!`));
+    try {
+      await FilesService.deleteFile(FilesService.extractFilenameFromUrl(foundListing!.imageUrl));
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete file: ${foundListing?.imageUrl}`),
+        error
+      );
+    }
     return res.status(202).send({ message: "Deleted" });
   } catch (error) {
     console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a listing by id!`));
