@@ -9,6 +9,14 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
     throw new Error("Authorization token missing from header");
   }
 
+  if (!getEnvVar("AUTH_USERS_SERVICE_URL", false)) {
+    console.log(
+      new Date().toISOString() +
+        chalk.yellowBright(` [WARN] Unable to call Auth Users Service to validate an access token`)
+    );
+    throw new Error("Unable to call auth user service due to a missing ENV variable");
+  }
+
   // Call Auth Service and validate the token
   try {
     const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL", false)}/validate`, {
