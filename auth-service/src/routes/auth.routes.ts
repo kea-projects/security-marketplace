@@ -30,9 +30,7 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
         .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
       return;
     }
-    // TODO - Wrap the entire thing in a try catch
-    // TODO - get rid of the question marks
-    res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+    res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
   } catch (error) {
     console.log(
       new Date().toISOString() + chalk.redBright(` [ERROR] An error has occurred while logging in a user!`, error)
