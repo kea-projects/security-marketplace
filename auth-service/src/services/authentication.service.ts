@@ -27,19 +27,19 @@ export class AuthenticationService {
 
   /**
    * Creates a access and refresh token pair. Returns
-   * @param username
+   * @param email
    * @param role
    * @returns both tokens if successfully created, or null if it fails.
    */
   static async createAccessToken(
-    username: string,
+    email: string,
     userId: string,
     role: Role
   ): Promise<{ accessToken: string; refreshToken: string } | null> {
     const refreshExpirationDate = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // 1 day ahead
     const accessExpirationDate = Math.floor(Date.now() / 1000) + 60 * 15; // 15 minutes ahead
-    const refreshToken = jwt.sign({ sub: username, userId, role, exp: refreshExpirationDate }, secret);
-    const accessToken = jwt.sign({ sub: username, userId, role, exp: accessExpirationDate }, secret);
+    const refreshToken = jwt.sign({ sub: email, userId, role, exp: refreshExpirationDate }, secret);
+    const accessToken = jwt.sign({ sub: email, userId, role, exp: accessExpirationDate }, secret);
     const savedToken = await TokenService.createToken({
       accessToken,
       refreshToken,
@@ -73,6 +73,7 @@ export class AuthenticationService {
    */
   static async encodePassword(password: string): Promise<string> {
     const saltOrRounds = 10;
+    // TODO - add a pepper to the password
     return await bcrypt.hash(password, saltOrRounds);
   }
 

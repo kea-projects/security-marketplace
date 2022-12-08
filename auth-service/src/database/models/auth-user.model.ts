@@ -2,14 +2,14 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 import { IBase, Role } from "../../interfaces";
 export interface IAuthUser extends IBase {
   userId: string;
-  username: string;
+  email: string;
   password: string;
   role: Role;
 }
 
 export class AuthUser extends Model implements IAuthUser {
   declare userId: string;
-  declare username: string;
+  declare email: string;
   declare password: string;
   declare role: Role;
 }
@@ -22,7 +22,7 @@ export const AuthUserInit = (sequelize: Sequelize) => {
         allowNull: false,
         primaryKey: true,
       },
-      username: {
+      email: {
         type: DataTypes.STRING(254),
         allowNull: false,
         unique: true,

@@ -10,7 +10,7 @@ import { MissingPropertyError } from "../utils/error-messages";
  * If all fields are present, the body will look something like this:
  ```json
  {
-    "username": "string",
+    "email": "string",
     "password": "string",
     "fullName": "string"
   }
@@ -27,19 +27,38 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const validateSignupRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { username, password } = req.body!;
+  const { name, email, password } = req.body!;
 
-  if (!username) {
-    res.status(400).send(new MissingPropertyError("username"));
+  if (!name) {
+    return res.status(400).send(new MissingPropertyError("name"));
+  }
+
+  // TODO - validate that it's an email
+  if (!email) {
+    return res.status(400).send(new MissingPropertyError("email"));
   }
 
   if (!password) {
-    res.status(400).send(new MissingPropertyError("password"));
+    return res.status(400).send(new MissingPropertyError("password"));
   }
-  req.body = { username, password };
+  req.body = { name, email, password };
   next();
+  return;
 };
 
-const validateLoginRequestBody = validateSignupRequestBody;
+const validateLoginRequestBody = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body!;
+
+  if (!email) {
+    return res.status(400).send(new MissingPropertyError("email"));
+  }
+
+  if (!password) {
+    return res.status(400).send(new MissingPropertyError("password"));
+  }
+  req.body = { email, password };
+  next();
+  return;
+};
 
 export { validateSignupRequestBody, validateLoginRequestBody };
