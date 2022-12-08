@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import { sequelize } from "../config/database.config";
+import { SequelizeSingleton } from "../config/database.config";
 
 class User extends Model {
   declare userId: typeof DataTypes.UUIDV4;
@@ -35,7 +35,7 @@ User.init(
     },
   },
   {
-    sequelize,
+    sequelize: SequelizeSingleton.getInstance(),
     modelName: "User",
     tableName: "users",
   }

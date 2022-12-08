@@ -14,17 +14,15 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
-
-initializeDb();
 // ---------------------Routers------------------------
 app.use(userRouter);
 
 // ---------------------Default------------------------
 // Reject all non defined paths
 app.all("*", (req: Request, res: Response) => {
-  console.log(`Invalid request: ${req.method} ${req.url}.`);
-  console.log(`Request body: ${JSON.stringify(req.body)}`);
-  console.log("Rejecting request.");
+  console.info(`Invalid request: ${req.method} ${req.url}.`);
+  console.info(`Request body: ${JSON.stringify(req.body)}`);
+  console.info("Rejecting request.");
 
   res.status(401).send();
 });
@@ -33,7 +31,11 @@ app.all("*", (req: Request, res: Response) => {
 
 const PORT: number = Number(getEnvOrExit("APP_PORT") || 5000);
 
-await initializeDb();
-app.listen(PORT, () => {
-  console.log(`Backend App is running on port: ${PORT}`);
-});
+const main = async () => {
+  await initializeDb();
+  app.listen(PORT, () => {
+    console.log(`Backend App is running on port: ${PORT}`);
+  });
+};
+
+main();

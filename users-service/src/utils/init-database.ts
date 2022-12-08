@@ -1,11 +1,10 @@
-import { sequelize } from "../config/database.config";
+import { SequelizeSingleton } from "../config/database.config";
 
 const initializeDb = async () => {
-  console.log("Initializing database ...");
-  
-  await sequelize.sync({ alter: true });
-  console.log("DB initialization complete.");
-  
+  console.info("Initializing database ...");
+
+  await SequelizeSingleton.getInstance().sync({ alter: true });
+  console.info("Database initialization complete.");
 };
 
 export { initializeDb };
