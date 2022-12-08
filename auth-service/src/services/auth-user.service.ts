@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { getEnvVar } from "../config/config.service";
 import { sequelize } from "../database/database.service";
 import { AuthUser, IAuthUser } from "../database/models/auth-user.model";
 import { Role, SignupRequestDto } from "../interfaces";
@@ -17,30 +18,38 @@ export class AuthUserService {
       let result: IAuthUser | null = null;
       result = await AuthUser.create({ email: params.email, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
-      const accessToken = await AuthenticationService.createAccessToken(result.email, result.userId, Role.admin);
-      try {
-        // TODO - uncomment the below fetch statement once users service is implemented
-        // const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", true)}`, {
-        //   method: "POST",
-        //   headers: new Headers({
-        //     Authorization: `Bearer ${accessToken?.accessToken}`,
-        //   }),
-        //   // TODO - the users service request body has to be updated
-        //   body: JSON.stringify({
-        //     userId: result.userId,
-        //     email: result.email,
-        //     name: name,
-        //   }),
-        // });
-        // if (response.status !== 200) {
-        //   throw new Error("The users service has responded with status code 200 to the create user request");
-        // }
-      } catch (error) {
+      if (!getEnvVar("USERS_SERVICE_URL", false)) {
         console.log(
           new Date().toISOString() +
-            chalk.redBright(` [ERROR] POST request to create a user object has failed!`, error.stack)
+            chalk.yellowBright(` [WARN] Unable to call Users Service to create a user due to the env variable missing!`)
         );
-        throw Error("Post request to create a user object has failed");
+      } else {
+        try {
+          const accessToken = await AuthenticationService.createAccessToken(result.email, result.userId, Role.admin);
+          const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", false)}`, {
+            method: "POST",
+            headers: new Headers({
+              Authorization: `Bearer ${accessToken?.accessToken}`,
+              "Content-Type": "application/json",
+            }),
+            body: JSON.stringify({
+              userId: result.userId,
+              email: result.email,
+              name: params.name,
+            }),
+          });
+          if (response.status !== 201) {
+            throw new Error(
+              `The users service has responded with status code ${response.status} to the create user request`
+            );
+          }
+        } catch (error) {
+          console.log(
+            new Date().toISOString() +
+              chalk.redBright(` [ERROR] POST request to create a user object has failed!`, error.stack)
+          );
+          throw Error("Post request to create a user object has failed");
+        }
       }
 
       transaction.commit();

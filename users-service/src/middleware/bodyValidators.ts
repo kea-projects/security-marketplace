@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/userModel";
 import { MissingPropertyError } from "../utils/error-messages";
 
@@ -29,7 +29,7 @@ import { MissingPropertyError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
-  const { userId, email, name, pictureUrl } = req.body!;
+  const { userId, email, name } = req.body!;
 
   if (!userId) {
     return res.status(400).send(new MissingPropertyError("userId"));
@@ -42,11 +42,7 @@ const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => 
   }
 
   req.body = {};
-  if (pictureUrl) {
-    req.body.user = new User({ userId, email, name, pictureUrl });
-  } else {
-    req.body.user = new User({ userId, email, name });
-  }
+  req.body.user = new User({ userId, email, name });
   return next();
 };
 

@@ -1,12 +1,12 @@
 import { Request, Response, Router } from "express";
-import { cleanUserImageUrlObj, cleanUserObjFields } from "../middleware/bodyValidators";
-import { User } from "../models/userModel";
-import { InternalServerError, ValidationError, NotFoundError, BadRequestError } from "../utils/error-messages";
-import { paramUuidValidator, isOwnIdValidator } from "../middleware/path-param-validators";
-import { validate as isValidUuid, v4 as uuidv4 } from "uuid";
+import { validate as isValidUuid } from "uuid";
 import { uploadSingleImage } from "../config/multer.config";
-import { log } from "../utils/logger";
+import { cleanUserImageUrlObj, cleanUserObjFields } from "../middleware/bodyValidators";
+import { isOwnIdValidator, paramUuidValidator } from "../middleware/path-param-validators";
+import { User } from "../models/userModel";
+import { BadRequestError, InternalServerError, NotFoundError, ValidationError } from "../utils/error-messages";
 import { FilesService } from "../utils/file-uploader";
+import { log } from "../utils/logger";
 
 const router: Router = Router();
 

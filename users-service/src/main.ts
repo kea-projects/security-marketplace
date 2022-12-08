@@ -1,12 +1,14 @@
-import express, { Request, Response } from "express";
 import cors from "cors";
-import { initializeDb } from "./utils/init-database";
-import { userRouter } from "./routes/user.routes";
+import express, { Request, Response } from "express";
 import { getEnvOrExit } from "./config/secrets";
+import { logger } from "./middleware/logging.middleware";
+import { userRouter } from "./routes/user.routes";
+import { initializeDb } from "./utils/init-database";
 import { log } from "./utils/logger";
 
 const app = express();
 app.use(express.json());
+app.use(logger);
 
 // -----------------------CORS-------------------------
 const corsOptions = {
