@@ -30,33 +30,35 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
   const { name, email, password } = req.body!;
 
   if (!name) {
-    res.status(400).send(new MissingPropertyError("name"));
+    return res.status(400).send(new MissingPropertyError("name"));
   }
 
   // TODO - validate that it's an email
   if (!email) {
-    res.status(400).send(new MissingPropertyError("email"));
+    return res.status(400).send(new MissingPropertyError("email"));
   }
 
   if (!password) {
-    res.status(400).send(new MissingPropertyError("password"));
+    return res.status(400).send(new MissingPropertyError("password"));
   }
   req.body = { name, email, password };
   next();
+  return;
 };
 
 const validateLoginRequestBody = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body!;
 
   if (!email) {
-    res.status(400).send(new MissingPropertyError("email"));
+    return res.status(400).send(new MissingPropertyError("email"));
   }
 
   if (!password) {
-    res.status(400).send(new MissingPropertyError("password"));
+    return res.status(400).send(new MissingPropertyError("password"));
   }
   req.body = { email, password };
   next();
+  return;
 };
 
 export { validateSignupRequestBody, validateLoginRequestBody };

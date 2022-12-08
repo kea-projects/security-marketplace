@@ -9,59 +9,69 @@ import { TokenService } from "../services/token.service";
 const router: Router = Router();
 
 router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const foundUser = await AuthUserService.findOneByEmail(email);
-  if (!foundUser) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-  let tokens;
   try {
-    tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
-  } catch {
-    // TODO - write the catch
+    const { email, password } = req.body;
+    const foundUser = await AuthUserService.findOneByEmail(email);
+    if (!foundUser) {
+      res.status(401).send({ message: "Unauthorized" });
+      return;
+    }
+    if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
+      res.status(401).send({ message: "Unauthorized" });
+      return;
+    }
+    let tokens;
+    try {
+      tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
+    } catch {}
+    if (!tokens) {
+      res
+        .status(500)
+        .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+      return;
+    }
+    // TODO - Wrap the entire thing in a try catch
+    // TODO - get rid of the question marks
+    res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+  } catch (error) {
+    console.log(
+      new Date().toISOString() + chalk.redBright(` [ERROR] An error has occurred while logging in a user!`, error)
+    );
+    return res.status(500).send({ message: "Failed to login due to an internal error. Please try again later." });
   }
-  if (!tokens) {
-    res
-      .status(500)
-      .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
-    return;
-  }
-  // TODO - Wrap the entire thing in a try catch
-  // TODO - get rid of the question marks
-  res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+  return res.status(401).send({ message: "Unauthorized" });
 });
 
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
-  // TODO - emails can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
-  // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
-  const { name, email, password } = req.body;
-  if (await AuthUserService.findOneByEmail(email)) {
-    // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
-    res.status(409).send({
-      message: "The email is already in use",
-    });
-    return;
-  }
-  // TODO - try catch this stuff
-  const createdUser = await AuthUserService.create({ name, email, password });
-  if (createdUser) {
-    const tokens = await AuthenticationService.createAccessToken(
-      createdUser.email,
-      createdUser.userId,
-      createdUser.role
-    );
-    if (tokens) {
-      res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+  try {
+    // TODO - emails can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
+    // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
+    const { name, email, password } = req.body;
+    if (await AuthUserService.findOneByEmail(email)) {
+      // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
+      res.status(409).send({
+        message: "The email is already in use",
+      });
       return;
     }
+    const createdUser = await AuthUserService.create({ name, email, password });
+    if (createdUser) {
+      const tokens = await AuthenticationService.createAccessToken(
+        createdUser.email,
+        createdUser.userId,
+        createdUser.role
+      );
+      if (tokens) {
+        return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+      }
+    }
+  } catch (error) {
+    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] An error has occurred while signing up!`, error));
+    return res
+      .status(500)
+      .send({ message: "Failed to create the user due to an internal error. Please try again later." });
   }
-  res.status(500).send({ message: "Failed to create the user due to an internal error. Please try again later." });
-  return;
+  return res.status(401).send({ message: "Unauthorized" });
 });
 
 router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => {
