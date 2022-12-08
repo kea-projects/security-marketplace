@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
@@ -20,7 +20,7 @@ app.use(userRouter);
 
 // ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", (req, res) => {
+app.all("*", (req: Request, res: Response) => {
   console.log(`Invalid request: ${req.method} ${req.url}.`);
   console.log(`Request body: ${JSON.stringify(req.body)}`);
   console.log("Rejecting request.");

@@ -8,6 +8,7 @@ import { validate as isValidUuid } from "uuid";
 
 const router: Router = Router();
 
+// TODO: token validation, admin only
 router.get("/users", async (_req: Request, res: Response) => {
   try {
     const userList: User[] = await User.findAll();
@@ -18,10 +19,10 @@ router.get("/users", async (_req: Request, res: Response) => {
   }
 });
 
+// TODO: check that the id is the same as the userId in the token
 router.get("/users/:id", validateUuidFromParams, async (req: Request, res: Response) => {
   const userId = req.params.id;
 
-  // TODO: check that the id is the same as the userId in the token
 
   try {
     const user: User | null = await User.findByPk(userId);
@@ -36,6 +37,7 @@ router.get("/users/:id", validateUuidFromParams, async (req: Request, res: Respo
   }
 });
 
+// TODO: token validation, admin only
 router.post("/users", cleanUserObjFields, async (req: Request, res: Response) => {
   const user = req.body.user;
   if (!isValidUuid(user.userId)) {
@@ -57,12 +59,11 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
   }
 });
 
-router.patch("/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
+// TODO: Check that id userId is the same as the token's userId
+// TODO: Validate pictureUrl
+router.patch( "/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
     const userId = req.params.id;
     const pictureUrl = req.body.pictureUrl;
-
-    // TODO: Check that id userId is the same as the token's userId
-    // TODO: Validate pictureUrl
 
     try {
       const user: User | null = await User.findByPk(userId);

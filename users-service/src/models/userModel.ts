@@ -31,7 +31,7 @@ User.init(
     pictureUrl: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      // unique: true // TODO: ?
+      /* unique: true?, */
       field: "picture_url",
     },
   },
@@ -41,6 +41,5 @@ User.init(
     tableName: "users",
   }
 );
-
 
 export { User };
