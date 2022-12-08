@@ -14,31 +14,13 @@
     "build": "ts-node ./tasks/run-build.ts",
     "build:dev": "ts-node --project ./tsconfig-dev.json ./tasks/run-build.ts -d",
     "start": "node ./dist/main.js",
-<<<<<<<< HEAD:users-service/package.json
     "start:dev": "nodemon -e .ts -w ./src/ --exec  'ts-node --project ./tsconfig-dev.json --logError ./src/main.ts'",
     "test": "echo \"Error: no test specified\" && exit 1"
-========
-    "start:dev": "nodemon -e .ts -w ./src/ --exec  'ts-node --project ./tsconfig-dev.json --logError ./src/main.ts'"
->>>>>>>> main:auth-service/package.json
   },
   "author": {
     "name": "*"
   },
   "license": "GPL-3.0",
-  "dependencies": {
-    "@types/jsonwebtoken": "^8.5.9",
-    "bcrypt": "^5.1.0",
-    "chalk": "^4.1.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^8.5.1",
-    "pg": "^8.8.0",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.25.8",
-    "sqlite3": "^5.1.2",
-    "uuid": "^9.0.0"
-  },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
@@ -49,16 +31,15 @@
     "sequelize-cli": "^6.5.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.3.2"
-<<<<<<<< HEAD:users-service/package.json
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.25.8",
     "sqlite3": "^5.1.2",
     "uuid": "^9.0.0"
-========
->>>>>>>> main:auth-service/package.json
   }
 }

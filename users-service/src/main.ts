@@ -1,7 +1,8 @@
-import express, {Request, Response} from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import { initializeDb } from "./utils/init-database";
 import { userRouter } from "./routes/user.routes";
+import { getEnvOrExit } from "./config/secrets";
 
 const app = express();
 app.use(express.json());
@@ -30,7 +31,9 @@ app.all("*", (req: Request, res: Response) => {
 
 // -------------------App-Launch-----------------------
 
-const PORT: number = Number(process.env.APP_PORT) || 5000;
+const PORT: number = Number(getEnvOrExit("APP_PORT") || 5000);
+
+await initializeDb();
 app.listen(PORT, () => {
   console.log(`Backend App is running on port: ${PORT}`);
 });
