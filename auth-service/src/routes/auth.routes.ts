@@ -9,8 +9,8 @@ import { TokenService } from "../services/token.service";
 const router: Router = Router();
 
 router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  const foundUser = await AuthUserService.findOneByUsername(username);
+  const { email, password } = req.body;
+  const foundUser = await AuthUserService.findOneByEmail(email);
   if (!foundUser) {
     res.status(401).send({ message: "Unauthorized" });
     return;
@@ -21,7 +21,7 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
   }
   let tokens;
   try {
-    tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.userId, foundUser.role);
+    tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
   } catch {
     // TODO - write the catch
   }
@@ -37,10 +37,10 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
 });
 
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
-  // TODO - usernames can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
+  // TODO - emails can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
   // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
-  const { username, password } = req.body;
-  if (await AuthUserService.findOneByUsername(username)) {
+  const { name, email, password } = req.body;
+  if (await AuthUserService.findOneByEmail(email)) {
     // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
     res.status(409).send({
       message: "The email is already in use",
@@ -48,10 +48,10 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
     return;
   }
   // TODO - try catch this stuff
-  const createdUser = await AuthUserService.create({ username, password });
+  const createdUser = await AuthUserService.create({ name, email, password });
   if (createdUser) {
     const tokens = await AuthenticationService.createAccessToken(
-      createdUser.username,
+      createdUser.email,
       createdUser.userId,
       createdUser.role
     );
@@ -99,8 +99,8 @@ router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req:
       return res.status(401).send({ message: "Unauthorized" });
     }
     // Create new access token pair
-    const { username, password } = req.body;
-    const foundUser = await AuthUserService.findOneByUsername(username);
+    const { email, password } = req.body;
+    const foundUser = await AuthUserService.findOneByEmail(email);
     if (!foundUser) {
       return res.status(401).send({ message: "Unauthorized" });
     }
@@ -109,7 +109,7 @@ router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req:
     }
     let tokens;
     try {
-      tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.userId, foundUser.role);
+      tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
     } catch {}
     if (!tokens) {
       console.log(new Date().toISOString() + chalk.yellowBright(` [WARN] Failed to create new access token pair!`));

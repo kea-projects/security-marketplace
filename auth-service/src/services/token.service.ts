@@ -9,10 +9,10 @@ export class TokenService {
     return Token.findOne({ where: [{ accessToken: token }, { refreshToken: token }] });
   }
 
-  static async findAllByUsername(username: string): Promise<IToken[]> {
+  static async findAllByEmail(email: string): Promise<IToken[]> {
     const tokens = await Token.findAll();
     const filteredTokens = tokens.filter((token) => {
-      jwt.decode(token.refreshToken)?.sub === username;
+      jwt.decode(token.refreshToken)?.sub === email;
     });
     return filteredTokens;
   }
@@ -42,8 +42,8 @@ export class TokenService {
   }
 
   // TODO - discuss potential functionality of deleting all tokens if someone tries to authenticate with an invalid token of that user
-  static async deleteAllOfUser(username: string): Promise<void> {
-    const tokens = await this.findAllByUsername(username);
+  static async deleteAllOfUser(email: string): Promise<void> {
+    const tokens = await this.findAllByEmail(email);
     const idList = tokens.map((token) => token.tokenId);
     try {
       await Token.destroy({ where: { tokenId: idList } });

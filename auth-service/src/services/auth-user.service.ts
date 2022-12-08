@@ -5,8 +5,8 @@ import { Role, SignupRequestDto } from "../interfaces";
 import { AuthenticationService } from "./authentication.service";
 
 export class AuthUserService {
-  static findOneByUsername(username: string): Promise<IAuthUser | null> {
-    return AuthUser.findOne({ where: { username } });
+  static findOneByEmail(email: string): Promise<IAuthUser | null> {
+    return AuthUser.findOne({ where: { email } });
   }
 
   static async create(params: SignupRequestDto): Promise<IAuthUser | null> {
@@ -15,9 +15,9 @@ export class AuthUserService {
     try {
       // TODO - refactor the structure of the code
       let result: IAuthUser | null = null;
-      result = await AuthUser.create({ username: params.username, password: hashedPassword }, { transaction });
+      result = await AuthUser.create({ email: params.email, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
-      const accessToken = await AuthenticationService.createAccessToken(result.username, result.userId, Role.admin);
+      const accessToken = await AuthenticationService.createAccessToken(result.email, result.userId, Role.admin);
       try {
         // TODO - uncomment the below fetch statement once users service is implemented
         // const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", true)}`, {
@@ -28,7 +28,8 @@ export class AuthUserService {
         //   // TODO - the users service request body has to be updated
         //   body: JSON.stringify({
         //     userId: result.userId,
-        //     username: result.username,
+        //     email: result.email,
+        //     name: name,
         //   }),
         // });
         // if (response.status !== 200) {

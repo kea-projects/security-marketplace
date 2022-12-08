@@ -11,7 +11,7 @@ import { MissingPropertyError, ValidationError } from "../utils/error-messages";
  * If all fields are present, the body will look something like this:
  ```json
  {
-    "username": "string",
+    "email": "string",
     "password": "string",
     "fullName": "string"
   }
