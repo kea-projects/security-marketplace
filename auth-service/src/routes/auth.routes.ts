@@ -17,27 +17,24 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
       return;
     }
     if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-      res.status(401).send({ message: "Unauthorized" });
-      return;
+      return res.status(401).send({ message: "Unauthorized" });
     }
     let tokens;
     try {
       tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
     } catch {}
     if (!tokens) {
-      res
+      return res
         .status(500)
         .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
-      return;
     }
-    res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
+    return res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
   } catch (error) {
     console.log(
       new Date().toISOString() + chalk.redBright(` [ERROR] An error has occurred while logging in a user!`, error)
     );
     return res.status(500).send({ message: "Failed to login due to an internal error. Please try again later." });
   }
-  return res.status(401).send({ message: "Unauthorized" });
 });
 
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
@@ -132,6 +129,53 @@ router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req:
     );
   }
   return res.status(401).send({ message: "Unauthorized" });
+});
+
+router.post("/validate", async (req: Request, res: Response) => {
+  try {
+    // Extract the token
+    const token = AuthenticationService.getTokenFromRequest(req);
+    if (!token) {
+      console.log(new Date().toISOString() + chalk.yellow(` [WARN] Tried to validate a non-existent token!`));
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    // Check if token is valid. If not, see if it exists in the DB and wipe all tokens of the given user
+    const isValid = AuthenticationService.isValidToken(token);
+    if (!isValid) {
+      console.log(new Date().toISOString() + chalk.yellow(` [WARN] Failed validation for an invalid token!`));
+    }
+    // Check if token exists in the database
+    const foundTokens = await TokenService.findByToken(token);
+    if (!foundTokens) {
+      console.log(
+        new Date().toISOString() + chalk.yellow(` [WARN] Validated token that doesn't exist in the database!`)
+      );
+    }
+    // Remove all tokens of given user if previous validation has failed
+    if (!isValid || !foundTokens) {
+      try {
+        const decodedToken = AuthenticationService.decodeToken(token);
+        await TokenService.deleteAllOfUser(decodedToken!.sub!);
+        console.log(
+          new Date().toISOString() + chalk.yellow(` [WARN] Removed all tokens of a user: ${decodedToken!.sub}`)
+        );
+      } catch (error) {
+        console.log(
+          new Date().toISOString() +
+            chalk.redBright(` [ERROR] Failed to delete all tokens of a user from the database!`)
+        );
+      }
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    // Confirm that the token is OK
+    return res.status(200).send({ message: "Token is valid", token: AuthenticationService.decodeToken(token) });
+  } catch (error) {
+    console.log(
+      new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while validating a token!}`),
+      error
+    );
+    return res.status(401).send({ message: "Unauthorized" });
+  }
 });
 
 export { router as authRouter };
