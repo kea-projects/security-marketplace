@@ -22,17 +22,23 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
   let tokens;
   try {
     tokens = await AuthenticationService.createAccessToken(foundUser.username, foundUser.userId, foundUser.role);
-  } catch {}
+  } catch {
+    // TODO - write the catch
+  }
   if (!tokens) {
     res
       .status(500)
       .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
     return;
   }
+  // TODO - Wrap the entire thing in a try catch
+  // TODO - get rid of the question marks
   res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
 });
 
 router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
+  // TODO - usernames can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
+  // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
   const { username, password } = req.body;
   if (await AuthUserService.findOneByUsername(username)) {
     // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
@@ -41,6 +47,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
     });
     return;
   }
+  // TODO - try catch this stuff
   const createdUser = await AuthUserService.create({ username, password });
   if (createdUser) {
     const tokens = await AuthenticationService.createAccessToken(
@@ -69,6 +76,8 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
   return res.status(401).send({ message: "Unauthorized" });
 });
 
+// TODO - the access middlewares need to verify that the token does exist in the DB
+// TODO - when trying to access the system using a deleted token, invalidate all of the users tokens
 router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req: Request, res: Response) => {
   try {
     // Remove old access token pair

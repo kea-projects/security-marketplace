@@ -13,6 +13,7 @@ export class AuthUserService {
     const hashedPassword = await AuthenticationService.encodePassword(params.password);
     const transaction = await sequelize.transaction();
     try {
+      // TODO - refactor the structure of the code
       let result: IAuthUser | null = null;
       result = await AuthUser.create({ username: params.username, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
