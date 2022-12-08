@@ -28,14 +28,16 @@ import { MissingPropertyError, ValidationError } from "../utils/error-messages";
  * @param next Express NextFunction object
  */
 const validateUpdateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
-  if (createdBy && !isValidUuid(createdBy)) {
-    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
-  }
-  if (createdBy && typeof isPublic !== "boolean" && isPublic !== "true" && isPublic != "false") {
+  const { name, description, isPublic } = req.body!;
+  if (isPublic === undefined) {
+    return res.status(400).send(new MissingPropertyError("isPublic"));
+    // TODO - lowercase the isPublic
+    // TODO - check for 0 and 1
+    // TODO - do the !!isPublic
+  } else if (typeof isPublic !== "boolean" && isPublic !== "true" && isPublic !== "false") {
     return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
   }
-  req.body = { name, description, imageUrl, createdBy, isPublic };
+  req.body = { name, description, isPublic };
   next();
   return;
 };
