@@ -8,12 +8,13 @@ import { users } from "./users.contants";
 let sequelize: Sequelize;
 
 async function initializeDb(): Promise<boolean> {
-  // TODO - switch to variable-based config instead of connection string. Connection strings may potentially be stored in plain text when connecting to the database
-  const connectionString = `postgres://${getEnvVar("AUTH_POSTGRES_USER")}:${getEnvVar(
-    "AUTH_POSTGRES_PASSWORD"
-  )}@${getEnvVar("AUTH_POSTGRES_HOST")}:${getEnvVar("AUTH_POSTGRES_PORT")}/${getEnvVar("AUTH_POSTGRES_DATABASE")}`;
-
-  sequelize = new Sequelize(connectionString, {
+  sequelize = new Sequelize({
+    username: getEnvVar("AUTH_POSTGRES_USER", true) as string,
+    password: getEnvVar(`AUTH_POSTGRES_PASSWORD`, true) as string,
+    host: getEnvVar("AUTH_POSTGRES_HOST", true) as string,
+    port: Number(getEnvVar("AUTH_POSTGRES_PORT", true) as string),
+    database: getEnvVar("AUTH_POSTGRES_DATABASE", true) as string,
+    dialect: "postgres",
     logging: false,
   });
   // Check the connection

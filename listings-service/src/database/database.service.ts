@@ -12,14 +12,13 @@ import { Listing, ListingInit } from "./models/listing.model";
 let sequelize: Sequelize;
 
 async function initializeDb(): Promise<boolean> {
-  // TODO - switch to variable-based config instead of connection string. Connection strings may potentially be stored in plain text when connecting to the database
-  const connectionString = `postgres://${getEnvVar("LISTINGS_POSTGRES_USER")}:${getEnvVar(
-    "LISTINGS_POSTGRES_PASSWORD"
-  )}@${getEnvVar("LISTINGS_POSTGRES_HOST")}:${getEnvVar("LISTINGS_POSTGRES_PORT")}/${getEnvVar(
-    "LISTINGS_POSTGRES_DATABASE"
-  )}`;
-
-  sequelize = new Sequelize(connectionString, {
+  sequelize = new Sequelize({
+    username: getEnvVar("LISTINGS_POSTGRES_USER", true) as string,
+    password: getEnvVar(`LISTINGS_POSTGRES_PASSWORD`, true) as string,
+    host: getEnvVar("LISTINGS_POSTGRES_HOST", true) as string,
+    port: Number(getEnvVar("LISTINGS_POSTGRES_PORT", true) as string),
+    database: getEnvVar("LISTINGS_POSTGRES_DATABASE", true) as string,
+    dialect: "postgres",
     logging: false,
   });
   // Check the connection
