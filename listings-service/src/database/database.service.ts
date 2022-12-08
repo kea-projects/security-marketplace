@@ -13,9 +13,11 @@ let sequelize: Sequelize;
 
 async function initializeDb(): Promise<boolean> {
   // TODO - switch to variable-based config instead of connection string. Connection strings may potentially be stored in plain text when connecting to the database
-  const connectionString = `postgres://${getEnvVar("MAIN_POSTGRES_USER")}:${getEnvVar(
-    "MAIN_POSTGRES_PASSWORD"
-  )}@${getEnvVar("MAIN_POSTGRES_HOST")}:${getEnvVar("MAIN_POSTGRES_PORT")}/${getEnvVar("MAIN_POSTGRES_DATABASE")}`;
+  const connectionString = `postgres://${getEnvVar("LISTINGS_POSTGRES_USER")}:${getEnvVar(
+    "LISTINGS_POSTGRES_PASSWORD"
+  )}@${getEnvVar("LISTINGS_POSTGRES_HOST")}:${getEnvVar("LISTINGS_POSTGRES_PORT")}/${getEnvVar(
+    "LISTINGS_POSTGRES_DATABASE"
+  )}`;
 
   sequelize = new Sequelize(connectionString, {
     logging: false,
@@ -40,8 +42,8 @@ async function initializeDb(): Promise<boolean> {
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: getEnvVar("MAIN_POSTGRES_SYNC", false) === "true",
-      alter: getEnvVar("MAIN_POSTGRES_SYNC", false) === "true",
+      force: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
+      alter: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
     });
     console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The schema has been synced`));
   } catch (error) {
@@ -50,9 +52,9 @@ async function initializeDb(): Promise<boolean> {
     return false;
   }
   // Populate the database
-  if (getEnvVar("MAIN_POSTGRES_POPULATE", false) === "true") {
+  if (getEnvVar("LISTINGS_POSTGRES_POPULATE", false) === "true") {
     try {
-      if (getEnvVar("MAIN_LINODE_POPULATE", false) === "true") {
+      if (getEnvVar("LISTINGS_LINODE_POPULATE", false) === "true") {
         console.log(
           new Date().toISOString() + chalk.greenBright(` [INFO] Populating Linode object storage, may take a minute`)
         );

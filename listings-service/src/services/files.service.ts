@@ -12,10 +12,10 @@ export class FilesService {
    * @throws InvalidAccessKeyIdError | UploadFailedError
    */
   static async uploadFile(dataBuffer: Buffer, filename: string, silentLog = false): Promise<{ url: string }> {
-    const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
-    const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
-    const accessKey = getEnvVar("LINODE_STORAGE_ACCESS_KEY", true) as string;
-    const secretKey = getEnvVar("LINODE_STORAGE_SECRET_KEY", true) as string;
+    const clusterId = getEnvVar("LISTINGS_LINODE_STORAGE_CLUSTER_ID", true) as string;
+    const bucketId = getEnvVar("LISTINGS_LINODE_STORAGE_BUCKET_ID", true) as string;
+    const accessKey = getEnvVar("LISTINGS_LINODE_STORAGE_ACCESS_KEY", true) as string;
+    const secretKey = getEnvVar("LISTINGS_LINODE_STORAGE_SECRET_KEY", true) as string;
 
     try {
       const s3 = new S3Client({
@@ -61,10 +61,10 @@ export class FilesService {
    * @throws InvalidAccessKeyIdError | DeleteFailedError
    */
   static async deleteFile(filename: string): Promise<boolean> {
-    const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
-    const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
-    const accessKey = getEnvVar("LINODE_STORAGE_ACCESS_KEY", true) as string;
-    const secretKey = getEnvVar("LINODE_STORAGE_SECRET_KEY", true) as string;
+    const clusterId = getEnvVar("LISTINGS_LINODE_STORAGE_CLUSTER_ID", true) as string;
+    const bucketId = getEnvVar("LISTINGS_LINODE_STORAGE_BUCKET_ID", true) as string;
+    const accessKey = getEnvVar("LISTINGS_LINODE_STORAGE_ACCESS_KEY", true) as string;
+    const secretKey = getEnvVar("LISTINGS_LINODE_STORAGE_SECRET_KEY", true) as string;
 
     try {
       const s3 = new S3Client({
@@ -121,8 +121,8 @@ export class FilesService {
    * @returns for example https://documents.eu-central-1.linodeobjects.com/35342b75-0cab-439b-ac6c-e0c3c176e9a7.png
    */
   static getResourceUrl(listingId: string, filename: string): string {
-    const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
-    const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
+    const clusterId = getEnvVar("LISTINGS_LINODE_STORAGE_CLUSTER_ID", true) as string;
+    const bucketId = getEnvVar("LISTINGS_LINODE_STORAGE_BUCKET_ID", true) as string;
     return `https://${bucketId}.${clusterId}.linodeobjects.com/${this.getFilename(listingId, filename)}`;
   }
 

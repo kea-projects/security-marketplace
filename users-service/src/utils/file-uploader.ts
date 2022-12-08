@@ -12,10 +12,10 @@ class FilesService {
    * @throws InvalidAccessKeyIdError | UploadFailedError
    */
   static async uploadFile(dataBuffer: Buffer, filename: string, silentLog = false): Promise<{ url: string }> {
-    const CLUSTER_ID = getEnvOrExit("LINODE_STORAGE_CLUSTER_ID");
-    const BUCKET_ID = getEnvOrExit("LINODE_STORAGE_BUCKET_ID");
-    const ACCESS_KEY = getEnvOrExit("LINODE_STORAGE_ACCESS_KEY");
-    const SECRET_KEY = getEnvOrExit("LINODE_STORAGE_SECRET_KEY");
+    const CLUSTER_ID = getEnvOrExit("USERS_LINODE_STORAGE_CLUSTER_ID");
+    const BUCKET_ID = getEnvOrExit("USERS_LINODE_STORAGE_BUCKET_ID");
+    const ACCESS_KEY = getEnvOrExit("USERS_LINODE_STORAGE_ACCESS_KEY");
+    const SECRET_KEY = getEnvOrExit("USERS_LINODE_STORAGE_SECRET_KEY");
 
     try {
       const s3 = new S3Client({
@@ -74,8 +74,8 @@ class FilesService {
    * @returns for example https://documents.eu-central-1.linodeobjects.com/35342b75-0cab-439b-ac6c-e0c3c176e9a7.png
    */
   static getResourceUrl(listingId: string, filename: string): string {
-    const CLUSTER_ID = getEnvOrExit("LINODE_STORAGE_CLUSTER_ID");
-    const BUCKET_ID = getEnvOrExit("LINODE_STORAGE_BUCKET_ID");
+    const CLUSTER_ID = getEnvOrExit("USERS_LINODE_STORAGE_CLUSTER_ID");
+    const BUCKET_ID = getEnvOrExit("USERS_LINODE_STORAGE_BUCKET_ID");
     return `https://${BUCKET_ID}.${CLUSTER_ID}.linodeobjects.com/${this.getFilename(listingId, filename)}`;
   }
 }

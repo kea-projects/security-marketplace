@@ -104,6 +104,7 @@ router.patch(
 );
 
 router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
+  const token = req.body.token;
   uploadLargeRequest(req, res, async function (err: any) {
     validateCreateListingRequestBody(req, res, () => {});
     // Check if the validation has responded to the HTTP call due to errors with request body
@@ -127,9 +128,8 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
       }
       // Create a listing and upload a file
       const { name, description, isPublic } = req.body;
-      const token = req.body?.token;
       if (!token || !token?.userId) {
-        res.status(403).send({ message: "Forbidden" });
+        return res.status(403).send({ message: "Forbidden" });
       }
       try {
         const listingId = uuidv4();
@@ -213,6 +213,7 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
 });
 
 router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
+  const token = req.body.token;
   uploadSingleImage(req, res, async function (err) {
     try {
       // Handle file upload errors
@@ -229,7 +230,6 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
         }
         return res.status(403).send({ message: "Forbidden" });
       }
-      const token = req.body?.token;
       const listingId = req.params.id;
       const listing = await ListingsService.findOne(listingId);
       if (listing && token && token.role !== Role.admin && listing!.createdBy === token!.userId) {

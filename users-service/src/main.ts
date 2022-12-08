@@ -33,7 +33,7 @@ app.all("*", (req: Request, res: Response) => {
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(getEnvOrExit("APP_PORT") || 5000);
+const PORT: number = Number(getEnvOrExit("USERS_PORT") || 5000);
 
 const main = async () => {
   await initializeDb();
