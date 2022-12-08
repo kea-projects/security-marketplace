@@ -6,8 +6,7 @@ import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/mult
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
-import { canAccessRoleUser } from "../middleware/validate-access.middleware";
-import { AuthenticationService } from "../services/authentication.service";
+import { canAccessAnonymous, canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";
 import { FilesService } from "../services/files.service";
 import { ListingsService } from "../services/listings.service";
@@ -20,9 +19,9 @@ const uploadLargeRequest = multerLargeRequest.single("file");
 
 const router: Router = Router();
 
-router.get("", async (req: Request, res: Response) => {
+router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
   try {
-    const token = AuthenticationService.getTokenFromRequest(req);
+    const token = req.body?.token;
     if (!token) {
       return res.send(await ListingsService.findByIsPublic());
     }
@@ -36,13 +35,13 @@ router.get("", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) => {
+router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Request, res: Response) => {
   try {
     const foundListing = await ListingsService.findOne(req.params.id);
     if (!foundListing) {
       res.status(404).send({ message: "Listing not found" });
     } else {
-      const token = AuthenticationService.getTokenFromRequest(req);
+      const token = req.body?.token;
       if (!token && foundListing.isPublic) {
         return res.send(foundListing);
       }
@@ -52,7 +51,7 @@ router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) =
         }
         console.log(
           new Date().toISOString() +
-            chalk.yellowBright(` [WARN] User with id ${token?.sub} tried to access a listing of another user!`)
+            chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to access a listing of another user!`)
         );
         return res.status(403).send({ message: "Forbidden" });
       }
@@ -81,17 +80,17 @@ router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) =
 router.patch(
   "/:id",
   validateUuidFromParams,
-  canAccessRoleUser,
   validateUpdateListingRequestBody,
+  canAccessRoleUser,
   async (req: Request, res: Response) => {
     try {
       const foundListing = await ListingsService.findOne(req.params.id);
-      const token = AuthenticationService.getTokenFromRequest(req);
+      const token = req.body?.token;
 
-      if (token?.role != Role.admin && token?.sub != foundListing?.createdBy) {
+      if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
         console.log(
           new Date().toISOString() +
-            chalk.yellowBright(` [WARN] User with id ${token?.sub} tried to access a listing of another user!`)
+            chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to access a listing of another user!`)
         );
         return res.status(403).send({ message: "Forbidden" });
       }
@@ -128,7 +127,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
       }
       // Create a listing and upload a file
       const { name, description, isPublic } = req.body;
-      const token = AuthenticationService.getTokenFromRequest(req);
+      const token = req.body?.token;
       if (!token || !token?.userId) {
         res.status(403).send({ message: "Forbidden" });
       }
@@ -176,9 +175,9 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
 router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     const foundListing = await ListingsService.findOne(req.params.id);
-    const token = AuthenticationService.getTokenFromRequest(req);
+    const token = req.body?.token;
 
-    if (token?.role != Role.admin && token?.sub != foundListing?.createdBy) {
+    if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
       console.log(
         new Date().toISOString() +
           chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to delete a listing of another user!`)
@@ -198,6 +197,14 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
       );
     }
     console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Deleted listing with id ${req.params.id}!`));
+    try {
+      await FilesService.deleteFile(FilesService.extractFilenameFromUrl(foundListing!.imageUrl));
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete file: ${foundListing?.imageUrl}`),
+        error
+      );
+    }
     return res.status(202).send({ message: "Deleted" });
   } catch (error) {
     console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a listing by id!`));
@@ -222,7 +229,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
         }
         return res.status(403).send({ message: "Forbidden" });
       }
-      const token = AuthenticationService.getTokenFromRequest(req);
+      const token = req.body?.token;
       const listingId = req.params.id;
       const listing = await ListingsService.findOne(listingId);
       if (listing && token && token.role !== Role.admin && listing!.createdBy === token!.userId) {

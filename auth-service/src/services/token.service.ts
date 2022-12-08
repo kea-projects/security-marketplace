@@ -5,14 +5,13 @@ import { IToken, Token } from "../database/models/token.model";
 
 export class TokenService {
   static async findByToken(token: string): Promise<IToken | null> {
-    // TODO - think about why [Op.or]: is not used
-    return Token.findOne({ where: [{ accessToken: token }, { refreshToken: token }] });
+    return Token.findOne({ where: { [Op.or]: [{ accessToken: token }, { refreshToken: token }] } });
   }
 
   static async findAllByEmail(email: string): Promise<IToken[]> {
     const tokens = await Token.findAll();
     const filteredTokens = tokens.filter((token) => {
-      jwt.decode(token.refreshToken)?.sub === email;
+      return jwt.decode(token.refreshToken)?.sub === email;
     });
     return filteredTokens;
   }
@@ -41,7 +40,6 @@ export class TokenService {
     return false;
   }
 
-  // TODO - discuss potential functionality of deleting all tokens if someone tries to authenticate with an invalid token of that user
   static async deleteAllOfUser(email: string): Promise<void> {
     const tokens = await this.findAllByEmail(email);
     const idList = tokens.map((token) => token.tokenId);

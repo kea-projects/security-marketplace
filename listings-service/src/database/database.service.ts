@@ -75,6 +75,10 @@ async function initializeDb(): Promise<boolean> {
             );
           }
         }
+      } else {
+        for (const listing of listings) {
+          listing.imageUrl = FilesService.getResourceUrl(listing.listingId, "image.jpg");
+        }
       }
       await Listing.bulkCreate([...listings], {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
