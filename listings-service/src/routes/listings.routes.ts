@@ -179,7 +179,7 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
     if (token?.role != Role.admin && token?.sub != foundListing?.createdBy) {
       console.log(
         new Date().toISOString() +
-          chalk.yellowBright(` [WARN] User with id ${token?.sub} tried to delete a listing of another user!`)
+          chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to delete a listing of another user!`)
       );
       return res.status(403).send({ message: "Forbidden" });
     }
@@ -203,7 +203,7 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
   }
 });
 
-router.put("/file", canAccessRoleUser, async (req: Request, res: Response) => {
+router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
   uploadSingleImage(req, res, async function (err) {
     try {
       // Handle file upload errors
@@ -220,8 +220,22 @@ router.put("/file", canAccessRoleUser, async (req: Request, res: Response) => {
         }
         return res.status(403).send({ message: "Forbidden" });
       }
-      const result = await FilesService.uploadFile(req.file?.buffer as Buffer, req.file?.originalname as string);
-      return res.send({ url: result.url });
+      const token = AuthenticationService.getTokenFromRequest(req);
+      const listingId = req.params.id;
+      const listing = await ListingsService.findOne(listingId);
+      if (listing && token && token.role !== Role.admin && listing!.createdBy === token!.userId) {
+        const filename = FilesService.getFilename(listingId, req.file!.originalname);
+        const result = await FilesService.uploadFile(req.file!.buffer, filename);
+        return res.send({ url: result.url });
+      } else {
+        console.log(
+          new Date().toISOString() +
+            chalk.yellow(
+              ` [WARN] User with id of ${token?.userId} tried to update a listing file they don't have access to!`
+            )
+        );
+        return res.status(403).send({ message: "Forbidden" });
+      }
     } catch (error) {
       console.log(
         new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
