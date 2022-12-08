@@ -6,6 +6,7 @@ import { getEnvOrExit } from "./config/secrets";
 
 const app = express();
 app.use(express.json());
+
 // -----------------------CORS-------------------------
 const corsOptions = {
   origin: "*",
@@ -14,6 +15,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
+
 // ---------------------Routers------------------------
 app.use(userRouter);
 
@@ -28,7 +30,6 @@ app.all("*", (req: Request, res: Response) => {
 });
 
 // -------------------App-Launch-----------------------
-
 const PORT: number = Number(getEnvOrExit("APP_PORT") || 5000);
 
 const main = async () => {

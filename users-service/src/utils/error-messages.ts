@@ -32,4 +32,10 @@ class NotFoundError extends BaseError {
   }
 }
 
-export { MissingPropertyError, ValidationError, InternalServerError, NotFoundError };
+class UnauthorizedError extends BaseError {
+  constructor() {
+    super("UnauthorizedError", "Unauthorized");
+  }
+}
+
+export { MissingPropertyError, ValidationError, InternalServerError, NotFoundError, UnauthorizedError };

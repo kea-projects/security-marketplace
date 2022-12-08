@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationError } from "../utils/error-messages";
+import { UnauthorizedError, ValidationError } from "../utils/error-messages";
 import { validate as isValidUuid } from "uuid";
 
-const validateUuidFromParams = (req: Request, res: Response, next: NextFunction) => {
+const paramUuidValidator = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   if (!id) {
@@ -16,4 +16,16 @@ const validateUuidFromParams = (req: Request, res: Response, next: NextFunction)
   return next();
 };
 
-export { validateUuidFromParams };
+const isOwnIdValidator = (req: Request, res: Response, next: NextFunction) => {
+  const paramId = req.params.id;
+  const role = req.body.token.role
+  const userId = req.body.token.userId;
+
+  if (role !== 'admin' && paramId !== userId) {
+    return res.status(401).send(new UnauthorizedError());
+  }
+
+  return next();
+};
+
+export { paramUuidValidator , isOwnIdValidator, isValidUuid };

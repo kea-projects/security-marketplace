@@ -2,8 +2,8 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import { cleanUserImageUrlObj, cleanUserObjFields } from "../middleware/bodyValidators";
 import { User } from "../models/userModel";
-import { InternalServerError, ValidationError, NotFoundError } from "../utils/error-messages";
-import { validateUuidFromParams } from "../middleware/path-param-validators";
+import { InternalServerError, ValidationError, NotFoundError, UnauthorizedError } from "../utils/error-messages";
+import { paramUuidValidator, isOwnIdValidator } from "../middleware/path-param-validators";
 import { validate as isValidUuid } from "uuid";
 
 const router: Router = Router();
@@ -20,9 +20,8 @@ router.get("/users", async (_req: Request, res: Response) => {
 });
 
 // Logged in
-router.get("/users/:id", validateUuidFromParams, async (req: Request, res: Response) => {
+router.get("/users/:id", paramUuidValidator, async (req: Request, res: Response) => {
   const userId = req.params.id;
-
 
   try {
     const user: User | null = await User.findByPk(userId);
@@ -59,27 +58,27 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
   }
 });
 
-
 // TODO: admin can change any :id pictures
 // TODO: users can only update their own pictures
-router.put( "/users/:id/pictures", validateUuidFromParams, cleanUserImageUrlObj, async (req: Request, res: Response) => {
-    const userId = req.params.id;
-    const pictureUrl = req.body.pictureUrl;
-    // TODO: csrf token, this is a form!
-    try {
-      const user: User | null = await User.findByPk(userId);
-      if (user) {
-        user.set({ pictureUrl });
-        user.save();
-        return res.status(202).send(user);
-      } else {
-        return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
-      }
-    } catch (error) {
-      console.log("Error occurred while getting user: ", error);
-      return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+router.put("/users/:id/pictures", paramUuidValidator, cleanUserImageUrlObj, /*validateToken, */ isOwnIdValidator, async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const pictureUrl = req.body.pictureUrl;
+  // TODO: csrf token, this is a form!
+
+  try {
+    const user: User | null = await User.findByPk(userId);
+    if (user) {
+      // TODO: make url upload happen
+      user.set({ pictureUrl });
+      user.save();
+      return res.status(202).send(user);
+    } else {
+      return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
     }
+  } catch (error) {
+    console.log("Error occurred while getting user: ", error);
+    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
   }
-);
+});
 
 export { router as userRouter };
