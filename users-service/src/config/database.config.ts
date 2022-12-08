@@ -12,17 +12,16 @@ class SequelizeSingleton {
     if (!SequelizeSingleton.instance) {
       log.info("Connecting to database...");
       SequelizeSingleton.instance = new Sequelize(
-        getEnvOrExit("POSTGRES_DABA"),
-        getEnvOrExit("POSTGRES_USER"),
-        getEnvOrExit("POSTGRES_PASS"),
+        getEnvOrExit("MAIN_POSTGRES_DATABASE"),
+        getEnvOrExit("MAIN_POSTGRES_USER"),
+        getEnvOrExit("MAIN_POSTGRES_PASSWORD"),
         {
-          host: getEnvOrExit("POSTGRES_HOST"),
-          port: Number(getEnvOrExit("POSTGRES_PORT")),
+          host: getEnvOrExit("MAIN_POSTGRES_HOST"),
+          port: Number(getEnvOrExit("MAIN_POSTGRES_PORT")),
           dialect: "postgres",
           logging: log_flag,
         }
       );
-
       log.info("Sequelize connection created.");
     }
 
