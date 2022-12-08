@@ -60,6 +60,7 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
   }
 });
 
+// TODO: Make it not ignore multer and actually handle uploaded file
 // TODO: admin can change any :id pictures
 // TODO: users can only update their own pictures
 router.put(

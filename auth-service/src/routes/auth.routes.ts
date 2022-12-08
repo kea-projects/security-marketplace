@@ -83,11 +83,12 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
 
 // TODO - the access middlewares need to verify that the token does exist in the DB
 // TODO - when trying to access the system using a deleted token, invalidate all of the users tokens
-router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req: Request, res: Response) => {
+router.post("/refresh", canAccessRoleUser, async (req: Request, res: Response) => {
   try {
+    let accessToken;
     // Remove old access token pair
     try {
-      const accessToken = AuthenticationService.getTokenFromRequest(req);
+      accessToken = AuthenticationService.getTokenFromRequest(req);
       if (!accessToken) {
         return res.status(401).send({ message: "Unauthorized" });
       }
@@ -104,12 +105,9 @@ router.post("/refresh", canAccessRoleUser, validateLoginRequestBody, async (req:
       return res.status(401).send({ message: "Unauthorized" });
     }
     // Create new access token pair
-    const { email, password } = req.body;
-    const foundUser = await AuthUserService.findOneByEmail(email);
+    const token = AuthenticationService.decodeToken(accessToken);
+    const foundUser = await AuthUserService.findOneByEmail(token!.sub!);
     if (!foundUser) {
-      return res.status(401).send({ message: "Unauthorized" });
-    }
-    if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
       return res.status(401).send({ message: "Unauthorized" });
     }
     let tokens;
