@@ -1,9 +1,9 @@
-import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
 import { FilesService } from "../services/files.service";
+import { log } from "../utils/logger";
 import { comments } from "./comments.constant";
 import { listings } from "./listings.constant";
 import { Comment, CommentInit } from "./models/comment.model";
@@ -25,17 +25,17 @@ async function initializeDb(): Promise<boolean> {
   // Check the connection
   try {
     await sequelize.authenticate();
-    console.log(new Date().toISOString() + chalk.greenBright(` [INFO] Connected to the PostgreSQL database!`));
+    log.info(`Connected to the PostgreSQL database`);
   } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Database connection error!`, error.stack));
+    log.error(`Database connection error!`, error);
     return false;
   }
   // Load the models
   try {
     loadDbModels(sequelize);
-    console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The database models have been loaded`));
+    log.info(`The database models have been loaded`);
   } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to load database models!`, error.stack));
+    log.error(`Failed to load database models!`, error);
     sequelize.close();
     return false;
   }
@@ -45,9 +45,9 @@ async function initializeDb(): Promise<boolean> {
       force: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
       alter: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
     });
-    console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The schema has been synced`));
+    log.info(`The schema has been synced`);
   } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to sync the schema!`, error.stack));
+    log.error(`Failed to sync the schema!`, error);
     sequelize.close();
     return false;
   }
@@ -55,9 +55,7 @@ async function initializeDb(): Promise<boolean> {
   if (getEnvVar("LISTINGS_POSTGRES_POPULATE", false) === "true") {
     try {
       if (getEnvVar("LISTINGS_LINODE_POPULATE", false) === "true") {
-        console.log(
-          new Date().toISOString() + chalk.greenBright(` [INFO] Populating Linode object storage, may take a minute`)
-        );
+        log.info(`Populating Linode object storage, may take a minute`);
 
         // The file that will be uploaded to Linode
         const documentBuffer = fs.readFileSync(path.join(__dirname, "/assets/image.jpg"));
@@ -72,9 +70,7 @@ async function initializeDb(): Promise<boolean> {
           listing.imageUrl = uploadedFile.url;
           count++;
           if (Math.floor((count / listings.length) * 100) % 10 === 0) {
-            console.log(
-              new Date().toISOString() + chalk.cyan(`[VERBOSE] ${Math.floor((count / listings.length) * 100)}%`)
-            );
+            log.trace(`${Math.floor((count / listings.length) * 100)}%`);
           }
         }
       } else {
@@ -90,11 +86,9 @@ async function initializeDb(): Promise<boolean> {
         updateOnDuplicate: ["commentId", "name", "email", "comment", "createdBy", "commentedOn", "createdAt"],
         returning: true,
       });
-      console.log(new Date().toISOString() + chalk.greenBright(` [INFO] The main database has been populated`));
+      log.info(`The main database has been populated`);
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to populate the main database!`, error.stack)
-      );
+      log.error(`Failed to populate the main database!`, error);
     }
   }
 

@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { NextFunction, Request, Response } from "express";
 import { getEnv } from "../config/secrets";
+import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
 const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
@@ -10,10 +11,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
   }
 
   if (!getEnv("AUTH_USERS_SERVICE_URL")) {
-    console.log(
-      new Date().toISOString() +
-        chalk.yellowBright(` [WARN] Unable to call Auth Users Service to validate an access token`)
-    );
+    log.warn(`Unable to call Auth Users Service to validate an access token!`);
     throw new Error("Unable to call auth user service due to a missing ENV variable");
   }
 

@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -10,6 +9,7 @@ import { canAccessAnonymous, canAccessRoleUser } from "../middleware/validate-ac
 import { CommentsService } from "../services/comments.service";
 import { FilesService } from "../services/files.service";
 import { ListingsService } from "../services/listings.service";
+import { log } from "../utils/logger";
 
 // Multer setup for file upload handling
 const multerSingleImage = multer(multerConfigSingleFile);
@@ -30,7 +30,7 @@ router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
     }
     return res.send(await ListingsService.findAll());
   } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get all listings!`), error);
+    log.error(`Failed to get all listings!`, error);
     return res.status(403).send({ message: "Forbidden" });
   }
 });
@@ -49,10 +49,7 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
         if (foundListing.createdBy === token.userId) {
           return res.send(foundListing);
         }
-        console.log(
-          new Date().toISOString() +
-            chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to access a listing of another user!`)
-        );
+        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
         return res.status(403).send({ message: "Forbidden" });
       }
 
@@ -60,19 +57,12 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
         const comments = await CommentsService.findByListingId(foundListing.listingId as string);
         return res.send({ listing: foundListing, comments });
       } catch (error) {
-        console.log(
-          new Date().toISOString() +
-            chalk.redBright(` [ERROR] Failed to get comments for listing with id: ${req.params.id}`),
-          error
-        );
+        log.error(`Failed to get comments for listing with id: ${req.params.id}`, error);
         return res.status(403).send({ message: "Forbidden" });
       }
     }
   } catch (error) {
-    console.log(
-      new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get a listing with id: ${req.params.id}`),
-      error
-    );
+    log.error(`Failed to get a listing with id: ${req.params.id}`, error);
   }
   return res.status(403).send({ message: "Forbidden" });
 });
@@ -88,16 +78,13 @@ router.patch(
       const token = req.body?.token;
 
       if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
-        console.log(
-          new Date().toISOString() +
-            chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to access a listing of another user!`)
-        );
+        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
         return res.status(403).send({ message: "Forbidden" });
       }
 
       return res.send(await ListingsService.update(req.params.id, req.body));
     } catch (error) {
-      console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to get a listing by id!`));
+      log.error(`Failed to get a listing by id!`, error);
       return res.status(403).send({ message: "Forbidden" });
     }
   }
@@ -114,7 +101,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
     try {
       // Handle file upload errors
       if (err) {
-        console.log(new Date().toISOString() + chalk.yellow(` [WARN] An invalid file was uploaded: ${err.message}`));
+        log.warn(`An invalid file was uploaded: ${err.message}!`);
         if (err.message == "Invalid mime type") {
           return res.status(400).send({ message: "You can only upload files of type png, jpg, and jpeg" });
         }
@@ -159,14 +146,11 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
         // Return the created listing information
         return res.status(201).send(listing);
       } catch (error) {
-        console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create a listing!`));
+        log.error(`Failed to create a listing!`, error);
         return res.status(403).send({ message: "Forbidden" });
       }
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
-        error
-      );
+      log.error(` An error occurred while uploading a file!`, error);
     }
     return res.status(403).send({ message: "Forbidden" });
   });
@@ -178,36 +162,26 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
     const token = req.body?.token;
 
     if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
-      console.log(
-        new Date().toISOString() +
-          chalk.yellowBright(` [WARN] User with id ${token?.userId} tried to delete a listing of another user!`)
-      );
+      log.warn(`User with id ${token?.userId} tried to delete a listing of another user!`);
       return res.status(403).send({ message: "Forbidden" });
     }
     const result = await ListingsService.delete(req.params.id);
     if (result === 0) {
-      console.log(
-        new Date().toISOString() + chalk.yellowBright(` [WARN] Failed to delete a listing with id ${req.params.id}!`)
-      );
+      log.warn(`Failed to delete a listing with id ${req.params.id}!`);
       return res.status(403).send({ message: "Forbidden" });
     }
     if (result !== 1) {
-      console.log(
-        new Date().toISOString() + chalk.yellowBright(` [WARN] Deleted more than one listing with id ${req.params.id}!`)
-      );
+      log.warn(`Deleted more than one listing with id ${req.params.id}!`);
     }
-    console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Deleted listing with id ${req.params.id}!`));
+    log.info(`Deleted listing with id ${req.params.id}!`);
     try {
       await FilesService.deleteFile(FilesService.extractFilenameFromUrl(foundListing!.imageUrl));
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete file: ${foundListing?.imageUrl}`),
-        error
-      );
+      log.error(`Failed to delete file: ${foundListing?.imageUrl}`, error);
     }
     return res.status(202).send({ message: "Deleted" });
   } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a listing by id!`));
+    log.error(`Failed to delete a listing by id!`, error);
     return res.status(403).send({ message: "Forbidden" });
   }
 });
@@ -218,7 +192,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
     try {
       // Handle file upload errors
       if (err) {
-        console.log(new Date().toISOString() + chalk.yellow(` [WARN] An invalid file was uploaded: ${err.message}`));
+        log.error(`An invalid file was uploaded: ${err.message}`, err);
         if (err.message == "Invalid mime type") {
           return res.status(400).send({ message: "You can only upload files of type png, jpg, and jpeg" });
         }
@@ -237,19 +211,11 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
         const result = await FilesService.uploadFile(req.file!.buffer, filename);
         return res.send({ url: result.url });
       } else {
-        console.log(
-          new Date().toISOString() +
-            chalk.yellow(
-              ` [WARN] User with id of ${token?.userId} tried to update a listing file they don't have access to!`
-            )
-        );
+        log.warn(`User with id of ${token?.userId} tried to update a listing file they don't have access to!`);
         return res.status(403).send({ message: "Forbidden" });
       }
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
-        error
-      );
+      log.error(`An error occurred while uploading a file!`, error);
     }
     return res.status(403).send({ message: "Forbidden" });
   });

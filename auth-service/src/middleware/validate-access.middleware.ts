@@ -1,8 +1,8 @@
-import chalk from "chalk";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
+import { log } from "../utils/logger";
 
 const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
 /**
@@ -25,10 +25,7 @@ const canAccessRoleUser = (req: Request, res: Response, next: NextFunction) => {
       return next();
     }
   } catch (error) {
-    console.log(
-      new Date().toISOString() +
-        chalk.redBright(` [ERROR] An error has occurred while validating an access token!`, error.stack)
-    );
+    log.error(`An error has occurred while validating an access token!`, error);
   }
 
   return res.status(401).send({ message: "Unauthorized" });
@@ -53,10 +50,7 @@ const canAccessRoleAdmin = (req: Request, res: Response, next: NextFunction) => 
       return next();
     }
   } catch (error) {
-    console.log(
-      new Date().toISOString() +
-        chalk.redBright(` [ERROR] An error has occurred while validating an access token!`, error.stack)
-    );
+    log.error(`An error has occurred while validating an access token!`, error);
   }
 
   return res.status(401).send({ message: "Unauthorized" });

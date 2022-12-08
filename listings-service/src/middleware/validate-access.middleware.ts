@@ -1,7 +1,7 @@
-import chalk from "chalk";
 import { NextFunction, Request, Response } from "express";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
+import { log } from "../utils/logger";
 
 const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
   // validate that the request contains the jwt access token
@@ -10,10 +10,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
   }
 
   if (!getEnvVar("AUTH_USERS_SERVICE_URL", false)) {
-    console.log(
-      new Date().toISOString() +
-        chalk.yellowBright(` [WARN] Unable to call Auth Users Service to validate an access token`)
-    );
+    log.warn(`Unable to call Auth Users Service to validate an access token`);
     throw new Error("Unable to call auth user service due to a missing ENV variable");
   }
 
@@ -31,8 +28,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
     }
     throw new Error("Authorization token is invalid");
   } catch (error) {
-    new Date().toISOString() +
-      chalk.redBright(` [ERROR] An unknown error has occurred while validating an access token!`, error.stack);
+    log.error(`An unknown error has occurred while validating an access token!`, error);
     throw new Error("An unknown error has occurred while validating an access token");
   }
 };

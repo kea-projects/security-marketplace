@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
@@ -70,10 +69,7 @@ async function populateDb() {
       });
       log.info(`The users database has been populated`);
     } catch (error) {
-      // TODO - add an option to pass the error object to the error log
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to populate the users database!`, error.stack)
-      );
+      log.error(`Failed to populate the users database!`, error);
     }
   }
 }

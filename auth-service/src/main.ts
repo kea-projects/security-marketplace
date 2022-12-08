@@ -1,10 +1,10 @@
-import chalk from "chalk";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
 import { authRouter } from "./routes/auth.routes";
+import { log } from "./utils/logger";
 
 const app = express();
 app.use(express.json());
@@ -30,11 +30,9 @@ app.all("*", (_req, res) => {
 const PORT: number = Number(process.env.AUTH_PORT) || 8080;
 app.listen(PORT, async () => {
   if (!(await initializeDb())) {
-    console.log(
-      new Date().toISOString() + chalk.redBright(` [ERROR] SHUTTING DOWN due to issues with the database connection`!)
-    );
+    log.error(`SHUTTING DOWN due to issues with the database connection!`);
     return process.exit(1);
   }
-  console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Auth Server has started on port: ${PORT}`));
+  log.info(`Auth Server has started on port: ${PORT}`);
   return;
 });
