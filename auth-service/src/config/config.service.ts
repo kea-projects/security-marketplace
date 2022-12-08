@@ -7,6 +7,9 @@ export const getEnvVar = (varName: string, exitOnMissing: boolean = true) => {
       console.log(chalk.redBright(`[ERROR] ${varName} is missing from environment variables, shutting down!`));
       process.exit(0);
     }
+    console.log(
+      chalk.yellow(`[WARN] ${varName} is missing from environment variables, some functionality may not work!`)
+    );
     return null;
   } else {
     return process.env[varName];
