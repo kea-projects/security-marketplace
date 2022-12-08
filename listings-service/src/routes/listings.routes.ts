@@ -34,8 +34,6 @@ router.get("", async (req: Request, res: Response) => {
   }
 });
 
-// TODO - add the middleware
-// TODO - can get any public listing
 router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) => {
   try {
     const foundListing = await ListingsService.findOne(req.params.id);
@@ -43,7 +41,9 @@ router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) =
       res.status(404).send({ message: "Listing not found" });
     } else {
       const token = AuthenticationService.getTokenFromRequest(req);
-
+      if (!token && foundListing.isPublic) {
+        return res.send(foundListing);
+      }
       if (token && token.role != Role.admin) {
         if (foundListing.createdBy === token.userId) {
           return res.send(foundListing);
