@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { IListing, Listing } from "../database/models/listing.model";
-import { CreateListingRequest, UpdateListingRequest } from "./listing.dto";
+import { UpdateListingRequest } from "./listing.dto";
 
 export class ListingsService {
   static async findAll(): Promise<IListing[]> {
@@ -28,7 +28,7 @@ export class ListingsService {
     return await foundListing.save();
   }
 
-  static async create(data: CreateListingRequest): Promise<IListing> {
+  static async create(data: IListing): Promise<IListing> {
     return await Listing.create({ ...data });
   }
 

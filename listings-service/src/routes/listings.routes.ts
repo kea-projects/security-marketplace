@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import { Request, Response, Router } from "express";
 import multer from "multer";
-import { multerConfig } from "../config/multer.config";
+import { v4 as uuidv4 } from "uuid";
+import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
@@ -12,15 +13,17 @@ import { FilesService } from "../services/files.service";
 import { ListingsService } from "../services/listings.service";
 
 // Multer setup for file upload handling
-const upload = multer(multerConfig);
-const uploadSingleImage = upload.single("file");
+const multerSingleImage = multer(multerConfigSingleFile);
+const multerLargeRequest = multer(multerConfigLargeRequest);
+const uploadSingleImage = multerSingleImage.single("file");
+const uploadLargeRequest = multerLargeRequest.single("file");
 
 const router: Router = Router();
 
 router.get("", async (req: Request, res: Response) => {
   try {
     const token = AuthenticationService.getTokenFromRequest(req);
-
+    // TODO - handle anonymous users only public listings
     if (token && token.role != Role.admin) {
       return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
     }
@@ -31,6 +34,8 @@ router.get("", async (req: Request, res: Response) => {
   }
 });
 
+// TODO - add the middleware
+// TODO - can get any public listing
 router.get("/:id", validateUuidFromParams, async (req: Request, res: Response) => {
   try {
     const foundListing = await ListingsService.findOne(req.params.id);
@@ -97,13 +102,73 @@ router.patch(
   }
 );
 
-router.post("", canAccessRoleUser, validateCreateListingRequestBody, async (req: Request, res: Response) => {
-  try {
-    return res.send(await ListingsService.create(req.body));
-  } catch (error) {
-    console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create a listing!`));
+router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
+  uploadLargeRequest(req, res, async function (err: any) {
+    validateCreateListingRequestBody(req, res, () => {});
+    // Check if the validation has responded to the HTTP call due to errors with request body
+    if (res.writableEnded) {
+      return;
+    }
+    try {
+      // Handle file upload errors
+      if (err) {
+        console.log(new Date().toISOString() + chalk.yellow(` [WARN] An invalid file was uploaded: ${err.message}`));
+        if (err.message == "Invalid mime type") {
+          return res.status(400).send({ message: "You can only upload files of type png, jpg, and jpeg" });
+        }
+        if (err.message === "Too many files") {
+          return res.status(400).send({ message: "You can only upload one file" });
+        }
+        if (err.message === "Unexpected field") {
+          return res.status(400).send({ message: "The field key has to be 'file'" });
+        }
+        return res.status(403).send({ message: "Forbidden" });
+      }
+      // Create a listing and upload a file
+      const { name, description, isPublic } = req.body;
+      const token = AuthenticationService.getTokenFromRequest(req);
+      if (!token || !token?.userId) {
+        res.status(403).send({ message: "Forbidden" });
+      }
+      try {
+        const listingId = uuidv4();
+        const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
+
+        const listing = await ListingsService.create({
+          listingId,
+          name,
+          description,
+          isPublic,
+          imageUrl,
+          createdBy: token!.userId,
+        });
+        // Upload the file
+        try {
+          const uploadedFile = FilesService.uploadFile(
+            req.file!.buffer,
+            FilesService.getFilename(listingId, req.file!.originalname)
+          );
+          if (!uploadedFile) {
+            throw new Error("Failed to upload the file");
+          }
+        } catch (error) {
+          await ListingsService.delete(listingId);
+          throw new Error("Failed to upload a file");
+        }
+        // Return the created listing information
+        return res.status(201).send(listing);
+      } catch (error) {
+        console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create a listing!`));
+        return res.status(403).send({ message: "Forbidden" });
+      }
+    } catch (error) {
+      console.log(
+        new Date().toISOString() + chalk.redBright(` [ERROR] An error occurred while uploading a file!`),
+        error
+      );
+    }
     return res.status(403).send({ message: "Forbidden" });
-  }
+  });
 });
 
 router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
@@ -138,7 +203,7 @@ router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Req
   }
 });
 
-router.put("/file", async (req: Request, res: Response) => {
+router.put("/file", canAccessRoleUser, async (req: Request, res: Response) => {
   uploadSingleImage(req, res, async function (err) {
     try {
       // Handle file upload errors

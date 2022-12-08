@@ -41,27 +41,22 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, imageUrl, createdBy, isPublic } = req.body!;
+  const { name, description, isPublic } = req.body!;
   if (!name) {
     return res.status(400).send(new MissingPropertyError("name"));
   }
   if (!description) {
     return res.status(400).send(new MissingPropertyError("description"));
   }
-  if (!imageUrl) {
-    return res.status(400).send(new MissingPropertyError("imageUrl"));
-  }
-  if (!createdBy) {
-    return res.status(400).send(new MissingPropertyError("createdBy"));
-  } else if (!isValidUuid(createdBy)) {
-    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
-  }
   if (isPublic === undefined) {
     return res.status(400).send(new MissingPropertyError("isPublic"));
+    // TODO - lowercase the isPublic
+    // TODO - check for 0 and 1
+    // TODO - do the !!isPublic
   } else if (typeof isPublic !== "boolean" && isPublic !== "true" && isPublic !== "false") {
     return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
   }
-  req.body = { name, description, imageUrl, createdBy, isPublic };
+  req.body = { name, description, isPublic };
   next();
   return;
 };

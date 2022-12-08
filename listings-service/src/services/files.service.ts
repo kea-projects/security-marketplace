@@ -1,6 +1,5 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import chalk from "chalk";
-import { v4 as uuidv4 } from "uuid";
 import { getEnvVar } from "../config/config.service";
 
 export class FilesService {
@@ -27,20 +26,19 @@ export class FilesService {
         },
         endpoint: `https://${clusterId}.linodeobjects.com`,
       });
-      const anonymizedFilename = this.anonymizeFilename(filename);
       const uploadResult = await s3.send(
         new PutObjectCommand({
           Bucket: bucketId,
           Body: dataBuffer,
-          Key: anonymizedFilename,
+          Key: filename,
           ACL: "public-read",
         })
       );
       if (uploadResult.$metadata.httpStatusCode != 200) {
         throw new Error("UploadFailedError");
       } else {
-        console.log(new Date().toISOString() + chalk.greenBright(` [INFO] New file uploaded: ${anonymizedFilename}`));
-        return { url: `https://${bucketId}.${clusterId}.linodeobjects.com/${anonymizedFilename}` };
+        console.log(new Date().toISOString() + chalk.greenBright(` [INFO] New file uploaded: ${filename}`));
+        return { url: `https://${bucketId}.${clusterId}.linodeobjects.com/${filename}` };
       }
     } catch (error) {
       console.log(
@@ -54,12 +52,30 @@ export class FilesService {
     }
   }
 
-  static anonymizeFilename(filename: string): string {
+  /**
+   * Returns a listingId with the file extension attached.
+   * @param listingId a UUID.
+   * @param filename the original file name with the extension.
+   * @returns for example 4883d611-98f8-46cd-9f66-dc8357ae3346.png
+   */
+  static getFilename(listingId: string, filename: string): string {
     const regex = /(.jpg|.jpeg|.png)/gm;
     const extension = filename.match(regex);
     if (!extension || extension?.length != 1) {
       throw new Error("Provided file has no valid extension");
     }
-    return uuidv4() + extension[0];
+    return listingId + extension[0];
+  }
+
+  /**
+   * Returns a URL that can be used to access the URL if it is uploaded
+   * @param listingId a UUID.
+   * @param filename the original file name with the extension.
+   * @returns for example https://documents.eu-central-1.linodeobjects.com/35342b75-0cab-439b-ac6c-e0c3c176e9a7.png
+   */
+  static getResourceUrl(listingId: string, filename: string): string {
+    const clusterId = getEnvVar("LINODE_STORAGE_CLUSTER_ID", true) as string;
+    const bucketId = getEnvVar("LINODE_STORAGE_BUCKET_ID", true) as string;
+    return `https://${bucketId}.${clusterId}.linodeobjects.com/${this.getFilename(listingId, filename)}`;
   }
 }
