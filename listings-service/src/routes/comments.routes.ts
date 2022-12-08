@@ -2,15 +2,14 @@ import chalk from "chalk";
 import { Request, Response, Router } from "express";
 import { validateCreateCommentRequestBody } from "../middleware/bodyValidators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
-import { AuthenticationService } from "../services/authentication.service";
 import { CommentsService } from "../services/comments.service";
 import { ListingsService } from "../services/listings.service";
 
 const router: Router = Router();
 
-router.post("", canAccessRoleUser, validateCreateCommentRequestBody, async (req: Request, res: Response) => {
+router.post("", validateCreateCommentRequestBody, canAccessRoleUser, async (req: Request, res: Response) => {
   try {
-    const token = AuthenticationService.getTokenFromRequest(req);
+    const token = req.body?.token;
     try {
       const foundListing = await ListingsService.findOne(req.body.commentedOn);
       if (!foundListing) {
