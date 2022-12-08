@@ -7,6 +7,7 @@ import { LoginPage } from '../routes/LoginPage';
 import { ProfilePage } from '../routes/ProfilePage';
 import { SignupPage } from '../routes/SignupPage';
 import { UsersPage } from '../routes/UsersPage';
+import { ListingDetailsPage } from '../routes/ListingDetailsPage';
 
 export const router = createBrowserRouter([
     {
@@ -29,5 +30,9 @@ export const router = createBrowserRouter([
     {
         path: '/users',
         element: <UsersPage />,
+    },
+    {
+        path: '/listing-details/:listingId',
+        element: <ListingDetailsPage />,
     },
 ]);

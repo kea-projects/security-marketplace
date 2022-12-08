@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Center, Skeleton, SimpleGrid, HStack, Container } from '@chakra-ui/react';
+import { SimpleGrid } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
-import { Card } from '../components/Card';
 import { getCurrentUser, getMarketEntries } from '../fake-api/api';
 import { User } from '../fake-api/users';
 import { MarketEntry } from '../fake-api/marketEntries';
+import { Listing } from '../components/Listing';
 
 export function ProfilePage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,28 +22,9 @@ export function ProfilePage() {
 
         fetchData();
     }, []);
-
-    const getGridItems = (entries: MarketEntry[] = [], isLoading = false) => {
-        return entries.map((entry, index) => {
-            return (
-                <Center key={index} height="15vh" boxShadow="md" rounded="md">
-                    {isLoading ? (
-                        <Skeleton height="100%" width="100%" rounded="md" />
-                    ) : (
-                        <HStack background="primary" height="100%" width="100%" rounded="md" spacing="0" padding="0">
-                            <Container background="accent.500" height="100%" width="fit-content" rounded="md">
-                                {!isLoading && (
-                                    <Text noOfLines={2} fontSize="xl">
-                                        {entry.title}
-                                    </Text>
-                                )}
-                            </Container>
-                            <Container>{!isLoading && <Text noOfLines={2}>{entry.content}</Text>}</Container>
-                        </HStack>
-                    )}
-                </Center>
-            );
-        });
+    //TODO: Make it so that the isPublic can ge toggled
+    const getGridItems = (entries: MarketEntry[] = []) => {
+        return entries.map((entry, index) => <Listing isLoading={isLoading} key={index} marketEntry={entry} />);
     };
 
     return (
@@ -56,7 +37,7 @@ export function ProfilePage() {
                 paddingX="30px"
                 overflowY="auto"
             >
-                {isLoading ? getGridItems([...Array(5)], true) : getGridItems(entries)}
+                {isLoading ? getGridItems([...Array(5)]) : getGridItems(entries)}
             </SimpleGrid>
         </Layout>
     );

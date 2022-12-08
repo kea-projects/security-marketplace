@@ -1,305 +1,253 @@
-export interface MarketEntry {
-    title: string;
-    content: string;
-    isPublic: boolean;
+export interface Comment {
+    username: string;
+    comment: string;
 }
 
-export const marketEntries = [
+export const comments = [
     {
-        title: 'Carrots',
-        content: 'They Green',
-        isPublic: true,
+        username: 'Carrots',
+        comment: 'They Green',
     },
     {
-        title: 'Savana 2500',
-        content: 'In blandit ultrices enim.',
-        isPublic: false,
+        username: 'Savana 2500',
+        comment: 'In blandit ultrices enim.',
     },
     {
-        title: 'A6',
-        content:
+        username: 'A6',
+        comment:
             'In hac habitasse platea dictumst. Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem. Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat. Praesent blandit.',
-        isPublic: false,
     },
     {
-        title: '6 Series',
-        content:
+        username: '6 Series',
+        comment:
             'Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh. In quis justo.',
-        isPublic: false,
     },
     {
-        title: 'riolet',
-        content:
+        username: 'riolet',
+        comment:
             'Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.',
-        isPublic: true,
     },
     {
-        title: 'Corolla',
-        content:
+        username: 'Corolla',
+        comment:
             'Vestibulum rutrum rutrum neque. Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.',
-        isPublic: true,
     },
     {
-        title: 'Savana 1500',
-        content:
+        username: 'Savana 1500',
+        comment:
             'Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue.',
-        isPublic: true,
     },
     {
-        title: '3500',
-        content: 'Morbi quis tortor id nulla ultrices aliquet.',
-        isPublic: true,
+        username: '3500',
+        comment: 'Morbi quis tortor id nulla ultrices aliquet.',
     },
     {
-        title: 'E-Series',
-        content:
+        username: 'E-Series',
+        comment:
             'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat.',
-        isPublic: false,
     },
     {
-        title: 'Sprinter 3500',
-        content:
+        username: 'Sprinter 3500',
+        comment:
             'Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh. Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue.',
-        isPublic: false,
     },
     {
-        title: 'F-Series',
-        content:
+        username: 'F-Series',
+        comment:
             'Etiam vel augue. Vestibulum rutrum rutrum neque. Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.',
-        isPublic: false,
     },
     {
-        title: 'Celica',
-        content:
+        username: 'Celica',
+        comment:
             'In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui. Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.',
-        isPublic: false,
     },
     {
-        title: 'FF',
-        content:
+        username: 'FF',
+        comment:
             'Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo.',
-        isPublic: true,
     },
     {
-        title: 'Chariot',
-        content:
+        username: 'Chariot',
+        comment:
             'In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis.',
-        isPublic: true,
     },
     {
-        title: 'MX-3',
-        content:
+        username: 'MX-3',
+        comment:
             'Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.',
-        isPublic: true,
     },
     {
-        title: 'Cayman',
-        content:
+        username: 'Cayman',
+        comment:
             'Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc.',
-        isPublic: true,
     },
     {
-        title: 'Discovery',
-        content:
+        username: 'Discovery',
+        comment:
             'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.',
-        isPublic: true,
     },
     {
-        title: 'STS-V',
-        content:
+        username: 'STS-V',
+        comment:
             'Fusce consequat. Nulla nisl. Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa.',
-        isPublic: true,
     },
     {
-        title: 'G-Series G10',
-        content: 'Duis bibendum. Morbi non quam nec dui luctus rutrum.',
-        isPublic: true,
+        username: 'G-Series G10',
+        comment: 'Duis bibendum. Morbi non quam nec dui luctus rutrum.',
     },
     {
-        title: 'Ciera',
-        content:
+        username: 'Ciera',
+        comment:
             'Curabitur convallis. Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.',
-        isPublic: true,
     },
     {
-        title: 'Scoupe',
-        content:
+        username: 'Scoupe',
+        comment:
             'Vivamus tortor. Duis mattis egestas metus. Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh. Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est.',
-        isPublic: true,
     },
     {
-        title: 'Caliber',
-        content: 'Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui.',
-        isPublic: true,
+        username: 'Caliber',
+        comment: 'Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui.',
     },
     {
-        title: 'Passport',
-        content:
+        username: 'Passport',
+        comment:
             'Duis at velit eu est congue elementum. In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo. Aliquam quis turpis eget elit sodales scelerisque.',
-        isPublic: true,
     },
     {
-        title: '3500',
-        content:
+        username: '3500',
+        comment:
             'Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.',
-        isPublic: true,
     },
     {
-        title: 'Spirit',
-        content:
+        username: 'Spirit',
+        comment:
             'Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue. Etiam justo. Etiam pretium iaculis justo.',
-        isPublic: true,
     },
     {
-        title: '57S',
-        content: 'Sed vel enim sit amet nunc viverra dapibus.',
-        isPublic: true,
+        username: '57S',
+        comment: 'Sed vel enim sit amet nunc viverra dapibus.',
     },
     {
-        title: 'Gemini',
-        content:
+        username: 'Gemini',
+        comment:
             'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti. Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris. Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.',
-        isPublic: false,
     },
     {
-        title: 'Civic',
-        content:
+        username: 'Civic',
+        comment:
             'Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam vel augue. Vestibulum rutrum rutrum neque. Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo.',
-        isPublic: false,
     },
     {
-        title: 'Escalade EXT',
-        content: 'Nulla tellus. In sagittis dui vel nisl. Duis ac nibh.',
-        isPublic: false,
+        username: 'Escalade EXT',
+        comment: 'Nulla tellus. In sagittis dui vel nisl. Duis ac nibh.',
     },
     {
-        title: 'Cayenne',
-        content:
+        username: 'Cayenne',
+        comment:
             'Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem. Fusce consequat. Nulla nisl. Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum. In hac habitasse platea dictumst.',
-        isPublic: false,
     },
     {
-        title: 'Yukon XL 2500',
-        content:
+        username: 'Yukon XL 2500',
+        comment:
             'Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.',
-        isPublic: false,
     },
     {
-        title: 'Spectra',
-        content:
+        username: 'Spectra',
+        comment:
             'In congue. Etiam justo. Etiam pretium iaculis justo. In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus. Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.',
-        isPublic: false,
     },
     {
-        title: 'Accord',
-        content:
+        username: 'Accord',
+        comment:
             'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.',
-        isPublic: true,
     },
     {
-        title: 'TrailBlazer',
-        content:
+        username: 'TrailBlazer',
+        comment:
             'Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.',
-        isPublic: true,
     },
     {
-        title: '6 Series',
-        content:
+        username: '6 Series',
+        comment:
             'Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis.',
-        isPublic: true,
     },
     {
-        title: 'C8',
-        content:
+        username: 'C8',
+        comment:
             'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus. Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis. Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.',
-        isPublic: true,
     },
     {
-        title: '3 Series',
-        content:
+        username: '3 Series',
+        comment:
             'Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo. Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor. Duis mattis egestas metus.',
-        isPublic: true,
     },
     {
-        title: 'GTO',
-        content:
+        username: 'GTO',
+        comment:
             'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.',
-        isPublic: true,
     },
     {
-        title: 'LX',
-        content:
+        username: 'LX',
+        comment:
             'Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem.',
-        isPublic: true,
     },
     {
-        title: 'LTD Crown Victoria',
-        content: 'In blandit ultrices enim.',
-        isPublic: true,
+        username: 'LTD Crown Victoria',
+        comment: 'In blandit ultrices enim.',
     },
     {
-        title: 'Arnage',
-        content:
+        username: 'Arnage',
+        comment:
             'Aliquam erat volutpat. In congue. Etiam justo. Etiam pretium iaculis justo. In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus. Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.',
-        isPublic: true,
     },
     {
-        title: 'G35',
-        content:
+        username: 'G35',
+        comment:
             'Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est. Phasellus sit amet erat. Nulla tempus.',
-        isPublic: true,
     },
     {
-        title: 'Freestar',
-        content:
+        username: 'Freestar',
+        comment:
             'Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis. Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci.',
-        isPublic: true,
     },
     {
-        title: '900',
-        content:
+        username: '900',
+        comment:
             'Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus.',
-        isPublic: true,
     },
     {
-        title: 'Sierra 1500',
-        content:
+        username: 'Sierra 1500',
+        comment:
             'Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla. Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.',
-        isPublic: true,
     },
     {
-        title: 'PT Cruiser',
-        content:
+        username: 'PT Cruiser',
+        comment:
             'Etiam faucibus cursus urna. Ut tellus. Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit.',
-        isPublic: true,
     },
     {
-        title: 'Pathfinder',
-        content: 'Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.',
-        isPublic: true,
+        username: 'Pathfinder',
+        comment: 'Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.',
     },
     {
-        title: 'Chariot',
-        content:
+        username: 'Chariot',
+        comment:
             'Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui. Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.',
-        isPublic: true,
     },
     {
-        title: 'Explorer',
-        content:
+        username: 'Explorer',
+        comment:
             'Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede. Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem.',
-        isPublic: true,
     },
     {
-        title: '2500',
-        content:
+        username: '2500',
+        comment:
             'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.',
-        isPublic: true,
     },
     {
-        title: 'Excel',
-        content:
+        username: 'Excel',
+        comment:
             'Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.',
-        isPublic: true,
     },
 ];
