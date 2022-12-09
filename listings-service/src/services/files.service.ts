@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import chalk from "chalk";
 import { getEnvVar } from "../config/config.service";
+import { log } from "../utils/logger";
 
 export class FilesService {
   /**
@@ -38,14 +38,12 @@ export class FilesService {
         throw new Error("UploadFailedError");
       } else {
         if (!silentLog) {
-          console.log(new Date().toISOString() + chalk.greenBright(` [INFO] New file uploaded: ${filename}`));
+          log.info(`New file uploaded: ${filename}`);
         }
         return { url: `https://${bucketId}.${clusterId}.linodeobjects.com/${filename}` };
       }
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to upload a file to Linode Object storage`, error)
-      );
+      log.error(`Failed to upload a file to Linode Object storage`, error);
       if (error.name === "InvalidAccessKeyId") {
         throw new Error("InvalidAccessKeyIdError");
       } else {
@@ -81,16 +79,11 @@ export class FilesService {
           Key: filename,
         })
       );
-      console.log(
-        new Date().toISOString() + chalk.greenBright(` [INFO] File deleted from linode storage. Filename: ${filename}`)
-      );
+      log.info(`File deleted from linode storage. Filename: ${filename}`);
 
       return true;
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a file from Linode Object storage`),
-        error
-      );
+      log.error(`Failed to delete a file from Linode Object storage`, error);
       if (error.name === "InvalidAccessKeyId") {
         throw new Error("InvalidAccessKeyIdError");
       } else {

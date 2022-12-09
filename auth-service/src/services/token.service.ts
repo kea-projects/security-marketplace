@@ -1,7 +1,7 @@
-import chalk from "chalk";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 import { IToken, Token } from "../database/models/token.model";
+import { log } from "../utils/logger";
 
 export class TokenService {
   static async findByToken(token: string): Promise<IToken | null> {
@@ -20,7 +20,7 @@ export class TokenService {
     try {
       return Token.create({ ...token });
     } catch (error) {
-      console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to create a token`, error.stack));
+      log.error(`Failed to create a token!`, error);
       return null;
     }
   }
@@ -29,13 +29,11 @@ export class TokenService {
     try {
       const result = await Token.destroy({ where: { [Op.or]: [{ accessToken: token }, { refreshToken: token }] } });
       if (result == 0) {
-        console.log(
-          new Date().toISOString() + chalk.yellowBright(` [WARN] No tokens were removed when deleteByToken was called!`)
-        );
+        log.warn(`No tokens were removed when deleteByToken was called!`);
       }
       return result > 0;
     } catch (error) {
-      console.log(new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete a token pair`, error.stack));
+      log.error(`Failed to delete a token pair!`, error);
     }
     return false;
   }
@@ -46,9 +44,7 @@ export class TokenService {
     try {
       await Token.destroy({ where: { tokenId: idList } });
     } catch (error) {
-      console.log(
-        new Date().toISOString() + chalk.redBright(` [ERROR] Failed to delete all auth tokens of a user`, error.stack)
-      );
+      log.error(`Failed to delete all auth tokens of a user!`, error);
     }
   }
 }

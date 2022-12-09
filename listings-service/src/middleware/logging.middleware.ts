@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import { log } from "../utils/logger";
 
 const logger = (req: any, res: any, next: any) => {
   let method = req.method;
@@ -7,9 +7,9 @@ const logger = (req: any, res: any, next: any) => {
   next();
   res.on("finish", () => {
     const durationInMilliseconds = getActualRequestDurationInMilliseconds(start);
-    let status = res.statusCode;
-    let log = `${method} '${url}' ${status} ${durationInMilliseconds.toLocaleString()} ms`;
-    console.debug(new Date().toISOString() + chalk.cyan(` [TRACE] ${log}`));
+    const status = res.statusCode;
+    const message = `${method} '${url}' ${status} ${durationInMilliseconds.toLocaleString()} ms`;
+    log.trace(message);
   });
 };
 

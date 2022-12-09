@@ -1,8 +1,8 @@
 import * as bcrypt from "bcrypt";
-import chalk from "chalk";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
+import { log } from "../utils/logger";
 import { TokenService } from "./token.service";
 
 const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
@@ -17,10 +17,7 @@ export class AuthenticationService {
     try {
       return req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
     } catch (error) {
-      console.log(
-        new Date().toISOString() +
-          chalk.redBright(` [ERROR] An error has occurred while extracting the access token!`, error.stack)
-      );
+      log.error(`An error has occurred while extracting the access token!`, error);
       return null;
     }
   }
@@ -33,10 +30,7 @@ export class AuthenticationService {
     try {
       return jwt.decode(token) as JwtPayload;
     } catch (error) {
-      console.log(
-        new Date().toISOString() +
-          chalk.redBright(` [ERROR] An error has occurred while extracting the access token!`, error.stack)
-      );
+      log.error(`An error has occurred while extracting the access token!`, error);
       return null;
     }
   }
@@ -64,7 +58,7 @@ export class AuthenticationService {
     if (savedToken) {
       return { accessToken, refreshToken };
     }
-    console.log(new Date().toISOString() + chalk.yellowBright(` [WARN] The created token is null!`));
+    log.warn(`The created token is null!`);
     return null;
   }
 

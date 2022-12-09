@@ -1,4 +1,4 @@
-import { Model, DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { SequelizeSingleton } from "../config/database.config";
 
 class User extends Model {

@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
@@ -6,6 +5,7 @@ import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
 import { commentsRouter } from "./routes/comments.routes";
 import { listingsRouter } from "./routes/listings.routes";
+import { log } from "./utils/logger";
 
 const app = express();
 app.use(express.json());
@@ -32,11 +32,9 @@ app.all("*", (_req, res) => {
 const PORT: number = Number(process.env.LISTINGS_PORT) || 8081;
 app.listen(PORT, async () => {
   if (!(await initializeDb())) {
-    console.log(
-      new Date().toISOString() + chalk.redBright(` [ERROR] SHUTTING DOWN due to issues with the database connection`!)
-    );
+    log.error(`SHUTTING DOWN due to issues with the database connection!`);
     return process.exit(1);
   }
-  console.log(new Date().toISOString() + chalk.yellowBright(` [INFO] Listings Server has started on port: ${PORT}`));
+  log.info(`Listings Server has started on port: ${PORT}`);
   return;
 });
