@@ -20,7 +20,9 @@ const router: Router = Router();
 
 router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) => {
   try {
+    log.info("Attempting to retrieve a list of Users.");
     const userList: User[] = await User.findAll();
+    log.info("Returning the list of users, may be empty.");
     return res.status(200).send(userList);
   } catch (error) {
     log.info(`Error occurred while getting user:  ${error}`);
@@ -28,31 +30,36 @@ router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) =>
   }
 });
 
-// Logged in
 router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
   const userId = req.body.token.user_id;
+  log.info(`Attempting to retrieve a User by id: '${userId}'`);
   try {
     const user: User | null = await User.findByPk(userId);
     if (user) {
+      log.info(`User was found, returning the user.`);
       return res.status(200).send(user);
     } else {
+      log.warn(`User not was found, returning 404.`);
       return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
     }
   } catch (error) {
-    log.error("Error occurred while getting user: ${error}");
+    log.error(`Error occurred while getting user: ${error}`);
     return res.status(500).send(new InternalServerError(`Unable to reach database.`));
   }
 });
 
 router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Request, res: Response) => {
   const user = req.body.user;
+  log.info(`Attempting to crate a user: ${user}`)
   if (!isValidUuid(user.userId)) {
+    log.error("the provided userId was not valid!")
     return res.status(400).send(new ValidationError(`Provided UUID: '${user.userId}' is not a valid UUIDv4.`));
   }
 
   try {
     await user.validate();
     const result = await user.save();
+    log.info("User was added to the database")
     return res.status(201).send(result);
   } catch (error) {
     if (error.errors) {
@@ -67,6 +74,7 @@ router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Reques
 
 router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, async (req: Request, res: Response) => {
   if (req.body.token.role === Role.user && req.params.id !== req.body.token.userId) {
+    log.warn(`User: '${req.body.token.userId}' was attempting to change a picture of user: '${req.body.token.userId}'.`)
     res.status(400).send(new UnauthorizedError());
   }
   // TODO: csrf token, this is a form!
@@ -75,14 +83,18 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
     if (err) {
       log.warn(`An invalid file was uploaded: ${err.message}`);
       if (err.message == "Invalid mime type") {
+        log.error(`Invalid file mime type`)
         return res.status(400).send(new BadRequestError("You can only upload files of type png, jpg, and jpeg"));
       }
       if (err.message === "Too many files") {
+        log.error(`Too many files attempted to be uploaded`)
         return res.status(400).send(new BadRequestError("You can only upload one file"));
       }
       if (err.message === "Unexpected field") {
+        log.error(`An unexpected field was found with the file`)
         return res.status(400).send(new BadRequestError("The field key has to be 'file'"));
       }
+      log.error(`An unexpected error has occurred while uploading files.`)
       return res
         .status(500)
         .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
