@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { NextFunction, Request, Response } from "express";
 import { getEnv } from "../config/secrets";
+import { UnauthorizedError } from "../utils/error-messages";
 import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
@@ -54,10 +55,28 @@ const canAccessAnonymous = async (req: Request, res: Response, next: NextFunctio
 
 /**
  * Middleware\
+ * Verify that the token is valid and present.
+ * @returns 401: Unauthorized if validation fails or token is missing. Sets the token to request body
+ */
+const canAccessLoggedIn = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.headers && req.headers.authorization) {
+    try {
+      const token = await validateToken(req);
+      req.body.token = token;
+      return next();
+    } catch (error) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+  }
+  return res.status(401).send(new UnauthorizedError());
+};
+
+/**
+ * Middleware\
  * Verify if the user has the required role or admin role in their valid jwt token.\
  * @returns 401: Unauthorized if validation fails or sets the token to request body
  */
-const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction) => {
+const canAccessMinRoleUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = await validateToken(req);
     if (token.role === Role.admin || token.role === Role.user) {
@@ -82,8 +101,8 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
       return next();
     }
   } catch (error) {
-    return res.status(401).send({ message: "Unauthorized" });
+    return res.status(401).send(new UnauthorizedError());
   }
 };
 
-export { canAccessRoleUser, canAccessRoleAdmin, canAccessAnonymous };
+export { canAccessMinRoleUser, canAccessRoleAdmin, canAccessAnonymous, canAccessLoggedIn };

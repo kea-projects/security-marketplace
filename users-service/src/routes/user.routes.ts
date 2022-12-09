@@ -3,16 +3,22 @@ import { validate as isValidUuid } from "uuid";
 import { uploadSingleImage } from "../config/multer.config";
 import { cleanUserObjFields } from "../middleware/bodyValidators";
 import { paramUuidValidator } from "../middleware/path-param-validators";
-import { canAccessRoleUser } from "../middleware/validate-access.middleware";
+import { canAccessRoleAdmin, canAccessLoggedIn, canAccessMinRoleUser } from "../middleware/validate-access.middleware";
 import { User } from "../models/userModel";
-import { BadRequestError, InternalServerError, NotFoundError, ValidationError } from "../utils/error-messages";
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from "../utils/error-messages";
 import { FilesService } from "../utils/file-uploader";
 import { log } from "../utils/logger";
+import { Role } from "../utils/role.enum";
 
 const router: Router = Router();
 
-// TODO: token validation, admin only
-router.get("/users", async (_req: Request, res: Response) => {
+router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) => {
   try {
     const userList: User[] = await User.findAll();
     return res.status(200).send(userList);
@@ -23,9 +29,8 @@ router.get("/users", async (_req: Request, res: Response) => {
 });
 
 // Logged in
-router.get("/users/:id", paramUuidValidator, async (req: Request, res: Response) => {
-  const userId = req.params.id;
-
+router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
+  const userId = req.body.token.user_id;
   try {
     const user: User | null = await User.findByPk(userId);
     if (user) {
@@ -39,8 +44,7 @@ router.get("/users/:id", paramUuidValidator, async (req: Request, res: Response)
   }
 });
 
-// TODO: token validation, admin only
-router.post("/users", cleanUserObjFields, async (req: Request, res: Response) => {
+router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Request, res: Response) => {
   const user = req.body.user;
   if (!isValidUuid(user.userId)) {
     return res.status(400).send(new ValidationError(`Provided UUID: '${user.userId}' is not a valid UUIDv4.`));
@@ -52,18 +56,19 @@ router.post("/users", cleanUserObjFields, async (req: Request, res: Response) =>
     return res.status(201).send(result);
   } catch (error) {
     if (error.errors) {
-      log.error(error);
+      log.error(`An error occurred while validating the new user: ${error}`);
       return res.status(400).send(new ValidationError(error.errors[0]));
     } else {
-      log.error(`An error occurred retrieving the lost of market entries: ${error}`);
+      log.error(`An error occurred while saving the new user: ${error}`);
       return res.status(500).send(new InternalServerError());
     }
   }
 });
 
-// TODO: admin can change any :id pictures
-// TODO: users can only update their own pictures
-router.put("/users/:id/pictures", paramUuidValidator, canAccessRoleUser, async (req: Request, res: Response) => {
+router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, async (req: Request, res: Response) => {
+  if (req.body.token.role === Role.user && req.params.id !== req.body.token.userId) {
+    res.status(400).send(new UnauthorizedError());
+  }
   // TODO: csrf token, this is a form!
   const token = req.body.token;
   uploadSingleImage(req, res, async (err: any) => {
