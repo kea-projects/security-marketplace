@@ -35,6 +35,6 @@ app.listen(PORT, async () => {
     log.error(`SHUTTING DOWN due to issues with the database connection!`);
     return process.exit(1);
   }
-  log.error(`Listings Server has started on port: ${PORT}`);
+  log.info(`Listings Server has started on port: ${PORT}`);
   return;
 });
