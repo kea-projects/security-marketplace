@@ -6,5 +6,5 @@ export class SignupRequestDto {
 
 export class LoginResponse {
   accessToken!: string;
-  // TODO - add the refresh token to the response
+  refreshToken!: string;
 }
