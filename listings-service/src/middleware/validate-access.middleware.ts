@@ -78,6 +78,8 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
     if (token.role === Role.admin) {
       req.body.token = token;
       return next();
+    } else {
+      return res.status(401).send({ message: "Unauthorized" });
     }
   } catch (error) {
     return res.status(401).send({ message: "Unauthorized" });

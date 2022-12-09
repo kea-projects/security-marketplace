@@ -48,6 +48,8 @@ const canAccessRoleAdmin = (req: Request, res: Response, next: NextFunction) => 
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     if (decodedToken?.role === Role.admin) {
       return next();
+    } else {
+      return res.status(401).send({ message: "Unauthorized" });
     }
   } catch (error) {
     log.error(`An error has occurred while validating an access token!`, error);
