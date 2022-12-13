@@ -93,8 +93,6 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
   return res.status(401).send({ message: "Unauthorized" });
 });
 
-// TODO - the access middlewares need to verify that the token does exist in the DB
-// TODO - when trying to access the system using a deleted token, invalidate all of the users tokens
 router.post("/refresh", canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     log.trace(`Refreshing a token pair`);
