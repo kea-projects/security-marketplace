@@ -238,6 +238,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
     } catch (error) {
       log.error(`An error occurred while uploading a file!`, error);
     }
+    log.warn(`Failed to update a listing file`)
     return res.status(403).send({ message: "Forbidden" });
   });
 });
