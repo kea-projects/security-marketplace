@@ -9,7 +9,7 @@ const logger = (req: any, res: any, next: any) => {
     const durationInMilliseconds = getActualRequestDurationInMilliseconds(start);
     const status = res.statusCode;
     const message = `${method} '${url}' ${status} ${durationInMilliseconds.toLocaleString()} ms`;
-    log.trace(message);
+    log.info(message);
   });
 };
 
