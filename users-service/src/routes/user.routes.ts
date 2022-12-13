@@ -31,7 +31,7 @@ router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) =>
 });
 
 router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
-  const userId = req.body.token.user_id;
+  const userId = req.body.token.userId;
   log.info(`Attempting to retrieve a User by id: '${userId}'`);
   try {
     const user: User | null = await User.findByPk(userId);
