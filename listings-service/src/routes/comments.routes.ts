@@ -13,6 +13,7 @@ router.post("", validateCreateCommentRequestBody, canAccessRoleUser, async (req:
     try {
       const foundListing = await ListingsService.findOne(req.body.commentedOn);
       if (!foundListing) {
+        log.info(`Failed comment creation since no matching listing was found!`);
         return res.status(404).send({ message: "Listing not found" });
       }
       if (!foundListing.isPublic && foundListing.createdBy !== (token?.userId as string)) {

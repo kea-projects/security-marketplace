@@ -16,6 +16,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
 
   // Call Auth Service and validate the token
   try {
+    log.trace(`Calling auth-service with the token to attempt to validate...`);
     const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL", false)}/validate`, {
       method: "POST",
       headers: new Headers({
@@ -23,6 +24,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
       }),
     });
     if (response.status === 200) {
+      log.trace("Token was validated, returning it in the body.");
       const body = await response.json();
       return { ...body.token };
     }
@@ -39,14 +41,20 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
  * @returns 401: Unauthorized if validation fails or sets the token to request body
  */
 const canAccessAnonymous = async (req: Request, res: Response, next: NextFunction) => {
+  log.trace("Attempting to retrieve any access token that may exist...");
   if (req.headers && req.headers.authorization) {
+    log.trace("Token was found, validating...");
     try {
       const token = await validateToken(req);
       req.body.token = token;
+      log.trace(`User validated as ${req.body.token.role}.`);
+      return next();
     } catch (error) {
+      log.error(`An error has occurred while validating the user`, error);
       return res.status(401).send({ message: "Unauthorized" });
     }
   }
+  log.trace(`The user has no token in the headers, but letting him pass.`);
   return next();
 };
 
@@ -57,12 +65,15 @@ const canAccessAnonymous = async (req: Request, res: Response, next: NextFunctio
  */
 const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    log.trace("Attempting to validate user as either User or Admin...");
     const token = await validateToken(req);
     if (token.role === Role.admin || token.role === Role.user) {
       req.body.token = token;
+      log.trace(`User validated as ${req.body.token.role}.`);
       return next();
     }
   } catch (error) {
+    log.info("Role validation failed: User was NOT admin or user, rejecting.");
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
@@ -74,14 +85,18 @@ const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction
  */
 const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    log.trace("Attempting to validate user as admin...");
     const token = await validateToken(req);
     if (token.role === Role.admin) {
       req.body.token = token;
+      log.trace("Admin successfully validated.");
       return next();
     } else {
+      log.info("Role validation failed: User was NOT admin, rejecting.");
       return res.status(401).send({ message: "Unauthorized" });
     }
   } catch (error) {
+    log.error(`An error has occurred while validating the user`, error);
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
