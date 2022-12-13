@@ -43,7 +43,7 @@ class FilesService {
         return { url: `https://${BUCKET_ID}.${CLUSTER_ID}.linodeobjects.com/${filename}` };
       }
     } catch (error) {
-      log.error(`Failed to upload a file to Linode Object storage: ${error}`);
+      log.error(`Failed to upload a file to Linode Object storage`, error);
       if (error.name === "InvalidAccessKeyId") {
         throw new Error("InvalidAccessKeyIdError");
       } else {

@@ -31,27 +31,25 @@ import { log } from "../utils/logger";
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
   const { userId, email, name } = req.body!;
-  log.info(`Cleaning the request.body of any extra fields not related to User`);
+  log.trace(`Cleaning the request.body of any extra fields not related to User`);
 
   if (!userId) {
-    log.error(`The body was missing the: 'userId' attribute`)
+    log.info(`Request body validation failed: The body was missing the: 'userId' attribute`);
     return res.status(400).send(new MissingPropertyError("userId"));
   }
   if (!email) {
-    log.error(`The body was missing the: 'email' attribute`)
+    log.info(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
   if (!name) {
-    log.error(`The body was missing the: 'name' attribute`)
+    log.info(`Request body validation failed: The body was missing the: 'name' attribute`);
     return res.status(400).send(new MissingPropertyError("name"));
   }
-  log.info(`All required attributes are present, clearing the body.`)
+  log.trace(`All required attributes are present, clearing the body.`);
   req.body = {};
-  log.info(`Setting request.body to only contain User object.`)
+  log.trace(`Setting request.body to only contain User object.`);
   req.body.user = new User({ userId, email, name });
   return next();
 };
-
-
 
 export { cleanUserObjFields };

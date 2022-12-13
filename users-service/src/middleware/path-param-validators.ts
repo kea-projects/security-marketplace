@@ -5,7 +5,7 @@ import { log } from "../utils/logger";
 
 const paramUuidValidator = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  log.info(`Checking that the parameter id: '${id} is a valid uuid.`);
+  log.trace(`Checking that the parameter id: '${id} is a valid uuid.`);
   if (!id) {
     log.warn(`The id was invalid! rejecting...`);
     return res.status(400).send(new ValidationError("UUID was not provided."));
@@ -15,7 +15,7 @@ const paramUuidValidator = (req: Request, res: Response, next: NextFunction) => 
     log.warn(`The id was invalid! rejecting...`);
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-  log.info(`The id was valid, proceeding.`);
+  log.trace(`The id was valid, proceeding.`);
   return next();
 };
 
@@ -28,7 +28,7 @@ const isOwnIdValidator = (req: Request, res: Response, next: NextFunction) => {
     log.warn(`The user: '${userId}' was trying to access id: '${paramId}' !`);
     return res.status(401).send(new UnauthorizedError());
   }
-  log.info(`The user: '${userId}' is allowed to query: '${paramId}'.`);
+  log.trace(`The user: '${userId}' is allowed to query: '${paramId}'.`);
   return next();
 };
 
