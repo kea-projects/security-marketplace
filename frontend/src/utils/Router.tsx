@@ -8,6 +8,8 @@ import { ProfilePage } from '../routes/ProfilePage';
 import { SignupPage } from '../routes/SignupPage';
 import { UsersPage } from '../routes/UsersPage';
 import { ListingDetailsPage } from '../routes/ListingDetailsPage';
+import { RouterGuard } from '../components/RouterGuard';
+import { isNotLoggedIn, hasUserPrivileges, hasAdminPrivileges } from './Auth';
 
 export const router = createBrowserRouter([
     {
@@ -17,22 +19,42 @@ export const router = createBrowserRouter([
     },
     {
         path: '/login',
-        element: <LoginPage />,
+        element: (
+            <RouterGuard condition={isNotLoggedIn} redirectTo="/">
+                <LoginPage />
+            </RouterGuard>
+        ),
     },
     {
         path: '/signup',
-        element: <SignupPage />,
+        element: (
+            <RouterGuard condition={isNotLoggedIn} redirectTo="/">
+                <SignupPage />
+            </RouterGuard>
+        ),
     },
     {
         path: '/profile',
-        element: <ProfilePage />,
+        element: (
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+                <ProfilePage />
+            </RouterGuard>
+        ),
     },
     {
         path: '/users',
-        element: <UsersPage />,
+        element: (
+            <RouterGuard condition={hasAdminPrivileges} redirectTo="/login">
+                <UsersPage />
+            </RouterGuard>
+        ),
     },
     {
         path: '/listing-details/:listingId',
-        element: <ListingDetailsPage />,
+        element: (
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+                <ListingDetailsPage />
+            </RouterGuard>
+        ),
     },
 ]);
