@@ -88,7 +88,6 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
         return res.status(400).send(new BadRequestError("You can only upload files of type png, jpg, and jpeg"));
       }
       if (err.message === "Too many files") {
-        log.error(`Too many files attempted to be uploaded`);
         return res.status(400).send(new BadRequestError("You can only upload one file"));
       }
       if (err.message === "Unexpected field") {
