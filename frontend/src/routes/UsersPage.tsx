@@ -31,7 +31,13 @@ export function UsersPage() {
             return (
                 <Container key={index}>
                     <Link to={`/profile/${user?.userId}`}>
-                        <UserBadge fullName={user?.name} username={user?.email} isLoading={isLoading} showFull={true} />
+                        <UserBadge
+                            fullName={user?.name}
+                            username={user?.email}
+                            isLoading={isLoading}
+                            pictureUrl={user?.pictureUrl}
+                            showFull={true}
+                        />
                     </Link>
                 </Container>
             );

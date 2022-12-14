@@ -63,7 +63,12 @@ export function Profilebar({ userId }: ProfilebarProps) {
 
     return (
         <Navbar height="80px" minHeight="80px" variant="userDisplay" fontSize="lg">
-            <UserBadge fullName={user?.name} username={user?.email} isLoading={isLoading} />
+            <UserBadge
+                fullName={user?.name}
+                username={user?.email}
+                pictureUrl={user?.pictureUrl}
+                isLoading={isLoading}
+            />
             <Spacer />
 
             {/* Desktop */}
@@ -104,6 +109,9 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 </Show>
             </Popover>
 
+            <Button colorScheme="accent" variant="solid">
+                Update Picture
+            </Button>
             <Button colorScheme="accent" variant="solid" onClick={handleHideAllListings}>
                 Hide all Listings
             </Button>

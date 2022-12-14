@@ -17,9 +17,10 @@ interface UserBadgeProps {
     isLoading: boolean;
     fullName?: string;
     username?: string;
+    pictureUrl?: string;
 }
 
-export function UserBadge({ isLoading = false, fullName, username, showFull = false }: UserBadgeProps) {
+export function UserBadge({ isLoading = false, fullName, username, pictureUrl, showFull = false }: UserBadgeProps) {
     // TODO: provide proper link to the image.
     return (
         <>
@@ -36,7 +37,7 @@ export function UserBadge({ isLoading = false, fullName, username, showFull = fa
                     boxShadow="md"
                 >
                     <SkeletonCircle size="fit-content" isLoaded={!isLoading}>
-                        <Avatar size="lg" name={fullName} src="https://bit.ly/broken-link" />
+                        <Avatar size="lg" name={fullName} src={pictureUrl} />
                     </SkeletonCircle>
 
                     <SkeletonText noOfLines={2} minWidth="150px" width="fit-content" isLoaded={!isLoading}>
