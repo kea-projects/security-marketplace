@@ -1,6 +1,7 @@
+import e from "cors";
 import { NextFunction, Request, Response } from "express";
 import { getEnv } from "../config/secrets";
-import { UnauthorizedError } from "../utils/error-messages";
+import { ForbiddenError, UnauthorizedError } from "../utils/error-messages";
 import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
@@ -96,6 +97,9 @@ const canAccessMinRoleUser = async (req: Request, res: Response, next: NextFunct
       req.body.token = token;
       log.trace(`User validated as ${req.body.token.role}.`);
       return next();
+    } else {
+      log.trace("User was NOT admin or User, rejecting.");
+      return res.status(403).send(new ForbiddenError());
     }
   } catch (error) {
     log.error(`An error has occurred while validating the user`, error);
@@ -118,7 +122,7 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
       return next();
     } else {
       log.trace("User was NOT admin, rejecting.");
-      return res.status(401).send(new UnauthorizedError());
+      return res.status(403).send(new ForbiddenError());
     }
   } catch (error) {
     log.error(`An error has occurred while validating the user`, error);
