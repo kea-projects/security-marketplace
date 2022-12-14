@@ -52,7 +52,7 @@ router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Reques
   const user = req.body.user;
   log.trace(`Attempting to crate a user with id: ${user.userId}`);
   if (!isValidUuid(user.userId)) {
-    log.error("the provided userId was not valid!");
+    log.warn("the provided userId was not valid!");
     return res.status(400).send(new ValidationError(`Provided UUID: '${user.userId}' is not a valid UUIDv4.`));
   }
 
