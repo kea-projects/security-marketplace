@@ -38,6 +38,13 @@ class UnauthorizedError extends BaseError {
   }
 }
 
+
+class ForbiddenError extends BaseError {
+  constructor() {
+    super("ForbiddenError", "Forbidden");
+  }
+}
+
 class BadRequestError extends BaseError {
   constructor(detail: string) {
     super("BadRequest", detail);
@@ -51,4 +58,5 @@ export {
   NotFoundError,
   UnauthorizedError,
   BadRequestError,
+  ForbiddenError,
 };

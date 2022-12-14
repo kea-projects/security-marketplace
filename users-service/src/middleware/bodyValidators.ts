@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/userModel";
 import { MissingPropertyError } from "../utils/error-messages";
+import { log } from "../utils/logger";
 
 /**
  * Middleware function designed to only let valid User variables pass to the Router
@@ -30,32 +31,25 @@ import { MissingPropertyError } from "../utils/error-messages";
  */
 const cleanUserObjFields = (req: Request, res: Response, next: NextFunction) => {
   const { userId, email, name } = req.body!;
+  log.trace(`Cleaning the request.body of any extra fields not related to User`);
 
   if (!userId) {
+    log.warn(`Request body validation failed: The body was missing the: 'userId' attribute`);
     return res.status(400).send(new MissingPropertyError("userId"));
   }
   if (!email) {
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
   if (!name) {
+    log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
     return res.status(400).send(new MissingPropertyError("name"));
   }
-
+  log.trace(`All required attributes are present, clearing the body.`);
   req.body = {};
+  log.trace(`Setting request.body to only contain User object.`);
   req.body.user = new User({ userId, email, name });
   return next();
 };
 
-const cleanUserImageUrlObj = (req: Request, res: Response, next: NextFunction) => {
-  const { pictureUrl } = req.body!;
-
-  if (!pictureUrl) {
-    return res.status(400).send(new MissingPropertyError("pictureUrl"));
-  }
-
-  req.body = {};
-  req.body.pictureUrl = pictureUrl;
-  return next();
-};
-
-export { cleanUserObjFields, cleanUserImageUrlObj };
+export { cleanUserObjFields };

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { MissingPropertyError } from "../utils/error-messages";
+import { log } from "../utils/logger";
 
 /**
  * Middleware function designed to only let valid User variables pass to the Router
@@ -28,17 +29,21 @@ import { MissingPropertyError } from "../utils/error-messages";
  */
 const validateSignupRequestBody = (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body!;
+  log.trace(`Validating the request.body of Signup Request`);
 
   if (!name) {
+    log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
     return res.status(400).send(new MissingPropertyError("name"));
   }
 
   // TODO - validate that it's an email
   if (!email) {
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
 
   if (!password) {
+    log.warn(`Request body validation failed: The body was missing the: 'password' attribute`);
     return res.status(400).send(new MissingPropertyError("password"));
   }
   req.body = { name, email, password };
@@ -48,12 +53,15 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
 
 const validateLoginRequestBody = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body!;
+  log.trace(`Validating the request.body of Login Request`);
 
   if (!email) {
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
 
   if (!password) {
+    log.warn(`Request body validation failed: The body was missing the: 'password' attribute`);
     return res.status(400).send(new MissingPropertyError("password"));
   }
   req.body = { email, password };

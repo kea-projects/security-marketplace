@@ -23,11 +23,14 @@ router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
   try {
     const token = req.body?.token;
     if (!token) {
+      log.trace(`No access token, Returning all public listings`);
       return res.send(await ListingsService.findByIsPublic());
     }
     if (token && token.role != Role.admin) {
+      log.trace(`Access role: User, Returning all public listings and listings of user ${token.userId}`);
       return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
     }
+    log.trace(`Access role: Admin, Returning all listings`);
     return res.send(await ListingsService.findAll());
   } catch (error) {
     log.error(`Failed to get all listings!`, error);
@@ -39,26 +42,37 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
   try {
     const foundListing = await ListingsService.findOne(req.params.id);
     if (!foundListing) {
+      log.info(`Failed to find listing with id ${req.params.id}`);
       res.status(404).send({ message: "Listing not found" });
     } else {
+      log.trace(`Listing found with id ${req.params.id}`);
+      let comments;
+      try {
+        log.trace(`Getting comments of listing ${foundListing.listingId}`);
+        comments = await CommentsService.findByListingId(foundListing.listingId as string);
+      } catch (error) {
+        log.error(`Failed to get comments for listing with id: ${req.params.id}`, error);
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
+      log.trace(`Getting access token from request body`);
       const token = req.body?.token;
       if (!token && foundListing.isPublic) {
-        return res.send(foundListing);
+        log.trace(`Returning the public listing`);
+        return res.send({ listing: foundListing, comments });
       }
+
       if (token && token.role != Role.admin) {
         if (foundListing.createdBy === token.userId) {
-          return res.send(foundListing);
+          log.trace(`Returning the listing that belongs to ${token.userId}`);
+          return res.send({ listing: foundListing, comments });
         }
         log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
         return res.status(403).send({ message: "Forbidden" });
       }
-
-      try {
-        const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+      if (token && token.role === Role.admin) {
+        log.trace(`Returning the listing for the admin user`);
         return res.send({ listing: foundListing, comments });
-      } catch (error) {
-        log.error(`Failed to get comments for listing with id: ${req.params.id}`, error);
-        return res.status(403).send({ message: "Forbidden" });
       }
     }
   } catch (error) {
@@ -73,15 +87,15 @@ router.patch(
   validateUpdateListingRequestBody,
   canAccessRoleUser,
   async (req: Request, res: Response) => {
+    log.trace(`Updating listing ${req.params.id}`);
     try {
       const foundListing = await ListingsService.findOne(req.params.id);
       const token = req.body?.token;
-
       if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
         log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
         return res.status(403).send({ message: "Forbidden" });
       }
-
+      log.info(`Updating listing ${req.params.id}`);
       return res.send(await ListingsService.update(req.params.id, req.body));
     } catch (error) {
       log.error(`Failed to get a listing by id!`, error);
@@ -114,14 +128,16 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
         return res.status(403).send({ message: "Forbidden" });
       }
       // Create a listing and upload a file
+      log.trace(`Creating a listing`);
       const { name, description, isPublic } = req.body;
       if (!token || !token?.userId) {
+        log.warn(`Listing creation failed due to a missing token`);
         return res.status(403).send({ message: "Forbidden" });
       }
       try {
         const listingId = uuidv4();
         const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
-
+        log.trace(`Creating listing with id ${listingId}`);
         const listing = await ListingsService.create({
           listingId,
           name,
@@ -131,6 +147,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
           createdBy: token!.userId,
         });
         // Upload the file
+        log.trace(`Uploading file for listing ${listing.listingId}`);
         try {
           const uploadedFile = FilesService.uploadFile(
             req.file!.buffer,
@@ -144,6 +161,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
           throw new Error("Failed to upload a file");
         }
         // Return the created listing information
+        log.trace(`Listing created`);
         return res.status(201).send(listing);
       } catch (error) {
         log.error(`Failed to create a listing!`, error);
@@ -152,12 +170,14 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
     } catch (error) {
       log.error(` An error occurred while uploading a file!`, error);
     }
+    log.warn(`Failed to create a listing`);
     return res.status(403).send({ message: "Forbidden" });
   });
 });
 
 router.delete("/:id", validateUuidFromParams, canAccessRoleUser, async (req: Request, res: Response) => {
   try {
+    log.trace(`Deleting a listing with id ${req.params.id}`);
     const foundListing = await ListingsService.findOne(req.params.id);
     const token = req.body?.token;
 
@@ -204,6 +224,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
         }
         return res.status(403).send({ message: "Forbidden" });
       }
+      log.trace(`Updating listing file with id ${req.params.id}`);
       const listingId = req.params.id;
       const listing = await ListingsService.findOne(listingId);
       if (listing && token && token.role !== Role.admin && listing!.createdBy === token!.userId) {
@@ -217,6 +238,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
     } catch (error) {
       log.error(`An error occurred while uploading a file!`, error);
     }
+    log.warn(`Failed to update a listing file`)
     return res.status(403).send({ message: "Forbidden" });
   });
 });
