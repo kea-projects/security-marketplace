@@ -9,6 +9,13 @@ interface CreateListingRequestBody {
     isPublic: boolean;
 }
 
+interface UpdateListingRequestBody {
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+    isPublic?: boolean;
+}
+
 export interface ListingResponse {
     listingId: string;
     name: string;
@@ -57,6 +64,14 @@ export class ListingApi {
     public async createListing(body: CreateListingRequestBody) {
         console.log('Listing Api', 'Requesting listing creation...');
         return listingApi.postForm('/listings', { ...body });
+    }
+
+    public async updateListing(
+        body: UpdateListingRequestBody,
+        listingId: string,
+    ): Promise<AxiosResponse<ListingResponse>> {
+        console.log('Listing Api', 'Requesting listing update...');
+        return listingApi.patch(`/listings/${listingId}`, body);
     }
 
     // --- COMMENTS ---

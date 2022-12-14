@@ -18,6 +18,8 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import { Navbar } from '../components/Navbar';
 import { UserBadge } from './UserBadge';
 import { UserApi, UserResponse } from '../api/UserApi';
+import { ListingApi } from '../api/ListingApi';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfilebarProps {
     userId?: string;
@@ -30,6 +32,8 @@ export function Profilebar({ userId }: ProfilebarProps) {
 
     // Constants
     const userApi = new UserApi();
+    const listingApi = new ListingApi();
+    const navigate = useNavigate();
 
     // Fetching user
     useEffect(() => {
@@ -44,6 +48,18 @@ export function Profilebar({ userId }: ProfilebarProps) {
 
         fetchUser();
     }, []);
+
+    // Handlers
+    const handleHideAllListings = async () => {
+        if (userId) {
+            const { data } = await listingApi.getUserListings(userId);
+            for (const listing of data) {
+                listing.isPublic = false;
+                await listingApi.updateListing(listing, listing.listingId);
+            }
+            navigate(0);
+        }
+    };
 
     return (
         <Navbar height="80px" minHeight="80px" variant="userDisplay" fontSize="lg">
@@ -88,7 +104,7 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 </Show>
             </Popover>
 
-            <Button colorScheme="accent" variant="solid">
+            <Button colorScheme="accent" variant="solid" onClick={handleHideAllListings}>
                 Hide all Listings
             </Button>
         </Navbar>

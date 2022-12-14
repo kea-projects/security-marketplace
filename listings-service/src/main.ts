@@ -13,7 +13,7 @@ app.use(logger);
 // -----------------------CORS-------------------------
 const corsOptions = {
   origin: "*", // TODO - discuss the the cors rules
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PATCH"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 };

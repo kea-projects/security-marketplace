@@ -1,18 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Center, Skeleton, Container, HStack, Text, VStack, Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { ListingResponse } from '../api/ListingApi';
+import { ListingApi, ListingResponse } from '../api/ListingApi';
 
 interface ListingProps {
     isLoading: boolean;
-    listing: ListingResponse;
+    listingData: ListingResponse;
 }
 // TODO: Discuss whether the API should return the listing or not if it set to private
-export function Listing({ isLoading = false, listing }: ListingProps) {
-    const navigate = useNavigate();
+export function Listing({ isLoading = false, listingData }: ListingProps) {
+    // States
+    const [listing, setListing] = useState<ListingResponse | undefined>(undefined);
 
+    // Constants
+    const navigate = useNavigate();
+    const listingApi = new ListingApi();
+
+    // Set listing data
+    useEffect(() => {
+        if (!isLoading) {
+            setListing(listingData);
+        }
+    }, [isLoading]);
+
+    // Handlers
     const handleSeeMore = () => {
-        navigate(`/listing-details/${listing.listingId}`);
+        navigate(`/listing-details/${listing?.listingId}`);
+    };
+
+    const handleToggleIsPublic = async () => {
+        if (listing) {
+            const { data } = await listingApi.updateListing(
+                { ...listing, isPublic: !listing.isPublic },
+                listing.listingId,
+            );
+            setListing(data);
+        }
     };
 
     return (
@@ -31,16 +54,16 @@ export function Listing({ isLoading = false, listing }: ListingProps) {
                         >
                             {!isLoading && (
                                 <Text noOfLines={2} fontSize="xl">
-                                    {listing.name}
+                                    {listing?.name}
                                 </Text>
                             )}
                         </Container>
-                        <Container>{!isLoading && <Text noOfLines={2}>{listing.description}</Text>}</Container>
+                        <Container>{!isLoading && <Text noOfLines={2}>{listing?.description}</Text>}</Container>
                     </VStack>
 
                     <VStack paddingRight="10px">
-                        <Button colorScheme="accent" variant="solid">
-                            {!isLoading && (listing.isPublic ? 'Public' : 'Private')}
+                        <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
+                            {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
                         </Button>
                         <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
                             See More

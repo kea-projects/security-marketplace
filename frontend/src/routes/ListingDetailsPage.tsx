@@ -34,6 +34,17 @@ export function ListingDetailsPage() {
         fetchData();
     }, []);
 
+    // Handlers
+    const handleToggleIsPublic = async () => {
+        if (listing) {
+            const { data } = await listingApi.updateListing(
+                { ...listing, isPublic: !listing.isPublic },
+                listing.listingId,
+            );
+            setListing(data);
+        }
+    };
+
     const getCommentList = (comments: CommentResponse[] = []) => {
         return comments.map((comment, index) => {
             return (
@@ -60,7 +71,7 @@ export function ListingDetailsPage() {
                         </Skeleton>
                     </Box>
                     <Skeleton height="5vh" minWidth="15vw" rounded="md" isLoaded={!isLoading}>
-                        <Button colorScheme="accent" variant="solid">
+                        <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
                             Status: {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
                         </Button>
                     </Skeleton>
