@@ -85,7 +85,6 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
     if (err) {
       log.warn(`An invalid file was uploaded: ${err.message}`);
       if (err.message == "Invalid mime type") {
-        log.error(`Invalid file mime type`);
         return res.status(400).send(new BadRequestError("You can only upload files of type png, jpg, and jpeg"));
       }
       if (err.message === "Too many files") {
