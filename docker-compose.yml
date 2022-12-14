@@ -2,7 +2,167 @@ version: '3'
 
 services:
   users-service:
+    depends_on:
+      main-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
     container_name: users-service
     build:
       context: .
       dockerfile: ./configs/users-service/users-service.Dockerfile
+    # volumes:
+    #   - ./users-service:/app
+    environment:
+      - USERS_POSTGRES_HOST=$MAIN_POSTGRES_HOST
+      - USERS_POSTGRES_PORT=$MAIN_POSTGRES_PORT
+      - USERS_POSTGRES_USER=$MAIN_POSTGRES_USER
+      - USERS_POSTGRES_PASSWORD=$MAIN_POSTGRES_PASSWORD
+      - USERS_POSTGRES_DATABASE=$MAIN_POSTGRES_DATABASE
+      - USERS_POSTGRES_SYNC=$USERS_POSTGRES_SYNC
+      - USERS_POSTGRES_POPULATE=$USERS_POSTGRES_POPULATE
+      - USERS_LINODE_POPULATE=$USERS_LINODE_POPULATE
+      - USERS_POSTGRES_LOG=$USERS_POSTGRES_LOG
+      - USERS_PORT=$USERS_PORT
+      - AUTH_USERS_SERVICE_URL=$AUTH_USERS_SERVICE_URL
+      - USERS_LINODE_STORAGE_CLUSTER_ID=$LINODE_STORAGE_CLUSTER_ID
+      - USERS_LINODE_STORAGE_BUCKET_ID=$LINODE_STORAGE_BUCKET_ID
+      - USERS_LINODE_STORAGE_ACCESS_KEY=$LINODE_STORAGE_ACCESS_KEY
+      - USERS_LINODE_STORAGE_SECRET_KEY=$LINODE_STORAGE_SECRET_KEY
+    networks:
+      - sec-net
+      - main-db-net
+    ports:
+      - 8082:8082
+    restart: on-failure
+
+  listings-service:
+    depends_on:
+      main-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+    container_name: listings-service
+    build:
+      context: .
+      dockerfile: ./configs/listings-service/listings-service.Dockerfile
+    # volumes:
+    #   - ./listings-service:/app
+    environment:
+      - LISTINGS_POSTGRES_HOST=$MAIN_POSTGRES_HOST
+      - LISTINGS_POSTGRES_PORT=$MAIN_POSTGRES_PORT
+      - LISTINGS_POSTGRES_USER=$MAIN_POSTGRES_USER
+      - LISTINGS_POSTGRES_PASSWORD=$MAIN_POSTGRES_PASSWORD
+      - LISTINGS_POSTGRES_DATABASE=$MAIN_POSTGRES_DATABASE
+      - LISTINGS_POSTGRES_SYNC=$LISTINGS_POSTGRES_SYNC
+      - LISTINGS_POSTGRES_POPULATE=$LISTINGS_POSTGRES_POPULATE
+      - LISTINGS_LINODE_POPULATE=$LISTINGS_LINODE_POPULATE
+      - LISTINGS_PORT=$LISTINGS_PORT
+      - AUTH_USERS_SERVICE_URL=$AUTH_USERS_SERVICE_URL
+      - LISTINGS_LINODE_STORAGE_CLUSTER_ID=$LINODE_STORAGE_CLUSTER_ID
+      - LISTINGS_LINODE_STORAGE_BUCKET_ID=$LINODE_STORAGE_BUCKET_ID
+      - LISTINGS_LINODE_STORAGE_ACCESS_KEY=$LINODE_STORAGE_ACCESS_KEY
+      - LISTINGS_LINODE_STORAGE_SECRET_KEY=$LINODE_STORAGE_SECRET_KEY
+    networks:
+      - sec-net
+      - main-db-net
+    ports:
+      - 8081:8081
+    restart: on-failure
+
+  auth-service:
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./configs/auth-service/auth-service.Dockerfile
+    # volumes:
+    #   - ./auth-service:/app
+    environment:
+      - AUTH_POSTGRES_HOST=$AUTH_POSTGRES_HOST
+      - AUTH_POSTGRES_PORT=$AUTH_POSTGRES_PORT
+      - AUTH_POSTGRES_USER=$AUTH_POSTGRES_USER
+      - AUTH_POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
+      - AUTH_POSTGRES_DATABASE=$AUTH_POSTGRES_DATABASE
+      - AUTH_POSTGRES_SYNC=$AUTH_POSTGRES_SYNC
+      - AUTH_POSTGRES_POPULATE=$AUTH_POSTGRES_POPULATE
+      - AUTH_SECRET=$AUTH_SECRET
+      - AUTH_PORT=$AUTH_PORT
+      - USERS_SERVICE_URL=$USERS_SERVICE_URL
+    networks:
+      - sec-net
+      - auth-db-net
+    ports:
+      - 8080:8080
+    restart: on-failure
+
+  frontend:
+    depends_on:
+      - auth-service
+      - listings-service
+      - users-service
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: ./configs/frontend/frontend.Dockerfile
+    # volumes:
+    #   - ./frontend:/app
+    environment:
+      - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
+      - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
+      - REACT_APP_USERS_SERVICE_URL=$REACT_APP_USERS_SERVICE_URL
+    networks:
+      - sec-net
+    ports:
+      - 3001:3000
+    restart: on-failure
+
+  auth-postgres:
+    container_name: auth-postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=$AUTH_POSTGRES_USER
+      - POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
+      - POSTGRES_DB=$AUTH_POSTGRES_DATABASE
+    networks:
+      - auth-db-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${AUTH_POSTGRES_USER} -d ${AUTH_POSTGRES_DATABASE}'"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+  main-postgres:
+    container_name: main-postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=$MAIN_POSTGRES_USER
+      - POSTGRES_PASSWORD=$MAIN_POSTGRES_PASSWORD
+      - POSTGRES_DB=$MAIN_POSTGRES_DATABASE
+    networks:
+      - main-db-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${MAIN_POSTGRES_USER} -d ${MAIN_POSTGRES_DATABASE}'"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+# ---------------------------------
+# ------------ NETWORK ------------
+networks:
+  sec-net:
+    name: sec-net
+  auth-db-net:
+    name: auth-db-net
+  main-db-net:
+    name: main-db-net
