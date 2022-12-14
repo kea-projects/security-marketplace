@@ -32,7 +32,7 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
   log.trace(`Validating the request.body of Signup Request`);
 
   if (!name) {
-    log.info(`Request body validation failed: The body was missing the: 'name' attribute`);
+    log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
     return res.status(400).send(new MissingPropertyError("name"));
   }
 
