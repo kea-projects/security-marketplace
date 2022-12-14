@@ -43,7 +43,7 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
   }
 
   if (!password) {
-    log.info(`Request body validation failed: The body was missing the: 'password' attribute`);
+    log.warn(`Request body validation failed: The body was missing the: 'password' attribute`);
     return res.status(400).send(new MissingPropertyError("password"));
   }
   req.body = { name, email, password };

@@ -73,7 +73,7 @@ const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction
       return next();
     }
   } catch (error) {
-    log.info("Role validation failed: User was NOT admin or user, rejecting.");
+    log.warn("Role validation failed: User was NOT admin or user, rejecting.");
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
@@ -92,7 +92,7 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
       log.trace("Admin successfully validated.");
       return next();
     } else {
-      log.info("Role validation failed: User was NOT admin, rejecting.");
+      log.warn("Role validation failed: User was NOT admin, rejecting.");
       return res.status(401).send({ message: "Unauthorized" });
     }
   } catch (error) {

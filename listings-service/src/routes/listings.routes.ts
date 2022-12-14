@@ -131,7 +131,7 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
       log.trace(`Creating a listing`);
       const { name, description, isPublic } = req.body;
       if (!token || !token?.userId) {
-        log.info(`Listing creation failed due to a missing token`);
+        log.warn(`Listing creation failed due to a missing token`);
         return res.status(403).send({ message: "Forbidden" });
       }
       try {

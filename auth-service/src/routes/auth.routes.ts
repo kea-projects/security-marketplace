@@ -13,12 +13,12 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
     const { email, password } = req.body;
     const foundUser = await AuthUserService.findOneByEmail(email);
     if (!foundUser) {
-      log.info(`Login attempt failed since no matching user was found: ${email}`);
+      log.warn(`Login attempt failed since no matching user was found: ${email}`);
       res.status(401).send({ message: "Unauthorized" });
       return;
     }
     if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-      log.info(`Login attempt failed since the password hashes don't match: ${foundUser.userId}`);
+      log.warn(`Login attempt failed since the password hashes don't match: ${foundUser.userId}`);
       return res.status(401).send({ message: "Unauthorized" });
     }
     let tokens;
@@ -47,7 +47,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
     const { name, email, password } = req.body;
     if (await AuthUserService.findOneByEmail(email)) {
       // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
-      log.info(`Signup attempt failed due to the email already being in use: ${email}`);
+      log.warn(`Signup attempt failed due to the email already being in use: ${email}`);
       res.status(409).send({
         message: "The email is already in use",
       });
@@ -80,7 +80,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
 router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => {
   const accessToken = AuthenticationService.getTokenFromRequest(req);
   if (!accessToken) {
-    log.info(`Failed to log out a user to due missing access token`);
+    log.warn(`Failed to log out a user to due missing access token`);
     return res.status(401).send({ message: "Unauthorized" });
   }
   log.trace(`Trying to delete a token pair as part of the logout process for token: ${accessToken}`);

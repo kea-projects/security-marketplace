@@ -8,7 +8,7 @@ import { Role } from "../utils/role.enum";
 const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
   // validate that the request contains the jwt access token
   if (!req.headers || !req.headers.authorization) {
-    log.error("validateToken found no token to decode!");
+    log.warn("validateToken found no token to decode!");
     throw new Error("Authorization token missing from header");
   }
 
@@ -121,7 +121,7 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
       log.trace("Admin successfully validated.");
       return next();
     } else {
-      log.trace("User was NOT admin, rejecting.");
+      log.warn("User was NOT admin, rejecting.");
       return res.status(403).send(new ForbiddenError());
     }
   } catch (error) {

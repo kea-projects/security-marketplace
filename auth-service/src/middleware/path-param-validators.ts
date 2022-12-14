@@ -7,7 +7,7 @@ const validateUuidFromParams = (req: Request, res: Response, next: NextFunction)
   const { id } = req.params;
   log.trace(`Checking that the parameter id: '${id} is a valid uuid.`);
   if (!id) {
-    log.warn(`The id was invalid! rejecting...`);
+    log.warn(`The was not provided!`);
     return res.status(400).send(new ValidationError("UUID was not provided."));
   }
 
