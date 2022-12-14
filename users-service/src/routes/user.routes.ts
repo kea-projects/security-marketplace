@@ -91,7 +91,6 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
         return res.status(400).send(new BadRequestError("You can only upload one file"));
       }
       if (err.message === "Unexpected field") {
-        log.error(`An unexpected field was found with the file`);
         return res.status(400).send(new BadRequestError("The field key has to be 'file'"));
       }
       log.error(`An unexpected error has occurred while uploading files.`);
