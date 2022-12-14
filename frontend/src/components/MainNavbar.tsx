@@ -12,7 +12,7 @@ interface MainNavbarProps {
 }
 
 export function MainNavbar({ isAdmin }: MainNavbarProps) {
-    const { setUserData } = useContext(UserContext);
+    const { userData, setUserData } = useContext(UserContext);
 
     const handleLogout = () => {
         setUserData({});
@@ -33,7 +33,7 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
                 Market
             </Link>
             {hasUserPrivileges() && (
-                <Link as={Navigate} to="/profile">
+                <Link as={Navigate} to={`/profile/${userData.userId}`}>
                     Profile
                 </Link>
             )}

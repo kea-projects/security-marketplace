@@ -34,7 +34,7 @@ export const router = createBrowserRouter([
         ),
     },
     {
-        path: '/profile',
+        path: '/profile/:userId',
         element: (
             <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
                 <ProfilePage />

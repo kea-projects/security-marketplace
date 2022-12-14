@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Text,
     Button,
@@ -17,16 +17,16 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { Navbar } from '../components/Navbar';
 import { UserBadge } from './UserBadge';
-import { UserContext } from '../context/UserContextProvider';
 import { UserApi, UserResponse } from '../api/UserApi';
 
-export function Profilebar() {
+interface ProfilebarProps {
+    userId?: string;
+}
+
+export function Profilebar({ userId }: ProfilebarProps) {
     // States
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [user, setUser] = useState<UserResponse | undefined>(undefined);
-
-    // Contexts
-    const { userData } = useContext(UserContext);
 
     // Constants
     const userApi = new UserApi();
@@ -35,8 +35,8 @@ export function Profilebar() {
     useEffect(() => {
         const fetchUser = async () => {
             setIsLoading(true);
-            if (userData.userId) {
-                const { data } = await userApi.getUser(userData.userId);
+            if (userId) {
+                const { data } = await userApi.getUser(userId);
                 setUser(data);
                 setIsLoading(false);
             }

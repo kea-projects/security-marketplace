@@ -26,6 +26,11 @@ export class ListingApi {
         return listingApi.get('/listings');
     }
 
+    public async getUserListings(userId: string): Promise<AxiosResponse<ListingResponse[]>> {
+        console.log('Listing Api', 'Requesting all user listings...');
+        return listingApi.get(`/listings/user/${userId}`);
+    }
+
     public async createListing(body: CreateListingRequestBody) {
         console.log('Listing Api', 'Requesting listing creation...');
         return listingApi.postForm('/listings', { ...body });

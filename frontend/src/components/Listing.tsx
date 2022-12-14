@@ -1,15 +1,14 @@
 import React from 'react';
 import { Center, Skeleton, Container, HStack, Text, VStack, Button } from '@chakra-ui/react';
-import { MarketEntry } from '../fake-api/marketEntries';
 import { useNavigate } from 'react-router-dom';
+import { ListingResponse } from '../api/ListingApi';
 
 interface ListingProps {
     isLoading: boolean;
-    // TODO: Replace with actual entity form the API
-    marketEntry: MarketEntry;
+    listing: ListingResponse;
 }
 
-export function Listing({ isLoading = false, marketEntry }: ListingProps) {
+export function Listing({ isLoading = false, listing }: ListingProps) {
     const navigate = useNavigate();
 
     const handleSeeMore = () => {
@@ -32,16 +31,16 @@ export function Listing({ isLoading = false, marketEntry }: ListingProps) {
                         >
                             {!isLoading && (
                                 <Text noOfLines={2} fontSize="xl">
-                                    {marketEntry.title}
+                                    {listing.name}
                                 </Text>
                             )}
                         </Container>
-                        <Container>{!isLoading && <Text noOfLines={2}>{marketEntry.content}</Text>}</Container>
+                        <Container>{!isLoading && <Text noOfLines={2}>{listing.description}</Text>}</Container>
                     </VStack>
 
                     <VStack paddingRight="10px">
                         <Button colorScheme="accent" variant="solid">
-                            {!isLoading && (marketEntry.isPublic ? 'Public' : 'Private')}
+                            {!isLoading && (listing.isPublic ? 'Public' : 'Private')}
                         </Button>
                         <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
                             See More
