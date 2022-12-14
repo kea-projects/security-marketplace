@@ -36,7 +36,7 @@ export const router = createBrowserRouter([
     {
         path: '/profile/:userId',
         element: (
-            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/">
                 <ProfilePage />
             </RouterGuard>
         ),
@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
     {
         path: '/users',
         element: (
-            <RouterGuard condition={hasAdminPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasAdminPrivileges} redirectTo="/">
                 <UsersPage />
             </RouterGuard>
         ),
@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
     {
         path: '/listing-details/:listingId',
         element: (
-            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/">
                 <ListingDetailsPage />
             </RouterGuard>
         ),

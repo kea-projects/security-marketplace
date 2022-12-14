@@ -9,8 +9,13 @@ export interface UserResponse {
 }
 
 export class UserApi {
+    public async getUsers(): Promise<AxiosResponse<UserResponse[]>> {
+        console.log('User Api', 'Requesting user...');
+        return userApi.get('/users');
+    }
+
     public async getUser(id: string): Promise<AxiosResponse<UserResponse>> {
-        console.log('User Api', 'Requesting all listings...');
+        console.log('User Api', 'Requesting all users...');
         return userApi.get(`/users/${id}`);
     }
 }

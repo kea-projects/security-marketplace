@@ -4,35 +4,34 @@ import { SimpleGrid, Container } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
 import { UserBadge } from '../components/UserBadge';
-import { getUsers } from '../fake-api/api';
-import { User } from '../fake-api/users';
+import { UserApi, UserResponse } from '../api/UserApi';
 
 export function UsersPage() {
+    // States
     const [isLoading, setIsLoading] = useState(false);
-    const [users, setUsers] = useState<User[] | undefined>(undefined);
+    const [users, setUsers] = useState<UserResponse[] | undefined>(undefined);
 
+    // Constants
+    const userApi = new UserApi();
+
+    // Fetch users
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUsers = async () => {
             setIsLoading(true);
-            setUsers(await getUsers());
+            const { data } = await userApi.getUsers();
+            setUsers(data);
             setIsLoading(false);
         };
 
-        fetchData();
+        fetchUsers();
     }, []);
 
-    const getGridItems = (users: User[] = [], isLoading = false) => {
+    const getGridItems = (users: UserResponse[] = []) => {
         return users.map((user, index) => {
             return (
                 <Container key={index}>
-                    {/* TODO: link to individual profile page */}
-                    <Link to="/profile">
-                        <UserBadge
-                            fullName={isLoading ? '' : user.fullName}
-                            username={isLoading ? '' : user.username}
-                            isLoading={isLoading}
-                            showFull={true}
-                        />
+                    <Link to={`/profile/${user?.userId}`}>
+                        <UserBadge fullName={user?.name} username={user?.email} isLoading={isLoading} showFull={true} />
                     </Link>
                 </Container>
             );
@@ -49,7 +48,7 @@ export function UsersPage() {
                 paddingX="30px"
                 overflowY="auto"
             >
-                {isLoading ? getGridItems([...Array(5)], true) : getGridItems(users)}
+                {isLoading ? getGridItems([...Array(5)]) : getGridItems(users)}
             </SimpleGrid>
         </Layout>
     );
