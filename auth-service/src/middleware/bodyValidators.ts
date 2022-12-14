@@ -56,7 +56,7 @@ const validateLoginRequestBody = (req: Request, res: Response, next: NextFunctio
   log.trace(`Validating the request.body of Login Request`);
 
   if (!email) {
-    log.info(`Request body validation failed: The body was missing the: 'email' attribute`);
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
 
