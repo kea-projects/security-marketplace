@@ -38,7 +38,7 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
 
   // TODO - validate that it's an email
   if (!email) {
-    log.info(`Request body validation failed: The body was missing the: 'email' attribute`);
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
     return res.status(400).send(new MissingPropertyError("email"));
   }
 
