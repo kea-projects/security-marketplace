@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     Text,
     Button,
@@ -17,19 +17,39 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { Navbar } from '../components/Navbar';
 import { UserBadge } from './UserBadge';
-import { User } from '../fake-api/users';
+import { UserContext } from '../context/UserContextProvider';
+import { UserApi, UserResponse } from '../api/UserApi';
 
-interface ProfilebarProps {
-    isLoading: boolean;
-    user: User;
-}
+export function Profilebar() {
+    // States
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [user, setUser] = useState<UserResponse | undefined>(undefined);
 
-export function Profilebar({ user, isLoading }: ProfilebarProps) {
+    // Contexts
+    const { userData } = useContext(UserContext);
+
+    // Constants
+    const userApi = new UserApi();
+
+    // Fetching user
+    useEffect(() => {
+        const fetchUser = async () => {
+            setIsLoading(true);
+            if (userData.userId) {
+                const { data } = await userApi.getUser(userData.userId);
+                setUser(data);
+                setIsLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
     return (
         <Navbar height="80px" minHeight="80px" variant="userDisplay" fontSize="lg">
-            <UserBadge fullName={user.fullName} username={user.username} isLoading={isLoading} />
+            <UserBadge fullName={user?.name} username={user?.email} isLoading={isLoading} />
             <Spacer />
-            {/* TODO: Discuss -> Perhaps we can have something like this */}
+
             {/* Desktop */}
             <Hide below="md">
                 <Text fontSize="sm" maxWidth="100px">
@@ -52,7 +72,7 @@ export function Profilebar({ user, isLoading }: ProfilebarProps) {
                     <PopoverContent color="textDark">
                         <PopoverArrow />
 
-                        <PopoverHeader>{user.fullName}</PopoverHeader>
+                        <PopoverHeader>{user?.email}</PopoverHeader>
                         <PopoverBody>
                             <Text fontSize="sm">
                                 Extra User Information <Badge colorScheme="yellow">TBD</Badge>

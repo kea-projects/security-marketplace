@@ -52,3 +52,7 @@ authApi.interceptors.response.use(responseInterceptor, interceptorOnError);
 export const listingApi = axios.create(getConfig(process.env.REACT_APP_LISTING_SERVICE_URL || 'http://localhost:8081'));
 listingApi.interceptors.request.use(requestInterceptor, interceptorOnError);
 listingApi.interceptors.response.use(responseInterceptor, interceptorOnError);
+
+export const userApi = axios.create(getConfig(process.env.REACT_APP_USER_SERVICE_URL || 'http://localhost:8082'));
+userApi.interceptors.request.use(requestInterceptor, interceptorOnError);
+userApi.interceptors.response.use(responseInterceptor, interceptorOnError);

@@ -40,7 +40,7 @@ export function UsersPage() {
     };
 
     return (
-        <Layout isAdmin={true}>
+        <Layout>
             <SimpleGrid
                 minChildWidth="350px"
                 spacing={10}

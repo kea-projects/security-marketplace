@@ -15,8 +15,8 @@ import {
 interface UserBadgeProps {
     showFull?: boolean;
     isLoading: boolean;
-    fullName: string;
-    username: string;
+    fullName?: string;
+    username?: string;
 }
 
 export function UserBadge({ isLoading = false, fullName, username, showFull = false }: UserBadgeProps) {

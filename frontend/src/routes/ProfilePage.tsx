@@ -28,7 +28,7 @@ export function ProfilePage() {
     };
 
     return (
-        <Layout isAdmin={true} useProfilebar={true} user={user} isLoading={isLoading}>
+        <Layout useProfilebar={true}>
             <SimpleGrid
                 minChildWidth="350px"
                 spacing={10}

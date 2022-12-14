@@ -41,7 +41,7 @@ export function ListingDetailsPage() {
     };
 
     return (
-        <Layout useSearchbar={false} isLoading={isLoading}>
+        <Layout useSearchbar={false}>
             <VStack width="100%" paddingX="50px" paddingTop="60px" spacing="50px" overflowY="auto">
                 <Box width="100%" display="flex" justifyContent="space-between">
                     <Box height="15vh" width="20vw">
