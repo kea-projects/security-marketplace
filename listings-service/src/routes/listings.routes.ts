@@ -22,13 +22,24 @@ const router: Router = Router();
 router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
   try {
     const token = req.body?.token;
-    if (!token) {
-      return res.send(await ListingsService.findByIsPublic());
+    if (token && token.role == Role.admin) {
+      return res.send(await ListingsService.findAll());
     }
-    if (token && token.role != Role.admin) {
-      return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
+    return res.send(await ListingsService.findByIsPublic());
+  } catch (error) {
+    log.error(`Failed to get all listings!`, error);
+    return res.status(403).send({ message: "Forbidden" });
+  }
+});
+
+router.get("/user/:id", canAccessRoleUser, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const token = req.body?.token;
+    if (token && (token.role == Role.admin || (token.userId as string) === id)) {
+      return res.send(await ListingsService.findAllByCreatedBy(id));
     }
-    return res.send(await ListingsService.findAll());
+    return res.send(await ListingsService.findPublicByCreatedBy(id));
   } catch (error) {
     log.error(`Failed to get all listings!`, error);
     return res.status(403).send({ message: "Forbidden" });
