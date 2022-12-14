@@ -1,17 +1,16 @@
 import React from 'react';
 import { Skeleton, Box, VStack, Text } from '@chakra-ui/react';
 
-import { Comment } from '../fake-api/comments';
-import { User } from '../fake-api/users';
 import { UserBadge } from './UserBadge';
 
 interface UserCommentProps {
     isLoading: boolean;
-    user: User;
-    comment: Comment;
+    name: string;
+    email: string;
+    comment: string;
 }
 
-export function UserComment({ isLoading = false, user, comment }: UserCommentProps) {
+export function UserComment({ isLoading = false, name, email, comment }: UserCommentProps) {
     return (
         <Skeleton isLoaded={!isLoading} alignSelf="start" rounded="md">
             <VStack
@@ -22,9 +21,9 @@ export function UserComment({ isLoading = false, user, comment }: UserCommentPro
                 padding="10px"
                 alignItems="flex-start"
             >
-                <UserBadge fullName={user?.fullName} username={user?.username} isLoading={isLoading} />
+                <UserBadge fullName={name} username={email} isLoading={isLoading} />
                 <Box background="background" width="100%" height="fit-content" rounded="md" padding="10px">
-                    <Text color="textDark">{comment?.comment}</Text>
+                    <Text color="textDark">{comment}</Text>
                 </Box>
             </VStack>
         </Skeleton>

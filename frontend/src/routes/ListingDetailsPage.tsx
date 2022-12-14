@@ -2,31 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { Container, Button, VStack, Text, Skeleton, Box, Divider } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
-import { getMarketEntryById, getUserComments, getUsers } from '../fake-api/api';
-import { MarketEntry } from '../fake-api/marketEntries';
 import { useParams } from 'react-router-dom';
-import { User } from '../fake-api/users';
 import { UserComment } from '../components/UserComment';
-import { Comment } from '../fake-api/comments';
+import { ListingApi, ListingResponse, CommentResponse } from '../api/ListingApi';
 
 export function ListingDetailsPage() {
+    // States
     const [isLoading, setIsLoading] = useState(false);
-    const [listing, setListing] = useState<MarketEntry | undefined>(undefined);
-    const [comments, setComments] = useState<Comment[] | undefined>(undefined);
-    const [users, setUsers] = useState<User[] | undefined>(undefined);
+    const [listing, setListing] = useState<ListingResponse | undefined>(undefined);
+    const [comments, setComments] = useState<CommentResponse[] | undefined>(undefined);
 
+    // Path parameters
     const { listingId } = useParams();
 
+    // Constants
+    const listingApi = new ListingApi();
+
+    // Fetch listing and its comments
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             if (listingId) {
-                const listing = await getMarketEntryById(listingId);
-                const comments = await getUserComments();
-                const users = await getUsers();
-                setListing(listing);
-                setComments(comments);
-                setUsers(users);
+                const { data } = await listingApi.getListingById(listingId);
+                setListing(data.listing);
+                setComments(data.comments);
+                console.log(data);
                 setIsLoading(false);
             }
         };
@@ -34,9 +34,17 @@ export function ListingDetailsPage() {
         fetchData();
     }, []);
 
-    const getCommentList = (comments: Comment[] = [], users: User[] = []) => {
+    const getCommentList = (comments: CommentResponse[] = []) => {
         return comments.map((comment, index) => {
-            return <UserComment key={index} user={users[index]} comment={comment} isLoading={isLoading} />;
+            return (
+                <UserComment
+                    key={index}
+                    name={comment?.name}
+                    email={comment?.email}
+                    comment={comment?.comment}
+                    isLoading={isLoading}
+                />
+            );
         });
     };
 
@@ -47,7 +55,7 @@ export function ListingDetailsPage() {
                     <Box height="15vh" width="20vw">
                         <Skeleton height="100%" width="100%" rounded="md" isLoaded={!isLoading}>
                             <Container height="100%" background="accent.500" boxShadow="md" rounded="md" padding="10px">
-                                <Text>{listing?.title}</Text>
+                                <Text>{listing?.name}</Text>
                             </Container>
                         </Skeleton>
                     </Box>
@@ -67,11 +75,11 @@ export function ListingDetailsPage() {
                         rounded="md"
                         padding="10px"
                     >
-                        <Text>{listing?.content}</Text>
+                        <Text>{listing?.description}</Text>
                     </Box>
                 </Skeleton>
                 <Divider borderWidth="1px" rounded="md" borderColor="layer" />
-                {isLoading ? getCommentList([...Array(5)]) : getCommentList(comments, users)}
+                {isLoading ? getCommentList([...Array(5)]) : getCommentList(comments)}
             </VStack>
         </Layout>
     );

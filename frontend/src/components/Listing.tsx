@@ -7,12 +7,12 @@ interface ListingProps {
     isLoading: boolean;
     listing: ListingResponse;
 }
-
+// TODO: Discuss whether the API should return the listing or not if it set to private
 export function Listing({ isLoading = false, listing }: ListingProps) {
     const navigate = useNavigate();
 
     const handleSeeMore = () => {
-        navigate(`/listing-details/${2}`);
+        navigate(`/listing-details/${listing.listingId}`);
     };
 
     return (

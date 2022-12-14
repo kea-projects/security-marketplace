@@ -53,19 +53,18 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
       res.status(404).send({ message: "Listing not found" });
     } else {
       const token = req.body?.token;
-      if (!token && foundListing.isPublic) {
-        return res.send(foundListing);
-      }
-      if (token && token.role != Role.admin) {
-        if (foundListing.createdBy === token.userId) {
-          return res.send(foundListing);
-        }
-        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
-        return res.status(403).send({ message: "Forbidden" });
-      }
-
       try {
         const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+        if (!token && foundListing.isPublic) {
+          return res.send({ listing: foundListing, comments });
+        }
+        if (token && token.role != Role.admin) {
+          if (foundListing.createdBy === token.userId) {
+            return res.send({ listing: foundListing, comments });
+          }
+          log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
+          return res.status(403).send({ message: "Forbidden" });
+        }
         return res.send({ listing: foundListing, comments });
       } catch (error) {
         log.error(`Failed to get comments for listing with id: ${req.params.id}`, error);
