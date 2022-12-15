@@ -21,6 +21,7 @@ import { UserApi, UserResponse } from '../api/UserApi';
 import { ListingApi } from '../api/ListingApi';
 import { useNavigate } from 'react-router-dom';
 import { UploadFilePopover } from './UploadFilePopover';
+import { hasAdminPrivileges, isOwnProfile } from '../utils/Auth';
 
 interface ProfilebarProps {
     userId?: string;
@@ -42,6 +43,7 @@ export function Profilebar({ userId }: ProfilebarProps) {
             setIsLoading(true);
             if (userId) {
                 const { data } = await userApi.getUser(userId);
+                console.log(data);
                 setUser(data);
                 setIsLoading(false);
             }
@@ -116,23 +118,27 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 </Show>
             </Popover>
 
-            <Popover>
-                <PopoverTrigger>
-                    <Button colorScheme="accent" variant="solid" minWidth="min-content">
-                        Update Picture
-                    </Button>
-                </PopoverTrigger>
+            {((userId && isOwnProfile(userId)) || hasAdminPrivileges()) && (
+                <Popover>
+                    <PopoverTrigger>
+                        <Button colorScheme="accent" variant="solid" minWidth="min-content">
+                            Update Picture
+                        </Button>
+                    </PopoverTrigger>
 
-                <UploadFilePopover
-                    onFileSubmit={handleProfilePictureUpload}
-                    label="Upload"
-                    title="Select Profile Picture"
-                />
-            </Popover>
+                    <UploadFilePopover
+                        onFileSubmit={handleProfilePictureUpload}
+                        label="Upload"
+                        title="Select Profile Picture"
+                    />
+                </Popover>
+            )}
 
-            <Button colorScheme="accent" variant="solid" minWidth="min-content" onClick={handleHideAllListings}>
-                Hide all Listings
-            </Button>
+            {((userId && isOwnProfile(userId)) || hasAdminPrivileges()) && (
+                <Button colorScheme="accent" variant="solid" minWidth="min-content" onClick={handleHideAllListings}>
+                    Hide all Listings
+                </Button>
+            )}
         </Navbar>
     );
 }

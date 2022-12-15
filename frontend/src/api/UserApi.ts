@@ -10,12 +10,12 @@ export interface UserResponse {
 
 export class UserApi {
     public async getUsers(): Promise<AxiosResponse<UserResponse[]>> {
-        console.log('User Api', 'Requesting user...');
+        console.log('User Api', 'Requesting all users...');
         return userApi.get('/users');
     }
 
     public async getUser(userId: string): Promise<AxiosResponse<UserResponse>> {
-        console.log('User Api', 'Requesting all users...');
+        console.log('User Api', 'Requesting user...');
         return userApi.get(`/users/${userId}`);
     }
 

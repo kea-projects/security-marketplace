@@ -52,3 +52,11 @@ export const hasAdminPrivileges = () => {
     }
     return false;
 };
+
+export const isOwnProfile = (userId: string) => {
+    const userData = LocalStorage.getUser();
+    if (userData.userId && userData.userId === userId) {
+        return true;
+    }
+    return false;
+};

@@ -21,7 +21,6 @@ interface UserBadgeProps {
 }
 
 export function UserBadge({ isLoading = false, fullName, username, pictureUrl, showFull = false }: UserBadgeProps) {
-    // TODO: provide proper link to the image.
     return (
         <>
             <Hide below="md">
@@ -59,7 +58,7 @@ export function UserBadge({ isLoading = false, fullName, username, pictureUrl, s
                         margin="5px"
                         borderColor="background"
                     >
-                        <Avatar size="lg" name={fullName} src="https://bit.ly/broken-link" />
+                        <Avatar size="lg" name={fullName} src={pictureUrl} />
                     </SkeletonCircle>
                     {showFull && (
                         <SkeletonText noOfLines={2} width="150px" isLoaded={!isLoading}>
