@@ -2,8 +2,8 @@ import React, { useContext, useState } from 'react';
 import { Center, Text, Link } from '@chakra-ui/react';
 import { Link as Navigate } from 'react-router-dom';
 
-import { Card } from '../components/Card';
-import { SignupForm, SignupFormFields } from '../components/SignupForm';
+import { Card } from '../components/themed/Card';
+import { SignupForm, SignupFormFields } from '../components/auth/SignupForm';
 import { AuthApi } from '../api/AuthApi';
 import { UserContext } from '../context/UserContextProvider';
 import { getTokenData } from '../utils/Auth';

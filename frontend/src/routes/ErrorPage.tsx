@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouteError, useNavigate } from 'react-router-dom';
 import { Center, Text, VStack, Button } from '@chakra-ui/react';
 
-import { Card } from '../components/Card';
+import { Card } from '../components/themed/Card';
 
 interface ErrorResponse {
     statusText: string;

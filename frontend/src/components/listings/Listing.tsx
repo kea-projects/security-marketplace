@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Center, Skeleton, Container, HStack, Text, VStack, Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { ListingApi, ListingResponse } from '../api/ListingApi';
+import { ListingApi, ListingResponse } from '../../api/ListingApi';
 
 interface ListingProps {
     isLoading: boolean;

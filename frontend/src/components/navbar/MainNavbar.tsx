@@ -3,9 +3,9 @@ import { Link as Navigate } from 'react-router-dom';
 import { Link, Icon, Spacer } from '@chakra-ui/react';
 import { BsGithub } from 'react-icons/bs';
 
-import { Navbar } from '../components/Navbar';
-import { UserContext } from '../context/UserContextProvider';
-import { hasUserPrivileges } from '../utils/Auth';
+import { Navbar } from '../themed/Navbar';
+import { UserContext } from '../../context/UserContextProvider';
+import { hasUserPrivileges } from '../../utils/Auth';
 
 interface MainNavbarProps {
     isAdmin: boolean;

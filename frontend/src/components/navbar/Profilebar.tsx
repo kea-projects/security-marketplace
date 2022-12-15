@@ -15,13 +15,13 @@ import {
     PopoverContent,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { Navbar } from '../components/Navbar';
-import { UserBadge } from './UserBadge';
-import { UserApi, UserResponse } from '../api/UserApi';
-import { ListingApi } from '../api/ListingApi';
+import { Navbar } from '../themed/Navbar';
+import { UserBadge } from '../UserBadge';
+import { UserApi, UserResponse } from '../../api/UserApi';
+import { ListingApi } from '../../api/ListingApi';
 import { useNavigate } from 'react-router-dom';
-import { UploadFilePopover } from './UploadFilePopover';
-import { hasAdminPrivileges, isOwnProfile } from '../utils/Auth';
+import { UploadFilePopover } from '../UploadFilePopover';
+import { hasAdminPrivileges, isOwnProfile } from '../../utils/Auth';
 
 interface ProfilebarProps {
     userId?: string;

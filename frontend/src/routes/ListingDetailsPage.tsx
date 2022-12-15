@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Button, VStack, Text, Skeleton, Box, Divider } from '@chakra-ui/react';
+import { VStack, Divider } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
 import { useParams } from 'react-router-dom';
-import { UserComment } from '../components/UserComment';
 import { ListingApi, ListingResponse, CommentResponse } from '../api/ListingApi';
+import { CommentList } from '../components/comments/CommentList';
+import { ListingDetails } from '../components/listings/ListingDetails';
 
 export function ListingDetailsPage() {
     // States
@@ -35,7 +36,7 @@ export function ListingDetailsPage() {
     }, []);
 
     // Handlers
-    const handleToggleIsPublic = async () => {
+    const handleIsPublicToggle = async () => {
         if (listing) {
             const { data } = await listingApi.updateListing(
                 { ...listing, isPublic: !listing.isPublic },
@@ -45,52 +46,21 @@ export function ListingDetailsPage() {
         }
     };
 
-    const getCommentList = (comments: CommentResponse[] = []) => {
-        return comments.map((comment, index) => {
-            return (
-                <UserComment
-                    key={index}
-                    name={comment?.name}
-                    email={comment?.email}
-                    comment={comment?.comment}
-                    isLoading={isLoading}
-                />
-            );
-        });
-    };
-
     return (
         <Layout useSearchbar={false}>
             <VStack width="100%" paddingX="50px" paddingTop="60px" spacing="50px" overflowY="auto">
-                <Box width="100%" display="flex" justifyContent="space-between">
-                    <Box height="15vh" width="20vw">
-                        <Skeleton height="100%" width="100%" rounded="md" isLoaded={!isLoading}>
-                            <Container height="100%" background="accent.500" boxShadow="md" rounded="md" padding="10px">
-                                <Text>{listing?.name}</Text>
-                            </Container>
-                        </Skeleton>
-                    </Box>
-                    <Skeleton height="5vh" minWidth="15vw" rounded="md" isLoaded={!isLoading}>
-                        <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
-                            Status: {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
-                        </Button>
-                    </Skeleton>
-                </Box>
-                <Skeleton isLoaded={!isLoading} alignSelf="start" rounded="md">
-                    <Box
-                        background="accent.500"
-                        minHeight="10vh"
-                        height="fit-content"
-                        minWidth="250px"
-                        width="fit-content"
-                        rounded="md"
-                        padding="10px"
-                    >
-                        <Text>{listing?.description}</Text>
-                    </Box>
-                </Skeleton>
+                {/* Listing Data */}
+                <ListingDetails listing={listing} onIsPublicToggle={handleIsPublicToggle} isLoading={isLoading} />
+
                 <Divider borderWidth="1px" rounded="md" borderColor="layer" />
-                {isLoading ? getCommentList([...Array(5)]) : getCommentList(comments)}
+
+                {/* Comments list */}
+                <CommentList
+                    listingId={listingId}
+                    comments={comments}
+                    setComments={setComments}
+                    parentIsLoading={isLoading}
+                />
             </VStack>
         </Layout>
     );

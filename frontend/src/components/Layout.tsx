@@ -1,8 +1,8 @@
 import React from 'react';
 import { VStack, StackProps } from '@chakra-ui/react';
-import { Profilebar } from './Profilebar';
-import { Searchbar } from './Searchbar';
-import { MainNavbar } from './MainNavbar';
+import { Profilebar } from './navbar/Profilebar';
+import { Searchbar } from './navbar/Searchbar';
+import { MainNavbar } from './navbar/MainNavbar';
 import { hasAdminPrivileges } from '../utils/Auth';
 
 interface LayoutProps {

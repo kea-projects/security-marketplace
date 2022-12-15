@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, SimpleGrid, Center, SkeletonText } from '@chakra-ui/react';
 
-import { Card } from '../components/Card';
+import { Card } from '../components/themed/Card';
 import { Layout } from '../components/Layout';
 import { ListingApi, ListingResponse } from '../api/ListingApi';
 

@@ -1,6 +1,6 @@
 import { marketEntries } from './marketEntries';
 import { users } from '../fake-api/users';
-import { LoginFormFields } from '../components/LoginForm';
+import { LoginFormFields } from '../components/auth/LoginForm';
 import { SignupFormFields } from '../components/SignupForm';
 import { comments } from './comments';
 

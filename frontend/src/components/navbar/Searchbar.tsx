@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Button, Spacer, Badge, Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 
-import { Navbar } from '../components/Navbar';
+import { Navbar } from '../themed/Navbar';
 
 export function Searchbar() {
     return (

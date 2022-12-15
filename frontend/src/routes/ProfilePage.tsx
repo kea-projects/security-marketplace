@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 
 import { Layout } from '../components/Layout';
-import { Listing } from '../components/Listing';
+import { Listing } from '../components/listings/Listing';
 import { ListingApi, ListingResponse } from '../api/ListingApi';
 import { useParams } from 'react-router-dom';
 

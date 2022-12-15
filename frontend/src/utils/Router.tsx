@@ -8,7 +8,7 @@ import { ProfilePage } from '../routes/ProfilePage';
 import { SignupPage } from '../routes/SignupPage';
 import { UsersPage } from '../routes/UsersPage';
 import { ListingDetailsPage } from '../routes/ListingDetailsPage';
-import { RouterGuard } from '../components/RouterGuard';
+import { RouterGuard } from '../components/auth/RouterGuard';
 import { isNotLoggedIn, hasUserPrivileges, hasAdminPrivileges } from './Auth';
 
 export const router = createBrowserRouter([

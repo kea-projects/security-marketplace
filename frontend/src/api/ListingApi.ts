@@ -1,6 +1,14 @@
 import { AxiosResponse } from 'axios';
 import { listingApi } from '../configs/AxiosConfig';
 
+export interface CreateCommentRequestBody {
+    comment: string;
+    email: string;
+    name: string;
+    commentedOn: string;
+    createdBy: string;
+}
+
 interface CreateListingRequestBody {
     name: string;
     description: string;
@@ -34,8 +42,8 @@ export interface CommentResponse {
     name: string;
     commentedOn: string;
     createdBy: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface ListingByIdResponse {
@@ -61,7 +69,7 @@ export class ListingApi {
         return listingApi.get(`/listings/${listingId}`);
     }
 
-    public async createListing(body: CreateListingRequestBody) {
+    public async createListing(body: CreateListingRequestBody): Promise<AxiosResponse<ListingResponse>> {
         console.log('Listing Api', 'Requesting listing creation...');
         return listingApi.postForm('/listings', { ...body });
     }
@@ -76,5 +84,8 @@ export class ListingApi {
 
     // --- COMMENTS ---
 
-    // public async get
+    public async createComment(body: CreateCommentRequestBody): Promise<AxiosResponse<CommentResponse>> {
+        console.log('Listing Api', 'Requesting comment creation...');
+        return listingApi.post('/comments', body);
+    }
 }
