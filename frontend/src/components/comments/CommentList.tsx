@@ -56,10 +56,10 @@ export function CommentList({ listingId, comments, setComments, parentIsLoading 
     const getCommentList = (comments: CommentResponse[] = []) => {
         comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-        return comments.map((comment) => {
+        return comments.map((comment, index) => {
             return (
                 <UserComment
-                    key={comment?.commentId}
+                    key={comment?.commentId || index}
                     userId={comment?.createdBy}
                     name={comment?.name}
                     email={comment?.email}

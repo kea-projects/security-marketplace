@@ -27,7 +27,6 @@ export function ListingDetailsPage() {
                 const { data } = await listingApi.getListingById(listingId);
                 setListing(data.listing);
                 setComments(data.comments);
-                console.log(data);
                 setIsLoading(false);
             }
         };
@@ -50,7 +49,7 @@ export function ListingDetailsPage() {
         <Layout useSearchbar={false}>
             <VStack width="100%" paddingX="50px" paddingTop="60px" spacing="50px" overflowY="auto">
                 {/* Listing Data */}
-                <ListingDetails listing={listing} onIsPublicToggle={handleIsPublicToggle} isLoading={isLoading} />
+                <ListingDetails listing={listing} onIsPublicToggle={handleIsPublicToggle} parentIsLoading={isLoading} />
 
                 <Divider borderWidth="1px" rounded="md" borderColor="layer" />
 

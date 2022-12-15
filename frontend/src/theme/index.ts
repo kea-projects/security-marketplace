@@ -15,6 +15,11 @@ export const theme = extendTheme({
             500: '#319795',
             600: '#CBD5E0',
         },
+        layerBtn: {
+            100: '#CBD5E0',
+            500: '#4A5568',
+            600: '#CBD5E0',
+        },
         text: '#fefefe',
         textDark: '#4A5568',
         link: '#E6FFFA',
