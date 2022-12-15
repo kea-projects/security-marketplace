@@ -13,6 +13,7 @@ export const theme = extendTheme({
         accent: {
             100: '#CBD5E0',
             500: '#319795',
+            600: '#CBD5E0',
         },
         text: '#fefefe',
         textDark: '#4A5568',

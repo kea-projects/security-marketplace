@@ -20,6 +20,7 @@ import { UserBadge } from './UserBadge';
 import { UserApi, UserResponse } from '../api/UserApi';
 import { ListingApi } from '../api/ListingApi';
 import { useNavigate } from 'react-router-dom';
+import { UploadFilePopover } from './UploadFilePopover';
 
 interface ProfilebarProps {
     userId?: string;
@@ -61,6 +62,14 @@ export function Profilebar({ userId }: ProfilebarProps) {
         }
     };
 
+    const handleProfilePictureUpload = async (pictureList: File[]) => {
+        const picture = pictureList[0];
+        if (userId) {
+            await userApi.updateProfilePicture(userId, picture);
+            navigate(0);
+        }
+    };
+
     return (
         <Navbar height="80px" minHeight="80px" variant="userDisplay" fontSize="lg">
             <UserBadge
@@ -70,7 +79,6 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 isLoading={isLoading}
             />
             <Spacer />
-
             {/* Desktop */}
             <Hide below="md">
                 <Text fontSize="sm" maxWidth="100px">
@@ -83,7 +91,6 @@ export function Profilebar({ userId }: ProfilebarProps) {
                     Sales <Badge colorScheme="yellow">{18}</Badge>
                 </Text>
             </Hide>
-
             {/* Mobile */}
             <Popover>
                 <Show below="md">
@@ -109,10 +116,21 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 </Show>
             </Popover>
 
-            <Button colorScheme="accent" variant="solid">
-                Update Picture
-            </Button>
-            <Button colorScheme="accent" variant="solid" onClick={handleHideAllListings}>
+            <Popover>
+                <PopoverTrigger>
+                    <Button colorScheme="accent" variant="solid" minWidth="min-content">
+                        Update Picture
+                    </Button>
+                </PopoverTrigger>
+
+                <UploadFilePopover
+                    onFileSubmit={handleProfilePictureUpload}
+                    label="Upload"
+                    title="Select Profile Picture"
+                />
+            </Popover>
+
+            <Button colorScheme="accent" variant="solid" minWidth="min-content" onClick={handleHideAllListings}>
                 Hide all Listings
             </Button>
         </Navbar>

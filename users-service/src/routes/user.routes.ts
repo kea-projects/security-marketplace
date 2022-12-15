@@ -110,7 +110,7 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
     }
 
     try {
-      const uploadedPicture = FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
+      const uploadedPicture = await FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
       if (!uploadedPicture) throw new Error("Failed to upload the file");
     } catch (error) {
       log.error(`An unknown error has occurred while uploading file`, error);
@@ -119,7 +119,7 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
 
     try {
       user.set({ pictureUrl });
-      user.save();
+      await user.save();
       return res.status(202).send(user);
     } catch (error) {
       log.error(`Error occurred while updating the user's image url`, error);

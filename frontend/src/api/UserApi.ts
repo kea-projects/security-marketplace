@@ -14,8 +14,13 @@ export class UserApi {
         return userApi.get('/users');
     }
 
-    public async getUser(id: string): Promise<AxiosResponse<UserResponse>> {
+    public async getUser(userId: string): Promise<AxiosResponse<UserResponse>> {
         console.log('User Api', 'Requesting all users...');
-        return userApi.get(`/users/${id}`);
+        return userApi.get(`/users/${userId}`);
+    }
+
+    public async updateProfilePicture(userId: string, picture: File): Promise<AxiosResponse<UserResponse>> {
+        console.log('User Api', 'Updating profile picture...');
+        return userApi.putForm(`/users/${userId}/pictures`, { file: picture });
     }
 }
