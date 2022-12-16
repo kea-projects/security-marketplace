@@ -3,34 +3,34 @@ import { Text, SimpleGrid, Center, SkeletonText } from '@chakra-ui/react';
 
 import { Card } from '../components/Card';
 import { Layout } from '../components/Layout';
-import { getMarketEntries } from '../fake-api/api';
-import { MarketEntry } from '../fake-api/marketEntries';
+import { ListingApi, ListingResponse } from '../api/ListingApi';
 
 export function HomePage() {
     const [isLoading, setIsLoading] = useState(false);
-    const [entries, setEntries] = useState<MarketEntry[] | undefined>(undefined);
+    const [listings, setListings] = useState<ListingResponse[] | undefined>(undefined);
+    const listingApi = new ListingApi();
 
     useEffect(() => {
-        // TODO: replace this with actual implementation
-        const fetchMarketEntries = async () => {
+        const fetchListings = async () => {
             setIsLoading(true);
-            setEntries(await getMarketEntries());
+            const { data } = await listingApi.getListings();
+            setListings(data);
             setIsLoading(false);
         };
 
-        fetchMarketEntries();
+        fetchListings();
     }, []);
 
-    const getGridItems = (entries: MarketEntry[] = [], isLoading = false) => {
-        return entries.map((entry, index) => {
+    const getGridItems = (listings: ListingResponse[] = [], isLoading = false) => {
+        return listings.map((listing, index) => {
             return (
                 <Center key={index}>
                     <Card minWidth="300px" variant="rounded" background="accent.500">
                         {isLoading && <SkeletonText mt="4" noOfLines={5} spacing="10px" width="100%" />}
                         {!isLoading && (
                             <>
-                                <Text fontSize="2xl">{entry.title}</Text>
-                                <Text>{entry.content}</Text>
+                                <Text fontSize="2xl">{listing.name}</Text>
+                                <Text>{listing.description}</Text>
                             </>
                         )}
                     </Card>
@@ -49,7 +49,7 @@ export function HomePage() {
                 paddingX="30px"
                 overflowY="auto"
             >
-                {isLoading ? getGridItems([...Array(5)], true) : getGridItems(entries)}
+                {isLoading ? getGridItems([...Array(5)], true) : getGridItems(listings)}
             </SimpleGrid>
         </Layout>
     );
