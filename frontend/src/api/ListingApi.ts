@@ -12,7 +12,7 @@ export interface CreateCommentRequestBody {
 interface CreateListingRequestBody {
     name: string;
     description: string;
-    imageUrl: string;
+    file: File;
     createdBy: string;
     isPublic: boolean;
 }
@@ -20,7 +20,7 @@ interface CreateListingRequestBody {
 interface UpdateListingRequestBody {
     name?: string;
     description?: string;
-    imageUrl?: string;
+    file?: File;
     isPublic?: boolean;
 }
 

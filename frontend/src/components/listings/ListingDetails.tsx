@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
-import { HStack, Box, Skeleton, VStack, Button, Text, Image } from '@chakra-ui/react';
+import { HStack, Box, Skeleton, VStack, Button, Text, Image, useDisclosure } from '@chakra-ui/react';
 
 import { ListingResponse } from '../../api/ListingApi';
 import { UserApi, UserResponse } from '../../api/UserApi';
 import { useNavigate } from 'react-router-dom';
+import { UpdateListingModal } from './UpdateListingModal';
+import { hasAdminPrivileges, isOwnProfile } from '../../utils/Auth';
 
 interface ListingDetailsProps {
     listing?: ListingResponse;
+    setListing: (listing: ListingResponse | undefined) => void;
     onIsPublicToggle: () => void;
     parentIsLoading?: boolean;
 }
 
-export function ListingDetails({ listing, onIsPublicToggle, parentIsLoading = false }: ListingDetailsProps) {
+export function ListingDetails({
+    listing,
+    setListing,
+    onIsPublicToggle,
+    parentIsLoading = false,
+}: ListingDetailsProps) {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [author, setAuthor] = useState<UserResponse | undefined>(undefined);
@@ -20,6 +28,7 @@ export function ListingDetails({ listing, onIsPublicToggle, parentIsLoading = fa
     // Constants
     const userApi = new UserApi();
     const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     // Fetch author
     useEffect(() => {
@@ -100,18 +109,29 @@ export function ListingDetails({ listing, onIsPublicToggle, parentIsLoading = fa
             </Skeleton>
 
             {/* Listing Actions */}
-            <VStack>
-                <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>
-                    <Button colorScheme="accent" variant="solid" onClick={onIsPublicToggle}>
-                        Status: {!parentIsLoading && (listing?.isPublic ? 'Public' : 'Private')}
-                    </Button>
-                </Skeleton>
-                <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>
-                    <Button colorScheme="accent" variant="solid" onClick={() => null}>
-                        Edit
-                    </Button>
-                </Skeleton>
-            </VStack>
+            {((author?.userId && isOwnProfile(author?.userId)) || hasAdminPrivileges()) && (
+                <VStack>
+                    <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>
+                        <Button colorScheme="accent" variant="solid" onClick={onIsPublicToggle}>
+                            Status: {!parentIsLoading && (listing?.isPublic ? 'Public' : 'Private')}
+                        </Button>
+                    </Skeleton>
+                    (
+                    <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>
+                        <Button colorScheme="accent" variant="solid" onClick={onOpen}>
+                            Edit
+                        </Button>
+
+                        <UpdateListingModal
+                            listing={listing}
+                            setListing={setListing}
+                            onClose={onClose}
+                            isOpen={isOpen}
+                        />
+                    </Skeleton>
+                    )
+                </VStack>
+            )}
         </HStack>
     );
 }

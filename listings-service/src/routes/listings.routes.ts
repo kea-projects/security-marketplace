@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
+import { AuthRoles } from "../../../frontend/src/utils/Auth";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
@@ -67,6 +68,9 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
       const token = req.body?.token;
       try {
         const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+        if (foundListing.isPublic) {
+          return res.send({ listing: foundListing, comments });
+        }
         if (!token && foundListing.isPublic) {
           return res.send({ listing: foundListing, comments });
         }
@@ -78,7 +82,7 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
           return res.status(403).send({ message: "Forbidden" });
         }
         return res.send({ listing: foundListing, comments });
-      }
+      } // TODO: Add the damn catch
     }
   } catch (error) {
     log.error(`Failed to get a listing with id: ${req.params.id}`, error);
@@ -143,13 +147,15 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
         const listingId = uuidv4();
         const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
         log.trace(`Creating listing with id ${listingId}`);
+        const createdBy = (token!.role == AuthRoles.ADMIN && req.body.createdBy) ? req.body.createdBy : token!.userId;
+        log.trace(`Creating listing by ${createdBy}`)
         const listing = await ListingsService.create({
           listingId,
           name,
           description,
           isPublic,
           imageUrl,
-          createdBy: token!.userId,
+          createdBy,
         });
         // Upload the file
         log.trace(`Uploading file for listing ${listing.listingId}`);

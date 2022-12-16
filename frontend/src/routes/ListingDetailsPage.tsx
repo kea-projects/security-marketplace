@@ -47,9 +47,22 @@ export function ListingDetailsPage() {
 
     return (
         <Layout useSearchbar={false}>
-            <VStack width="100%" paddingX="50px" paddingTop="60px" spacing="50px" overflowY="auto">
+            <VStack
+                width="100%"
+                height="100%"
+                paddingX="50px"
+                paddingTop="60px"
+                spacing="50px"
+                overflowY="auto"
+                overflowX="hidden"
+            >
                 {/* Listing Data */}
-                <ListingDetails listing={listing} onIsPublicToggle={handleIsPublicToggle} parentIsLoading={isLoading} />
+                <ListingDetails
+                    listing={listing}
+                    setListing={setListing}
+                    onIsPublicToggle={handleIsPublicToggle}
+                    parentIsLoading={isLoading}
+                />
 
                 <Divider borderWidth="1px" rounded="md" borderColor="layer" />
 

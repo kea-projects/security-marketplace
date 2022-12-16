@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Center, Skeleton, Container, HStack, Text, VStack, Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { ListingApi, ListingResponse } from '../../api/ListingApi';
+import { hasAdminPrivileges, isOwnProfile } from '../../utils/Auth';
 
 interface ListingProps {
     isLoading: boolean;
@@ -62,9 +63,11 @@ export function Listing({ isLoading = false, listingData }: ListingProps) {
                     </VStack>
 
                     <VStack paddingRight="10px">
-                        <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
-                            {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
-                        </Button>
+                        {((listing?.createdBy && isOwnProfile(listing?.createdBy)) || hasAdminPrivileges()) && (
+                            <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
+                                {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
+                            </Button>
+                        )}
                         <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
                             See More
                         </Button>
