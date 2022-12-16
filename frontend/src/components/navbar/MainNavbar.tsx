@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { Link as Navigate } from 'react-router-dom';
-import { Link, Icon, Spacer } from '@chakra-ui/react';
+import { Link as Navigate, useNavigate } from 'react-router-dom';
+import { Link, Icon, Spacer, Button } from '@chakra-ui/react';
 import { BsGithub } from 'react-icons/bs';
 
 import { Navbar } from '../themed/Navbar';
@@ -12,10 +12,20 @@ interface MainNavbarProps {
 }
 
 export function MainNavbar({ isAdmin }: MainNavbarProps) {
+    // Context
     const { userData, setUserData } = useContext(UserContext);
 
+    // Constants
+    const navigate = useNavigate();
+
+    // Handlers
     const handleLogout = () => {
         setUserData({});
+    };
+
+    const handleNavigateProfile = () => {
+        navigate(`/profile/${userData?.userId}`);
+        navigate(0);
     };
 
     return (
@@ -32,11 +42,7 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
             <Link as={Navigate} to="/">
                 Market
             </Link>
-            {hasUserPrivileges() && (
-                <Link as={Navigate} to={`/profile/${userData.userId}`}>
-                    Profile
-                </Link>
-            )}
+            {hasUserPrivileges() && <Link onClick={handleNavigateProfile}>Profile</Link>}
             <Link as={Navigate} onClick={handleLogout} to={hasUserPrivileges() ? '/' : '/login'}>
                 {hasUserPrivileges() ? 'Logout' : 'Login'}
             </Link>
