@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link as Navigate, useNavigate } from 'react-router-dom';
-import { Link, Icon, Spacer, Button } from '@chakra-ui/react';
+import { Link, Icon, Spacer } from '@chakra-ui/react';
 import { BsGithub } from 'react-icons/bs';
 
 import { Navbar } from '../themed/Navbar';
