@@ -82,7 +82,9 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
           return res.status(403).send({ message: "Forbidden" });
         }
         return res.send({ listing: foundListing, comments });
-      } // TODO: Add the damn catch
+      } catch (error) {
+        log.error(`An error occurred while getting the comments`, error);
+      }
     }
   } catch (error) {
     log.error(`Failed to get a listing with id: ${req.params.id}`, error);
@@ -147,8 +149,8 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
         const listingId = uuidv4();
         const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
         log.trace(`Creating listing with id ${listingId}`);
-        const createdBy = (token!.role == AuthRoles.ADMIN && req.body.createdBy) ? req.body.createdBy : token!.userId;
-        log.trace(`Creating listing by ${createdBy}`)
+        const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
+        log.trace(`Creating listing by ${createdBy}`);
         const listing = await ListingsService.create({
           listingId,
           name,
@@ -249,7 +251,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
     } catch (error) {
       log.error(`An error occurred while uploading a file!`, error);
     }
-    log.warn(`Failed to update a listing file`)
+    log.warn(`Failed to update a listing file`);
     return res.status(403).send({ message: "Forbidden" });
   });
 });
