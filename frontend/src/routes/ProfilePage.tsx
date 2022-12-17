@@ -7,11 +7,13 @@ import { ListingApi, ListingResponse } from '../api/ListingApi';
 import { useParams } from 'react-router-dom';
 import { CreateListingModal } from '../components/listings/CreateListingModal';
 import { hasAdminPrivileges, isOwnProfile } from '../utils/Auth';
+import { UserResponse } from '../api/UserApi';
 
 export function ProfilePage() {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [listings, setListings] = useState<ListingResponse[] | undefined>(undefined);
+    const [displayListings, setDisplayListings] = useState<ListingResponse[] | undefined>(undefined);
 
     // Path parameters
     const { userId } = useParams();
@@ -27,6 +29,7 @@ export function ProfilePage() {
             if (userId) {
                 const { data } = await listingApi.getUserListings(userId);
                 setListings(data);
+                setDisplayListings(data);
                 setIsLoading(false);
             }
         };
@@ -41,7 +44,12 @@ export function ProfilePage() {
     };
 
     return (
-        <Layout useProfilebar={true} userId={userId}>
+        <Layout
+            useProfilebar={true}
+            userId={userId}
+            searchItems={listings}
+            setSearchItems={setDisplayListings as (items: UserResponse[] | ListingResponse[]) => void}
+        >
             <VStack width="100%" overflowY="auto">
                 {((userId && isOwnProfile(userId)) || hasAdminPrivileges()) && (
                     <Box width="100%" paddingX="30px" display="flex" justifyContent="flex-end">
@@ -64,7 +72,7 @@ export function ProfilePage() {
                     </Box>
                 )}
                 <SimpleGrid minChildWidth="350px" spacing={10} width="100%" paddingTop="20px" paddingX="30px">
-                    {isLoading ? getGridItems([...Array(5)]) : getGridItems(listings)}
+                    {isLoading ? getGridItems([...Array(5)]) : getGridItems(displayListings)}
                 </SimpleGrid>
             </VStack>
         </Layout>

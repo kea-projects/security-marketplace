@@ -5,11 +5,13 @@ import { SimpleGrid, Container } from '@chakra-ui/react';
 import { Layout } from '../components/Layout';
 import { UserBadge } from '../components/UserBadge';
 import { UserApi, UserResponse } from '../api/UserApi';
+import { ListingResponse } from '../api/ListingApi';
 
 export function UsersPage() {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<UserResponse[] | undefined>(undefined);
+    const [displayUsers, setDisplayUsers] = useState<UserResponse[] | undefined>(undefined);
 
     // Constants
     const userApi = new UserApi();
@@ -20,6 +22,7 @@ export function UsersPage() {
             setIsLoading(true);
             const { data } = await userApi.getUsers();
             setUsers(data);
+            setDisplayUsers(data);
             setIsLoading(false);
         };
 
@@ -45,7 +48,10 @@ export function UsersPage() {
     };
 
     return (
-        <Layout>
+        <Layout
+            searchItems={users}
+            setSearchItems={setDisplayUsers as (items: UserResponse[] | ListingResponse[]) => void}
+        >
             <SimpleGrid
                 minChildWidth="350px"
                 spacing={10}
@@ -54,7 +60,7 @@ export function UsersPage() {
                 paddingX="30px"
                 overflowY="auto"
             >
-                {isLoading ? getGridItems([...Array(5)]) : getGridItems(users)}
+                {isLoading ? getGridItems([...Array(5)]) : getGridItems(displayUsers)}
             </SimpleGrid>
         </Layout>
     );
