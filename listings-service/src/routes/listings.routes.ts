@@ -2,7 +2,14 @@ import cors from "cors";
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import { corsDeleteConfig, corsGetConfig, corsPatchConfig, corsPostConfig, corsPutConfig } from "../config/cors.config";
+import {
+  corsDeleteConfig,
+  corsGetConfig,
+  corsOptionsConfig,
+  corsPatchConfig,
+  corsPostConfig,
+  corsPutConfig,
+} from "../config/cors.config";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import {
@@ -23,6 +30,8 @@ const uploadSingleImage = multerSingleImage.single("file");
 const uploadLargeRequest = multerLargeRequest.single("file");
 
 const router: Router = Router();
+// Allow preflight and options requests
+router.options("*", cors(corsOptionsConfig));
 
 router.get("", cors(corsGetConfig), canAccessAnonymous, async (req: Request, res: Response) => {
   try {

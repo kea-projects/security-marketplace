@@ -1,7 +1,7 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
 import { validate as isValidUuid } from "uuid";
-import { corsGetConfig, corsPostConfig, corsPutConfig } from "../config/cors.config";
+import { corsGetConfig, corsOptionsConfig, corsPostConfig, corsPutConfig } from "../config/cors.config";
 import { uploadSingleImage } from "../config/multer.config";
 import { cleanUserObjFields } from "../middleware/body-validators.middleware";
 import { paramUuidValidator } from "../middleware/path-param-validators";
@@ -19,6 +19,8 @@ import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
 const router: Router = Router();
+// Allow preflight and options requests
+router.options("*", cors(corsOptionsConfig));
 
 router.get("/users", cors(corsGetConfig), canAccessRoleAdmin, async (_req: Request, res: Response) => {
   try {

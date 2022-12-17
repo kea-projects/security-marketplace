@@ -1,6 +1,6 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
-import { corsGetConfig, corsPostConfig } from "../config/cors.config";
+import { corsGetConfig, corsOptionsConfig, corsPostConfig } from "../config/cors.config";
 import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/bodyValidators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthUserService } from "../services/auth-user.service";
@@ -9,6 +9,8 @@ import { TokenService } from "../services/token.service";
 import { log } from "../utils/logger";
 
 const router: Router = Router();
+// Allow preflight and options requests
+router.options("*", cors(corsOptionsConfig));
 
 /**
  * Validate that the provided credentials are valid, and return a access token pair if they do match a user.

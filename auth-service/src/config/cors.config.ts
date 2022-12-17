@@ -2,41 +2,45 @@ import { CorsOptions } from "cors";
 import { log } from "../utils/logger";
 import { getEnvVar } from "./config.service";
 
-const allowedOrigins = ["https://marketplace.hotdeals.dev"];
-if (getEnvVar("GLOBAL_CORS_ALLOW_LOCALHOST_ORIGIN")) {
-  allowedOrigins.push(`http://localhost:3000`);
-}
-log.info(`CORS allowed origins: ${allowedOrigins}`);
+const allowedOrigin = getEnvVar("GLOBAL_CORS_ALLOW_ANY_ORIGIN") ? "*" : "https://marketplace.hotdeals.dev";
+log.info(`CORS allowed origin: ${allowedOrigin}`);
 const allowedHeaders = ["Content-Type", "Authorization"];
 
 export const corsGetConfig: CorsOptions = {
   methods: "GET",
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   allowedHeaders,
 };
 
 export const corsPostConfig: CorsOptions = {
   methods: "POST",
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   allowedHeaders,
 };
 
 export const corsPatchConfig: CorsOptions = {
   methods: "PATCH",
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   allowedHeaders,
 };
 
 export const corsPutConfig: CorsOptions = {
   methods: "PUT",
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   allowedHeaders,
 };
 
 export const corsDeleteConfig: CorsOptions = {
   methods: "DELETE",
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   allowedHeaders,
+};
+
+export const corsOptionsConfig: CorsOptions = {
+  methods: "OPTIONS",
+  origin: allowedOrigin,
+  allowedHeaders,
+  preflightContinue: true,
 };
 
 /**
