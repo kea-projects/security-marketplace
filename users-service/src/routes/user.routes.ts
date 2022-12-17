@@ -100,35 +100,36 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
         .status(500)
         .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
     }
-
-    const userId = token.userId;
-    const fileName = req.file!.originalname;
-    const fileBuffer = req.file!.buffer;
-    const pictureUrl = FilesService.getResourceUrl(userId, fileName);
-
-    const user = await User.findByPk(userId);
-    if (!user) {
-      log.warn(`User with id: ${userId} not found!.`);
-      return res.status(404).send(new NotFoundError(`User with id: ${userId} not found!.`));
-    }
-
-    // Upload the new image
     try {
+      const userId = token.userId;
+      const fileName = req.file!.originalname;
+      const fileBuffer = req.file!.buffer;
+      const pictureUrl = FilesService.getResourceUrl(userId, fileName);
+
+      const user = await User.findByPk(userId);
+      if (!user) {
+        log.warn(`User with id: ${userId} not found!.`);
+        return res.status(404).send(new NotFoundError(`User with id: ${userId} not found!.`));
+      }
+
+      // Upload the new image
       const uploadedPicture = FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
       if (!uploadedPicture) throw new Error("Failed to upload the file");
+
+      // Update the user's picture url
+      try {
+        user.set({ pictureUrl });
+        user.save();
+        return res.status(202).send(user);
+      } catch (error) {
+        log.error(`An error occurred while updating the user's image url`, error);
+        return res
+          .status(500)
+          .send(new InternalServerError(`Internal Server Error - failed to update the users image.`));
+      }
     } catch (error) {
       log.error(`An unknown error has occurred while uploading file`, error);
       return res.status(500).send(new InternalServerError(`Internal Server Error - failed to update the users images`));
-    }
-
-    // Update the user's picture url
-    try {
-      user.set({ pictureUrl });
-      user.save();
-      return res.status(202).send(user);
-    } catch (error) {
-      log.error(`An error occurred while updating the user's image url`, error);
-      return res.status(500).send(new InternalServerError(`Internal Server Error - failed to update the users image.`));
     }
   });
 });
