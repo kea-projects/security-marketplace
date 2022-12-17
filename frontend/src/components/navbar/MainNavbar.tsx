@@ -40,7 +40,7 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
 
     return (
         <Navbar height="60px" minHeight="60px" fontSize="xl">
-            <Link href="https://github.com/kea-projects">
+            <Link href="https://github.com/kea-projects/security-marketplace">
                 <Icon as={BsGithub} /> Source Code
             </Link>
             <Spacer />
