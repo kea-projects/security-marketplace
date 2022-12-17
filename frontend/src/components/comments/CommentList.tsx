@@ -13,6 +13,11 @@ interface CommentListProps {
     parentIsLoading?: boolean;
 }
 
+/**
+ * Creates a component that displays the comment list for a given listing.
+ * It will render the list itself, along with with a box containing the comment form, to allow the user to post
+ * their own comment.
+ */
 export function CommentList({ listingId, comments, setComments, parentIsLoading = false }: CommentListProps) {
     // States
     const [isLoading, setIsLoading] = useState(false);
@@ -21,18 +26,19 @@ export function CommentList({ listingId, comments, setComments, parentIsLoading 
     // Context
     const { userData } = useContext(UserContext);
 
-    // Constants
-    const listingApi = new ListingApi();
-    const userApi = new UserApi();
-
     // Handlers
+
+    /**
+     * Attempts to create the new comment, and display an error message if it fails.
+     * @param formFields
+     */
     const handlePostComment = async (formFields: CommentFormFields) => {
         setIsLoading(true);
         try {
             if (userData.userId && userData.username && listingId) {
-                const userResponse = await userApi.getUser(userData.userId);
+                const userResponse = await UserApi.getUser(userData.userId);
 
-                const { data } = await listingApi.createComment({
+                const { data } = await ListingApi.createComment({
                     comment: formFields.comment,
                     commentedOn: listingId,
                     createdBy: userData.userId,
@@ -53,6 +59,9 @@ export function CommentList({ listingId, comments, setComments, parentIsLoading 
         }
     };
 
+    /**
+     * Generates `UserComment` components for each of the given comments.
+     */
     const getCommentList = (comments: CommentResponse[] = []) => {
         comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 

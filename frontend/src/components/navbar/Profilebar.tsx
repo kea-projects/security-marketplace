@@ -12,14 +12,16 @@ interface ProfilebarProps {
     userId?: string;
 }
 
+/**
+ * Creates a `Navbar` component that displays specific user information.
+ * Intended to be used on the user profile.
+ */
 export function Profilebar({ userId }: ProfilebarProps) {
     // States
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [user, setUser] = useState<UserResponse | undefined>(undefined);
 
     // Constants
-    const userApi = new UserApi();
-    const listingApi = new ListingApi();
     const navigate = useNavigate();
 
     // Fetching user
@@ -27,7 +29,7 @@ export function Profilebar({ userId }: ProfilebarProps) {
         const fetchUser = async () => {
             setIsLoading(true);
             if (userId) {
-                const { data } = await userApi.getUser(userId);
+                const { data } = await UserApi.getUser(userId);
                 console.log(data);
                 setUser(data);
                 setIsLoading(false);
@@ -38,21 +40,29 @@ export function Profilebar({ userId }: ProfilebarProps) {
     }, []);
 
     // Handlers
+
+    /**
+     * Sets the `isPublic` attribute of all the user's listings to `false`.
+     */
     const handleHideAllListings = async () => {
         if (userId) {
-            const { data } = await listingApi.getUserListings(userId);
+            const { data } = await ListingApi.getUserListings(userId);
             for (const listing of data) {
                 listing.isPublic = false;
-                await listingApi.updateListing(listing, listing.listingId);
+                await ListingApi.updateListing(listing, listing.listingId);
             }
             navigate(0);
         }
     };
 
+    /**
+     * Calls the Api to update the profile picture of the user.
+     * @param pictureList
+     */
     const handleProfilePictureUpload = async (pictureList: File[]) => {
         const picture = pictureList[0];
         if (userId) {
-            await userApi.updateProfilePicture(userId, picture);
+            await UserApi.updateProfilePicture(userId, picture);
             navigate(0);
         }
     };
@@ -67,6 +77,7 @@ export function Profilebar({ userId }: ProfilebarProps) {
             />
             <Spacer />
 
+            {/* Update Picture button is only displayed for user's own profile, or if the user is an admin */}
             {((userId && isOwnProfile(userId)) || hasAdminPrivileges()) && (
                 <Popover>
                     <PopoverTrigger>
@@ -83,6 +94,7 @@ export function Profilebar({ userId }: ProfilebarProps) {
                 </Popover>
             )}
 
+            {/* Hide all listings button is only displayed for user's own profile, or if the user is an admin */}
             {((userId && isOwnProfile(userId)) || hasAdminPrivileges()) && (
                 <Button colorScheme="accent" variant="solid" minWidth="min-content" onClick={handleHideAllListings}>
                     Hide all Listings

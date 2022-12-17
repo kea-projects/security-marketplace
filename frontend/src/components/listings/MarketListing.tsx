@@ -12,20 +12,27 @@ interface MarketListingProps {
     listing: ListingResponse;
 }
 
+/**
+ * Creates a wrapped component for the `Listing` component.
+ * It displays the `Listing` component, along with a header that contains information about
+ * the author of the listing, as well as the listing's picture.
+ *
+ * Intended to be used on the home page.
+ *
+ * NOTE: It only displays the author information if the user is logged in.
+ */
 export function MarketListing({ parentIsLoading = false, listing }: MarketListingProps) {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [author, setAuthor] = useState<UserResponse | undefined>(undefined);
 
-    // Constants
-    const userApi = new UserApi();
-
     // Fetch Listing author
     useEffect(() => {
+        // Only fetches author information if user is logged in.
         if (!parentIsLoading && hasUserPrivileges()) {
             const fetchAuthor = async () => {
                 setIsLoading(true);
-                const { data } = await userApi.getUser(listing.createdBy);
+                const { data } = await UserApi.getUser(listing.createdBy);
                 setAuthor(data);
                 setIsLoading(false);
             };

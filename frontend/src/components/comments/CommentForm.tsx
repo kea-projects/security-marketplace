@@ -12,6 +12,9 @@ interface CommentFormProps {
     error?: string;
 }
 
+/**
+ * Creates a component containing the form for posting a comment.
+ */
 export function CommentForm({ onFormSubmit, isLoading = false, error, ...rest }: BoxProps & CommentFormProps) {
     const {
         register,
@@ -29,13 +32,14 @@ export function CommentForm({ onFormSubmit, isLoading = false, error, ...rest }:
                             minWidth="400px"
                             placeholder="Write your comment here..."
                             {...register('comment', {
-                                required: 'Comment is required to post a comment.',
-                                maxLength: { value: 250, message: 'Comment cannot exceed 250 characters.' },
+                                required: 'You need to write text in order to post a comment.',
+                                maxLength: { value: 500, message: 'Comment cannot exceed 500 characters.' },
                             })}
                         />
                         <FormErrorMessage>{errors.comment?.message}</FormErrorMessage>
                     </FormControl>
 
+                    {/* Api Error */}
                     <FormControl isInvalid={!!error}>
                         <FormErrorMessage>{error}</FormErrorMessage>
                     </FormControl>

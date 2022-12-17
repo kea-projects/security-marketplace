@@ -12,6 +12,9 @@ interface SearchbarProps {
     setItems: (items: UserResponse[] | ListingResponse[]) => void;
 }
 
+/**
+ * Creates a component of type Navbar that is contains a search input field.
+ */
 export function Searchbar({ items, setItems }: SearchbarProps) {
     // States
     const [searchInput, setSearchInput] = useState('');
@@ -28,6 +31,13 @@ export function Searchbar({ items, setItems }: SearchbarProps) {
     };
 
     // Searching functions
+
+    /**
+     * Filters the `users` list to only contain entries where either the `name` or the `email` includes
+     * the search string.
+     * @param users
+     * @returns the filtered list of `users`
+     */
     const searchUsers = (users: UserResponse[]) => {
         return users.filter((user) => {
             return (
@@ -37,6 +47,12 @@ export function Searchbar({ items, setItems }: SearchbarProps) {
         });
     };
 
+    /**
+     * Filters the `listings` list to only contain entries where either the `name` or the `description` includes
+     * the search string.
+     * @param listings
+     * @returns the filtered list of `listings`
+     */
     const searchListings = (listings: ListingResponse[]) => {
         return listings.filter((listing) => {
             return (

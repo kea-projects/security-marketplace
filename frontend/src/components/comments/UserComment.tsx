@@ -12,6 +12,10 @@ interface UserCommentProps {
     userId: string;
 }
 
+/**
+ * Creates a component that displays the user comment.
+ * It renders the `UserBadge` component, along with the comment itself.
+ */
 export function UserComment({ isLoading = false, name, email, comment, userId }: UserCommentProps) {
     return (
         <Skeleton isLoaded={!isLoading} alignSelf="start" rounded="md">

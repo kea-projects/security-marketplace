@@ -22,6 +22,9 @@ interface UploadFilePopoverProps {
     contentType?: string;
 }
 
+/**
+ * Creates a component displays a popover which contains an input field to upload one or multiple files.
+ */
 export function UploadFilePopover({
     onFileSubmit,
     placeholder = 'Upload file...',
@@ -35,6 +38,13 @@ export function UploadFilePopover({
     const [inputError, setInputError] = useState<string | undefined>(undefined);
 
     // Handlers
+
+    /**
+     * Checks if the files uploaded have less than 50MB each.
+     * If they do, then the component will render an error message.
+     * Otherwise, the files are set into the state.
+     * @param files
+     */
     const handleOnFileChange = (files: File[]) => {
         for (const file of files) {
             if (file.size > 50 * 1024 * 1024) {
@@ -45,6 +55,11 @@ export function UploadFilePopover({
         setFiles(files);
     };
 
+    /**
+     * Generates a component displaying the name and the file size of each of the
+     * files the user has uploaded.
+     * @returns the files uploaded by the user.
+     */
     const getFileItems = () => {
         const elements: JSX.Element[] = [];
         if (files) {
@@ -65,6 +80,7 @@ export function UploadFilePopover({
             <PopoverArrow />
             <PopoverHeader fontWeight="semibold">{title}</PopoverHeader>
             <PopoverCloseButton />
+
             <PopoverBody>
                 <VStack>
                     <HStack>

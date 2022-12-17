@@ -10,20 +10,20 @@ interface UpdateListingModalProps {
     setListing: (listing: ListingResponse | undefined) => void;
 }
 
+/**
+ * Creates a component that will display a modal which contains the form for updating a listing.
+ */
 export function UpdateListingModal({ isOpen, onClose, listing, setListing }: UpdateListingModalProps) {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [listingUpdateError, setListingUpdateError] = useState<string | undefined>(undefined);
-
-    // Constants
-    const listingApi = new ListingApi();
 
     // Handlers
     const handleUpdateListing = async (formFields: UpdateListingFormFields) => {
         setIsLoading(true);
         try {
             if (listing) {
-                const { data } = await listingApi.updateListing(formFields, listing.listingId);
+                const { data } = await ListingApi.updateListing(formFields, listing.listingId);
                 setListing(data);
                 setListingUpdateError(undefined);
                 onClose();

@@ -10,13 +10,15 @@ export interface ListingProps {
     useStatusToggle?: boolean;
 }
 
+/**
+ * Creates a component that displays the listing data.
+ */
 export function Listing({ isLoading = false, listingData, useStatusToggle = true }: ListingProps) {
     // States
     const [listing, setListing] = useState<ListingResponse | undefined>(undefined);
 
     // Constants
     const navigate = useNavigate();
-    const listingApi = new ListingApi();
 
     // Set listing data
     useEffect(() => {
@@ -26,13 +28,20 @@ export function Listing({ isLoading = false, listingData, useStatusToggle = true
     }, [isLoading]);
 
     // Handlers
+
+    /**
+     * Takes the user to the `ListingDetails` page for the specific listing.
+     */
     const handleSeeMore = () => {
         navigate(`/listing-details/${listing?.listingId}`);
     };
 
+    /**
+     * Toggles the visibility of the listing by toggling the boolean `isPublic`.
+     */
     const handleToggleIsPublic = async () => {
         if (listing) {
-            const { data } = await listingApi.updateListing(
+            const { data } = await ListingApi.updateListing(
                 { ...listing, isPublic: !listing.isPublic },
                 listing.listingId,
             );
@@ -42,6 +51,7 @@ export function Listing({ isLoading = false, listingData, useStatusToggle = true
 
     return (
         <Center height="15vh" boxShadow="md" rounded="md" width="100%">
+            {/* Displays a "Skeleton Component" while the data is loading. */}
             {isLoading ? (
                 <Skeleton height="100%" width="100%" rounded="md" />
             ) : (
@@ -64,12 +74,15 @@ export function Listing({ isLoading = false, listingData, useStatusToggle = true
                     </VStack>
 
                     <VStack paddingRight="10px">
+                        {/* Only allow visibility to be toggled by the listing's author or an admin. */}
                         {((useStatusToggle && listing?.createdBy && isOwnProfile(listing?.createdBy)) ||
                             hasAdminPrivileges()) && (
                             <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
                                 {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
                             </Button>
                         )}
+
+                        {/* Only allow to see details about the listing if the user is logged in. */}
                         {hasUserPrivileges() && (
                             <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
                                 See More

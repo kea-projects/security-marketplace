@@ -13,6 +13,9 @@ interface LoginFormProps {
     error?: string;
 }
 
+/**
+ * Creates a component that contains the Login form.
+ */
 export function LoginForm({ onSubmit, isLoading = false, error }: LoginFormProps) {
     const {
         register,
@@ -30,7 +33,7 @@ export function LoginForm({ onSubmit, isLoading = false, error }: LoginFormProps
                         placeholder="user@example.com"
                         {...register('username', {
                             required: 'Username is required to login.',
-                            maxLength: { value: 320, message: 'Username cannot exceed 320 characters.' },
+                            maxLength: { value: 254, message: 'Username cannot exceed 254 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
@@ -44,7 +47,7 @@ export function LoginForm({ onSubmit, isLoading = false, error }: LoginFormProps
                         {...register('password', {
                             required: 'Password is required to login.',
                             minLength: { value: 8, message: 'Password has to contain at least 8 characters.' },
-                            maxLength: { value: 32, message: 'Password cannot exceed 32 characters.' },
+                            maxLength: { value: 60, message: 'Password cannot exceed 60 characters.' },
                             pattern: {
                                 value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                                 message:
@@ -57,6 +60,7 @@ export function LoginForm({ onSubmit, isLoading = false, error }: LoginFormProps
                     </FormErrorMessage>
                 </FormControl>
 
+                {/* Api Error */}
                 <FormControl isInvalid={!!error}>
                     <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>

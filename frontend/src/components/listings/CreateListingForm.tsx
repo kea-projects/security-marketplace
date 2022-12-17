@@ -15,6 +15,9 @@ interface CreateListingFormProps {
     error?: string;
 }
 
+/**
+ * Creates a component with the form for creating a new `Listing`.
+ */
 export function CreateListingForm({ onSubmit, isLoading = false, error }: CreateListingFormProps) {
     // States
     const [file, setFile] = useState<File | undefined>(undefined);
@@ -29,6 +32,7 @@ export function CreateListingForm({ onSubmit, isLoading = false, error }: Create
     return (
         <form
             onSubmit={handleSubmit((formFields) => {
+                // Manually validate the file input, since it is not compatible with the useForm hook.
                 if (file) {
                     if (file.size <= 50 * 1024 * 1024) {
                         setFileError(undefined);
@@ -48,7 +52,7 @@ export function CreateListingForm({ onSubmit, isLoading = false, error }: Create
                         placeholder="Used Toyota"
                         {...register('name', {
                             required: 'The name is required to post the listing.',
-                            maxLength: { value: 30, message: 'Name cannot exceed 30 characters.' },
+                            maxLength: { value: 150, message: 'Name cannot exceed 150 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
@@ -60,7 +64,7 @@ export function CreateListingForm({ onSubmit, isLoading = false, error }: Create
                         placeholder="Write a description of the item."
                         {...register('description', {
                             required: 'The description is required to post the listing.',
-                            maxLength: { value: 300, message: 'Description cannot exceed 300 characters.' },
+                            maxLength: { value: 1000, message: 'Description cannot exceed 1000 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
@@ -88,6 +92,7 @@ export function CreateListingForm({ onSubmit, isLoading = false, error }: Create
                     <FormErrorMessage>{fileError}</FormErrorMessage>
                 </FormControl>
 
+                {/* Api Error */}
                 <FormControl isInvalid={!!error}>
                     <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>

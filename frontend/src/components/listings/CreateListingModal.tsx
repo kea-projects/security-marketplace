@@ -11,27 +11,27 @@ interface CreateListingModalProps {
     userId?: string;
 }
 
+/**
+ * Creates a component that will display a modal which contains the form for creating a listing.
+ */
 export function CreateListingModal({ isOpen, onClose, listings, setListings, userId }: CreateListingModalProps) {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [listingCreateError, setListingCreateError] = useState<string | undefined>(undefined);
-
-    // Constants
-    const listingApi = new ListingApi();
 
     // Handlers
     const handleCreateListing = async (formFields: CreateListingFormFields & { file: File }) => {
         setIsLoading(true);
         try {
             if (listings && userId) {
-                const { data } = await listingApi.createListing({ ...formFields, createdBy: userId });
+                const { data } = await ListingApi.createListing({ ...formFields, createdBy: userId });
                 listings.push(data);
                 setListings(listings);
                 setListingCreateError(undefined);
                 onClose();
             }
         } catch (error) {
-            setListingCreateError('We encountered an error while updating your listing.');
+            setListingCreateError('We encountered an error while creating your listing.');
         } finally {
             setIsLoading(false);
         }

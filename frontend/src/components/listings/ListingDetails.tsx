@@ -15,6 +15,9 @@ interface ListingDetailsProps {
     parentIsLoading?: boolean;
 }
 
+/**
+ * Creates a component that displays the listings of a given listing, along with its `CommentList`.
+ */
 export function ListingDetails({
     listing,
     setListing,
@@ -26,8 +29,6 @@ export function ListingDetails({
     const [author, setAuthor] = useState<UserResponse | undefined>(undefined);
 
     // Constants
-    const userApi = new UserApi();
-    const listingApi = new ListingApi();
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -36,7 +37,7 @@ export function ListingDetails({
         const fetchAuthor = async () => {
             setIsLoading(true);
             if (listing) {
-                const { data } = await userApi.getUser(listing.createdBy);
+                const { data } = await UserApi.getUser(listing.createdBy);
                 setAuthor(data);
                 setIsLoading(false);
             }
@@ -46,15 +47,22 @@ export function ListingDetails({
     }, [parentIsLoading]);
 
     // Handlers
+
+    /**
+     * Sends the user to the profile page of the listing's author.
+     */
     const handleVisitProfile = () => {
         if (author) {
             navigate(`/profile/${author.userId}`);
         }
     };
 
+    /**
+     * Calls the Api to attempt to delete the listing, and sends the user one page back in history.
+     */
     const handleDeleteListing = async () => {
         if (listing) {
-            await listingApi.deleteListing(listing.listingId);
+            await ListingApi.deleteListing(listing.listingId);
             navigate(-1);
         }
     };
@@ -117,6 +125,7 @@ export function ListingDetails({
             </Skeleton>
 
             {/* Listing Actions */}
+            {/* Only displayed for the listing's author or an admin. */}
             {((author?.userId && isOwnProfile(author?.userId)) || hasAdminPrivileges()) && (
                 <VStack>
                     <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>

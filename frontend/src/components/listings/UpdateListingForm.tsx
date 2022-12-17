@@ -16,6 +16,9 @@ interface UpdateListingFormProps {
     listing?: ListingResponse;
 }
 
+/**
+ * Creates a component with the form for updating a `Listing`.
+ */
 export function UpdateListingForm({ onSubmit, isLoading = false, error, listing }: UpdateListingFormProps) {
     const {
         register,
@@ -34,7 +37,7 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
                         value={listing?.name}
                         {...register('name', {
                             required: 'The name is required to post the listing.',
-                            maxLength: { value: 30, message: 'Name cannot exceed 30 characters.' },
+                            maxLength: { value: 150, message: 'Name cannot exceed 150 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
@@ -47,7 +50,7 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
                         value={listing?.description}
                         {...register('description', {
                             required: 'The description is required to post the listing.',
-                            maxLength: { value: 300, message: 'Description cannot exceed 300 characters.' },
+                            maxLength: { value: 1000, message: 'Description cannot exceed 1000 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
@@ -59,6 +62,7 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
                     <FormErrorMessage>{errors.isPublic?.message}</FormErrorMessage>
                 </FormControl>
 
+                {/* Api Error */}
                 <FormControl isInvalid={!!error}>
                     <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>

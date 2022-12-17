@@ -14,15 +14,20 @@ import {
 
 interface UserBadgeProps {
     showFull?: boolean;
-    isLoading: boolean;
+    isLoading?: boolean;
     fullName?: string;
     username?: string;
     pictureUrl?: string;
 }
 
+/**
+ * Creates a component that displays an individual user's profile picture, as long as their username and full name.
+ * It has both a desktop and a mobile friendly version which is being chosen automatically based on the window size.
+ */
 export function UserBadge({ isLoading = false, fullName, username, pictureUrl, showFull = false }: UserBadgeProps) {
     return (
         <>
+            {/* Desktop */}
             <Hide below="md">
                 <Tag
                     size="lg"
@@ -49,6 +54,8 @@ export function UserBadge({ isLoading = false, fullName, username, pictureUrl, s
                     </SkeletonText>
                 </Tag>
             </Hide>
+
+            {/* Mobile */}
             <Show below="md">
                 <Container display="flex" alignItems="center" boxShadow="md">
                     <SkeletonCircle
