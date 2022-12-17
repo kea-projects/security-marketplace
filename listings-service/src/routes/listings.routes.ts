@@ -2,14 +2,7 @@ import cors from "cors";
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import {
-  corsDeleteConfig,
-  corsGetConfig,
-  corsOptionsConfig,
-  corsPatchConfig,
-  corsPostConfig,
-  corsPutConfig,
-} from "../config/cors.config";
+import { AuthRoles } from "../../../frontend/src/utils/Auth";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import {
@@ -36,19 +29,24 @@ router.options("*", cors(corsOptionsConfig));
 router.get("", cors(corsGetConfig), canAccessAnonymous, async (req: Request, res: Response) => {
   try {
     const token = req.body?.token;
-
-    if (!token) {
-      log.trace(`No access token, Returning all public listings`);
-      return res.send(await ListingsService.findByIsPublic());
+    if (token && token.role == Role.admin) {
+      return res.send(await ListingsService.findAll());
     }
+    return res.send(await ListingsService.findByIsPublic());
+  } catch (error) {
+    log.error(`Failed to get all listings!`, error);
+    return res.status(403).send({ message: "Forbidden" });
+  }
+});
 
-    if (token && token.role != Role.admin) {
-      log.trace(`Access role: User, Returning all public listings and listings of user ${token.userId}`);
-      return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
+router.get("/user/:id", canAccessRoleUser, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const token = req.body?.token;
+    if (token && (token.role == Role.admin || (token.userId as string) === id)) {
+      return res.send(await ListingsService.findAllByCreatedBy(id));
     }
-
-    log.trace(`Access role: Admin, Returning all listings`);
-    return res.send(await ListingsService.findAll());
+    return res.send(await ListingsService.findPublicByCreatedBy(id));
   } catch (error) {
     log.error(`Failed to get all listings!`, error);
     return res.status(500).send({ message: "Internal Server Error - failed to get the listings." });
@@ -81,16 +79,24 @@ router.get(
       // Check if the user is authorized to access the given listing
       log.trace(`Getting access token from request body`);
       const token = req.body?.token;
-
-      // No token and the listing is public - return the listing
-      if (!token && foundListing.isPublic) {
-        log.trace(`Returning the public listing`);
+      try {
+        const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+        if (foundListing.isPublic) {
+          return res.send({ listing: foundListing, comments });
+        }
+        if (!token && foundListing.isPublic) {
+          return res.send({ listing: foundListing, comments });
+        }
+        if (token && token.role != Role.admin) {
+          if (foundListing.createdBy === token.userId) {
+            return res.send({ listing: foundListing, comments });
+          }
+          log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
+          return res.status(403).send({ message: "Forbidden" });
+        }
         return res.send({ listing: foundListing, comments });
-      }
-      // The user is an administrator - return the listing
-      if (token && token.role === Role.admin) {
-        log.trace(`Returning the listing for the admin user`);
-        return res.send({ listing: foundListing, comments });
+      } catch (error) {
+        log.error(`An error occurred while getting the comments`, error);
       }
       // The user owns the listing - return the listing
       if (token && token.role != Role.admin && foundListing.createdBy === token.userId) {
@@ -186,12 +192,32 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
       // Upload the file
       log.trace(`Uploading file for listing ${listing.listingId}`);
       try {
-        const uploadedFile = FilesService.uploadFile(
-          req.file!.buffer,
-          FilesService.getFilename(listingId, req.file!.originalname)
-        );
-        if (!uploadedFile) {
-          throw new Error("Failed to upload the file");
+        const listingId = uuidv4();
+        const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
+        log.trace(`Creating listing with id ${listingId}`);
+        const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
+        log.trace(`Creating listing by ${createdBy}`);
+        const listing = await ListingsService.create({
+          listingId,
+          name,
+          description,
+          isPublic,
+          imageUrl,
+          createdBy,
+        });
+        // Upload the file
+        log.trace(`Uploading file for listing ${listing.listingId}`);
+        try {
+          const uploadedFile = FilesService.uploadFile(
+            req.file!.buffer,
+            FilesService.getFilename(listingId, req.file!.originalname)
+          );
+          if (!uploadedFile) {
+            throw new Error("Failed to upload the file");
+          }
+        } catch (error) {
+          await ListingsService.delete(listingId);
+          throw new Error("Failed to upload a file");
         }
       } catch (error) {
         log.error(`Failed to upload a file as part of creating a listing with id ${listing.listingId}!`, error);
@@ -303,8 +329,12 @@ router.put(
         log.error(`An error occurred while uploading a file for listing with id ${req.params.id}!`, error);
         return res.status(500).send({ message: "Internal Server Error - failed to update the listing's file." });
       }
-    });
-  }
-);
+    } catch (error) {
+      log.error(`An error occurred while uploading a file!`, error);
+    }
+    log.warn(`Failed to update a listing file`);
+    return res.status(403).send({ message: "Forbidden" });
+  });
+});
 
 export { router as listingsRouter };

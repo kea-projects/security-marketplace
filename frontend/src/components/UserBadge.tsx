@@ -14,15 +14,20 @@ import {
 
 interface UserBadgeProps {
     showFull?: boolean;
-    isLoading: boolean;
-    fullName: string;
-    username: string;
+    isLoading?: boolean;
+    fullName?: string;
+    username?: string;
+    pictureUrl?: string;
 }
 
-export function UserBadge({ isLoading = false, fullName, username, showFull = false }: UserBadgeProps) {
-    // TODO: provide proper link to the image.
+/**
+ * Creates a component that displays an individual user's profile picture, as long as their username and full name.
+ * It has both a desktop and a mobile friendly version which is being chosen automatically based on the window size.
+ */
+export function UserBadge({ isLoading = false, fullName, username, pictureUrl, showFull = false }: UserBadgeProps) {
     return (
         <>
+            {/* Desktop */}
             <Hide below="md">
                 <Tag
                     size="lg"
@@ -36,7 +41,7 @@ export function UserBadge({ isLoading = false, fullName, username, showFull = fa
                     boxShadow="md"
                 >
                     <SkeletonCircle size="fit-content" isLoaded={!isLoading}>
-                        <Avatar size="lg" name={fullName} src="https://bit.ly/broken-link" />
+                        <Avatar size="lg" name={fullName} src={pictureUrl} />
                     </SkeletonCircle>
 
                     <SkeletonText noOfLines={2} minWidth="150px" width="fit-content" isLoaded={!isLoading}>
@@ -49,6 +54,8 @@ export function UserBadge({ isLoading = false, fullName, username, showFull = fa
                     </SkeletonText>
                 </Tag>
             </Hide>
+
+            {/* Mobile */}
             <Show below="md">
                 <Container display="flex" alignItems="center" boxShadow="md">
                     <SkeletonCircle
@@ -58,7 +65,7 @@ export function UserBadge({ isLoading = false, fullName, username, showFull = fa
                         margin="5px"
                         borderColor="background"
                     >
-                        <Avatar size="lg" name={fullName} src="https://bit.ly/broken-link" />
+                        <Avatar size="lg" name={fullName} src={pictureUrl} />
                     </SkeletonCircle>
                     {showFull && (
                         <SkeletonText noOfLines={2} width="150px" isLoaded={!isLoading}>

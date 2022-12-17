@@ -48,7 +48,7 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, isPublic } = req.body!;
+  const { name, description, isPublic, createdBy } = req.body!;
   log.trace(`Validating the request.body of Create Listing Request`);
   if (!name) {
     log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
@@ -66,7 +66,7 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
     (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
-    req.body = { name, description, isPublic: convertedIsPublic };
+    req.body = { name, description, isPublic: convertedIsPublic, createdBy };
     next();
     return;
   }

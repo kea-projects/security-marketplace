@@ -1,46 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { Text, SimpleGrid, Center, SkeletonText } from '@chakra-ui/react';
+import { SimpleGrid } from '@chakra-ui/react';
 
-import { Card } from '../components/Card';
 import { Layout } from '../components/Layout';
 import { ListingApi, ListingResponse } from '../api/ListingApi';
+import { UserResponse } from '../api/UserApi';
+import { MarketListing } from '../components/listings/MarketListing';
 
+/**
+ * Creates a `Page` component that displays the navbar and a list of all currently public listings.
+ */
 export function HomePage() {
+    // States
     const [isLoading, setIsLoading] = useState(false);
     const [listings, setListings] = useState<ListingResponse[] | undefined>(undefined);
-    const listingApi = new ListingApi();
+    const [displayListings, setDisplayListings] = useState<ListingResponse[] | undefined>(undefined);
 
+    // Fetch listings.
     useEffect(() => {
         const fetchListings = async () => {
             setIsLoading(true);
-            const { data } = await listingApi.getListings();
+            const { data } = await ListingApi.getListings();
             setListings(data);
+            setDisplayListings(data);
             setIsLoading(false);
         };
 
         fetchListings();
     }, []);
 
-    const getGridItems = (listings: ListingResponse[] = [], isLoading = false) => {
+    /**
+     * Creates a `MarketListing` component for each listing.
+     * @param listings
+     */
+    const getGridItems = (listings: ListingResponse[] = []) => {
         return listings.map((listing, index) => {
             return (
-                <Center key={index}>
-                    <Card minWidth="300px" variant="rounded" background="accent.500">
-                        {isLoading && <SkeletonText mt="4" noOfLines={5} spacing="10px" width="100%" />}
-                        {!isLoading && (
-                            <>
-                                <Text fontSize="2xl">{listing.name}</Text>
-                                <Text>{listing.description}</Text>
-                            </>
-                        )}
-                    </Card>
-                </Center>
+                <MarketListing
+                    parentIsLoading={isLoading}
+                    key={isLoading ? index : listing.listingId}
+                    listing={listing}
+                />
             );
         });
     };
 
     return (
-        <Layout>
+        <Layout
+            searchItems={listings}
+            setSearchItems={setDisplayListings as (items: UserResponse[] | ListingResponse[]) => void}
+        >
             <SimpleGrid
                 minChildWidth="350px"
                 spacing={10}
@@ -49,7 +57,7 @@ export function HomePage() {
                 paddingX="30px"
                 overflowY="auto"
             >
-                {isLoading ? getGridItems([...Array(5)], true) : getGridItems(listings)}
+                {isLoading ? getGridItems([...Array(5)]) : getGridItems(displayListings)}
             </SimpleGrid>
         </Layout>
     );

@@ -1,7 +1,7 @@
 import { defineStyleConfig } from '@chakra-ui/react';
 
 export const Navbar = defineStyleConfig({
-    // The styles all Cards have in common
+    // The styles all Navbars have in common
     baseStyle: {
         display: 'flex',
         flexDirection: 'row',
