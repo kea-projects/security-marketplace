@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import { getEnvVar } from "./config/secrets";
 import { logger } from "./middleware/logging.middleware";
 import { userRouter } from "./routes/user.routes";
+import { UnauthorizedError } from "./utils/error-messages";
 import { initializeDb } from "./utils/init-database";
 import { log } from "./utils/logger";
 
@@ -26,7 +27,7 @@ app.all("*", (req: Request, res: Response) => {
   log.info(`Request body: ${JSON.stringify(req.body)}`);
   log.info("Rejecting request.");
 
-  res.status(401).send();
+  res.status(401).send(new UnauthorizedError());
 });
 
 // -------------------App-Launch-----------------------

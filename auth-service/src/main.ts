@@ -1,5 +1,5 @@
 import cors from "cors";
-import express from "express";
+import express, { Request, Response } from "express";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
 import { authRouter } from "./routes/auth.routes";
@@ -17,9 +17,17 @@ app.use(cors(corsOptions));
 // ---------------------Routers------------------------
 app.use("/auth", authRouter);
 
+// ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", (_req, res) => {
-  res.status(401).send({ message: "Unauthorized" });
+app.all("*", (req: Request, res: Response) => {
+  log.info(`Invalid request: ${req.method} ${req.url}.`);
+  log.info(`Request body: ${JSON.stringify(req.body)}`);
+  log.info("Rejecting request.");
+
+  res.status(401).send({
+    error: "UnauthorizedError",
+    detail: "Unauthorized",
+  });
 });
 
 // -------------------App-Launch-----------------------
