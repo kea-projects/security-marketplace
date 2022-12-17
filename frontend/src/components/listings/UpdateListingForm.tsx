@@ -55,9 +55,7 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
 
                 <FormControl isInvalid={!!errors.isPublic}>
                     <FormLabel>Visibility</FormLabel>
-                    <Checkbox isChecked={listing?.isPublic} {...register('isPublic')}>
-                        Public
-                    </Checkbox>
+                    <Checkbox {...register('isPublic')}>Public</Checkbox>
                     <FormErrorMessage>{errors.isPublic?.message}</FormErrorMessage>
                 </FormControl>
 

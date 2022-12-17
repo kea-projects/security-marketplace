@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { HStack, Box, Skeleton, VStack, Button, Text, Image, useDisclosure } from '@chakra-ui/react';
 
-import { ListingResponse } from '../../api/ListingApi';
+import { ListingApi, ListingResponse } from '../../api/ListingApi';
 import { UserApi, UserResponse } from '../../api/UserApi';
 import { useNavigate } from 'react-router-dom';
 import { UpdateListingModal } from './UpdateListingModal';
@@ -27,6 +27,7 @@ export function ListingDetails({
 
     // Constants
     const userApi = new UserApi();
+    const listingApi = new ListingApi();
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -48,6 +49,13 @@ export function ListingDetails({
     const handleVisitProfile = () => {
         if (author) {
             navigate(`/profile/${author.userId}`);
+        }
+    };
+
+    const handleDeleteListing = async () => {
+        if (listing) {
+            await listingApi.deleteListing(listing.listingId);
+            navigate(-1);
         }
     };
 
@@ -128,6 +136,11 @@ export function ListingDetails({
                             onClose={onClose}
                             isOpen={isOpen}
                         />
+                    </Skeleton>
+                    <Skeleton height="50px" minWidth="150px" rounded="md" isLoaded={!parentIsLoading}>
+                        <Button colorScheme="red" variant="solid" onClick={handleDeleteListing}>
+                            Delete
+                        </Button>
                     </Skeleton>
                     )
                 </VStack>

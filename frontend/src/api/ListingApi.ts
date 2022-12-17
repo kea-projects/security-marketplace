@@ -82,6 +82,11 @@ export class ListingApi {
         return listingApi.patch(`/listings/${listingId}`, body);
     }
 
+    public async deleteListing(listingId: string) {
+        console.log('Listing Api', 'Requesting listing deletion...');
+        return listingApi.delete(`/listings/${listingId}`);
+    }
+
     // --- COMMENTS ---
 
     public async createComment(body: CreateCommentRequestBody): Promise<AxiosResponse<CommentResponse>> {
