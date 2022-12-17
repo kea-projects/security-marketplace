@@ -32,9 +32,16 @@ export function UploadFilePopover({
 }: UploadFilePopoverProps) {
     // States
     const [files, setFiles] = useState<File[] | undefined>(undefined);
+    const [inputError, setInputError] = useState<string | undefined>(undefined);
 
     // Handlers
     const handleOnFileChange = (files: File[]) => {
+        for (const file of files) {
+            if (file.size > 50 * 1024 * 1024) {
+                return setInputError('The Profile picture exceeds the maximum file size. (50MB)');
+            }
+        }
+        setInputError(undefined);
         setFiles(files);
     };
 
@@ -73,7 +80,7 @@ export function UploadFilePopover({
                             variant="solid"
                             minWidth="min-content"
                             onClick={() => {
-                                if (files) {
+                                if (files && !inputError) {
                                     onFileSubmit(files);
                                 }
                             }}
@@ -81,6 +88,7 @@ export function UploadFilePopover({
                             {label}
                         </Button>
                     </HStack>
+                    {inputError && <Text>{inputError}</Text>}
                     {getFileItems()}
                 </VStack>
             </PopoverBody>

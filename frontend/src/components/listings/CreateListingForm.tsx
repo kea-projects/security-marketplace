@@ -30,7 +30,11 @@ export function CreateListingForm({ onSubmit, isLoading = false, error }: Create
         <form
             onSubmit={handleSubmit((formFields) => {
                 if (file) {
-                    onSubmit({ ...formFields, file });
+                    if (file.size <= 50 * 1024 * 1024) {
+                        setFileError(undefined);
+                        onSubmit({ ...formFields, file });
+                    }
+                    setFileError('The Listing picture exceeds the maximum file size. (50MB)');
                 } else {
                     setFileError('The Listing picture is required to post the listing.');
                 }
