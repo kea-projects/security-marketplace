@@ -18,7 +18,7 @@ User.init(
       field: "user_id",
     },
     email: {
-      type: DataTypes.STRING(256),
+      type: DataTypes.STRING(254),
       allowNull: false,
       unique: true,
       field: "email",

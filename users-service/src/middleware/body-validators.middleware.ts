@@ -24,7 +24,7 @@ import { log } from "../utils/logger";
     "error": "MissingProperty",
     "detail": "property: 'email' is missing"
 }
-```
+``` 
  * @param req Express Request object
  * @param res Express Response object
  * @param next Express NextFunction object
