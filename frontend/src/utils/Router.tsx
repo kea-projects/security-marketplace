@@ -11,6 +11,9 @@ import { ListingDetailsPage } from '../routes/ListingDetailsPage';
 import { RouterGuard } from '../components/auth/RouterGuard';
 import { isNotLoggedIn, hasUserPrivileges, hasAdminPrivileges } from './Auth';
 
+/**
+ * Creates a browser router with all of our used routes.
+ */
 export const router = createBrowserRouter([
     {
         path: '/',

@@ -1,6 +1,9 @@
 import { ListingResponse } from '../api/ListingApi';
 import { UserResponse } from '../api/UserApi';
 
+/**
+ * Helper class to validate if a certain object matches a specific interface.
+ */
 export class TypeHelper {
     public static isUserResponse = (item: unknown): item is UserResponse => {
         return (
