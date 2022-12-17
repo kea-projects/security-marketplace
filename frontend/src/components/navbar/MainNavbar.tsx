@@ -6,6 +6,7 @@ import { BsGithub } from 'react-icons/bs';
 import { Navbar } from '../themed/Navbar';
 import { UserContext } from '../../context/UserContextProvider';
 import { hasUserPrivileges } from '../../utils/Auth';
+import { AuthApi } from '../../api/AuthApi';
 
 interface MainNavbarProps {
     isAdmin: boolean;
@@ -26,8 +27,9 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
     /**
      * Removes the local storage entry for user data when the user logs out.
      */
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setUserData({});
+        await AuthApi.logout();
     };
 
     /**

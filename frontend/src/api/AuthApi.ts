@@ -44,4 +44,9 @@ export class AuthApi {
             },
         );
     }
+
+    public static async logout(): Promise<AxiosResponse<TokenResponse>> {
+        console.log('Auth Api', 'Requesting logout...');
+        return authApi.post('/auth/logout', {});
+    }
 }
