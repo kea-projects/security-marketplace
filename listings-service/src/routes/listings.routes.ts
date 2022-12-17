@@ -262,6 +262,10 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
       log.trace(`Updating listing file with id ${req.params.id}`);
       const filename = FilesService.getFilename(listingId, req.file!.originalname);
       const result = await FilesService.uploadFile(req.file!.buffer, filename);
+
+      // Update the listings pictureUrl
+      await ListingsService.update(listingId, { ...listing, imageUrl: result.url });
+
       return res.send({ url: result.url });
     } catch (error) {
       log.error(`An error occurred while uploading a file for listing with id ${req.params.id}!`, error);
