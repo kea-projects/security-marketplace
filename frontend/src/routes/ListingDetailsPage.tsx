@@ -7,6 +7,10 @@ import { ListingApi, ListingResponse, CommentResponse } from '../api/ListingApi'
 import { CommentList } from '../components/comments/CommentList';
 import { ListingDetails } from '../components/listings/ListingDetails';
 
+/**
+ * Creates a `Page` component that displays the navbar, and a listing's details along with its comment list,
+ * based on the `listingId` provided as a path parameter.
+ */
 export function ListingDetailsPage() {
     // States
     const [isLoading, setIsLoading] = useState(false);
@@ -16,15 +20,12 @@ export function ListingDetailsPage() {
     // Path parameters
     const { listingId } = useParams();
 
-    // Constants
-    const listingApi = new ListingApi();
-
     // Fetch listing and its comments
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             if (listingId) {
-                const { data } = await listingApi.getListingById(listingId);
+                const { data } = await ListingApi.getListingById(listingId);
                 setListing(data.listing);
                 setComments(data.comments);
                 setIsLoading(false);
@@ -35,9 +36,13 @@ export function ListingDetailsPage() {
     }, []);
 
     // Handlers
+
+    /**
+     * Toggles the visibility of the listing by toggling the boolean `isPublic`.
+     */
     const handleIsPublicToggle = async () => {
         if (listing) {
-            const { data } = await listingApi.updateListing(
+            const { data } = await ListingApi.updateListing(
                 { ...listing, isPublic: !listing.isPublic },
                 listing.listingId,
             );

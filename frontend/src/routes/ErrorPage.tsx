@@ -9,6 +9,9 @@ interface ErrorResponse {
     message: string;
 }
 
+/**
+ * Creates a `Page` component that displays the error page in case an error occurs.
+ */
 export function ErrorPage() {
     const error = useRouteError() as ErrorResponse;
     const navigate = useNavigate();

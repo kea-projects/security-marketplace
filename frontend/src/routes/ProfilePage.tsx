@@ -9,6 +9,14 @@ import { CreateListingModal } from '../components/listings/CreateListingModal';
 import { hasAdminPrivileges, isOwnProfile } from '../utils/Auth';
 import { UserResponse } from '../api/UserApi';
 
+/**
+ * Creates a `Page` component for a user's profile. It will display the navbar, along with the
+ * given user's listings, and a button for creating a new listing.
+ *
+ * It requires the user to be logged in to access this page.
+ *
+ * NOTE: An admin account is allowed to manage and create new listings on this user's behalf.
+ */
 export function ProfilePage() {
     // States
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +27,6 @@ export function ProfilePage() {
     const { userId } = useParams();
 
     // Constants
-    const listingApi = new ListingApi();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     // Fetch user listings
@@ -27,7 +34,7 @@ export function ProfilePage() {
         const fetchData = async () => {
             setIsLoading(true);
             if (userId) {
-                const { data } = await listingApi.getUserListings(userId);
+                const { data } = await ListingApi.getUserListings(userId);
                 setListings(data);
                 setDisplayListings(data);
                 setIsLoading(false);
@@ -37,6 +44,9 @@ export function ProfilePage() {
         fetchData();
     }, []);
 
+    /**
+     * Creates `Listing` components for each of the user's listings.
+     */
     const getGridItems = (listings: ListingResponse[] = []) => {
         return listings.map((listing, index) => {
             return (

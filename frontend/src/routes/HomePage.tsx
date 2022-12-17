@@ -6,16 +6,20 @@ import { ListingApi, ListingResponse } from '../api/ListingApi';
 import { UserResponse } from '../api/UserApi';
 import { MarketListing } from '../components/listings/MarketListing';
 
+/**
+ * Creates a `Page` component that displays the navbar and a list of all currently public listings.
+ */
 export function HomePage() {
+    // States
     const [isLoading, setIsLoading] = useState(false);
     const [listings, setListings] = useState<ListingResponse[] | undefined>(undefined);
     const [displayListings, setDisplayListings] = useState<ListingResponse[] | undefined>(undefined);
-    const listingApi = new ListingApi();
 
+    // Fetch listings.
     useEffect(() => {
         const fetchListings = async () => {
             setIsLoading(true);
-            const { data } = await listingApi.getListings();
+            const { data } = await ListingApi.getListings();
             setListings(data);
             setDisplayListings(data);
             setIsLoading(false);
@@ -24,6 +28,10 @@ export function HomePage() {
         fetchListings();
     }, []);
 
+    /**
+     * Creates a `MarketListing` component for each listing.
+     * @param listings
+     */
     const getGridItems = (listings: ListingResponse[] = []) => {
         return listings.map((listing, index) => {
             return (

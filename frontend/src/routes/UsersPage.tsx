@@ -7,20 +7,22 @@ import { UserBadge } from '../components/UserBadge';
 import { UserApi, UserResponse } from '../api/UserApi';
 import { ListingResponse } from '../api/ListingApi';
 
+/**
+ * Creates a `Page` component to display the currently signed up users.
+ *
+ * NOTE: Only an admin account can access this page.
+ */
 export function UsersPage() {
     // States
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<UserResponse[] | undefined>(undefined);
     const [displayUsers, setDisplayUsers] = useState<UserResponse[] | undefined>(undefined);
 
-    // Constants
-    const userApi = new UserApi();
-
     // Fetch users
     useEffect(() => {
         const fetchUsers = async () => {
             setIsLoading(true);
-            const { data } = await userApi.getUsers();
+            const { data } = await UserApi.getUsers();
             setUsers(data);
             setDisplayUsers(data);
             setIsLoading(false);
@@ -29,6 +31,10 @@ export function UsersPage() {
         fetchUsers();
     }, []);
 
+    /**
+     * Creates a `UserBadge` component for each signed up user.
+     * If clicked, it will render the `ProfilePage` of that user.
+     */
     const getGridItems = (users: UserResponse[] = []) => {
         return users.map((user, index) => {
             return (

@@ -8,16 +8,26 @@ import { AuthApi } from '../api/AuthApi';
 import { UserContext } from '../context/UserContextProvider';
 import { getTokenData } from '../utils/Auth';
 
+/**
+ * Creates a `Page` component for the signup form.
+ */
 export function SignupPage() {
-    const { setUserData } = useContext(UserContext);
+    // States
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [signupError, setSignupError] = useState<string | undefined>(undefined);
-    const authApi = new AuthApi();
 
+    // Context
+    const { setUserData } = useContext(UserContext);
+
+    /**
+     * Calls the Api and attempts to signup the user.
+     * If it succeeds, it will set the user data in the local storage.
+     * @param formFields
+     */
     const submitSignup = async (formFields: SignupFormFields) => {
         setIsLoading(true);
         try {
-            const { data } = await authApi.signup({
+            const { data } = await AuthApi.signup({
                 email: formFields.username,
                 password: formFields.password,
                 name: formFields.fullName,
