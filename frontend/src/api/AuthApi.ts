@@ -18,18 +18,21 @@ interface TokenResponse {
     refreshToken: string;
 }
 
+/**
+ * API functions that call Auth Service API endpoints.
+ */
 export class AuthApi {
-    public async login(body: LoginRequestBody): Promise<AxiosResponse<TokenResponse>> {
+    public static async login(body: LoginRequestBody): Promise<AxiosResponse<TokenResponse>> {
         console.log('Auth Api', 'Requesting login...');
         return authApi.post('/auth/login', { ...body });
     }
 
-    public async signup(body: SignupRequestBody): Promise<AxiosResponse<TokenResponse>> {
+    public static async signup(body: SignupRequestBody): Promise<AxiosResponse<TokenResponse>> {
         console.log('Auth Api', 'Requesting signup...');
         return authApi.post('/auth/signup', { ...body });
     }
 
-    public async refresh(): Promise<AxiosResponse<TokenResponse>> {
+    public static async refresh(): Promise<AxiosResponse<TokenResponse>> {
         console.log('Auth Api', 'Requesting refresh...');
         return authApi.post(
             '/auth/refresh',
