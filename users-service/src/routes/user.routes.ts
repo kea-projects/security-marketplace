@@ -31,7 +31,7 @@ router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) =>
 });
 
 router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
-  const userId = req.body.token.userId;
+  const userId = req.params.id;
   log.trace(`Attempting to retrieve a User by id: '${userId}'`);
   try {
     const user: User | null = await User.findByPk(userId);
@@ -74,9 +74,7 @@ router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Reques
 
 router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, async (req: Request, res: Response) => {
   if (req.body.token.role === Role.user && req.params.id !== req.body.token.userId) {
-    log.warn(
-      `User: '${req.body.token.userId}' was attempting to change a picture of user: '${req.body.token.userId}'.`
-    );
+    log.warn(`User: '${req.body.token.userId}' was attempting to change a picture of user: '${req.params.id}'.`);
     res.status(400).send(new UnauthorizedError());
   }
   // TODO: csrf token, this is a form!
@@ -98,7 +96,7 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
         .status(500)
         .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
     }
-    const userId = token.userId;
+    const userId = req.params.id;
     const fileName = req.file!.originalname;
     const fileBuffer = req.file!.buffer;
     const pictureUrl = FilesService.getResourceUrl(userId, fileName);
@@ -110,7 +108,7 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
     }
 
     try {
-      const uploadedPicture = FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
+      const uploadedPicture = await FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
       if (!uploadedPicture) throw new Error("Failed to upload the file");
     } catch (error) {
       log.error(`An unknown error has occurred while uploading file`, error);
@@ -119,7 +117,7 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
 
     try {
       user.set({ pictureUrl });
-      user.save();
+      await user.save();
       return res.status(202).send(user);
     } catch (error) {
       log.error(`Error occurred while updating the user's image url`, error);

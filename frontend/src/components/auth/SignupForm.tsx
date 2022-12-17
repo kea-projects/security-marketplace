@@ -14,6 +14,9 @@ interface SignupFormProps {
     error?: string;
 }
 
+/**
+ * Creates a component that contains the Signup form.
+ */
 export function SignupForm({ onSubmit, isLoading = false, error }: SignupFormProps) {
     const {
         register,
@@ -31,7 +34,7 @@ export function SignupForm({ onSubmit, isLoading = false, error }: SignupFormPro
                         placeholder="Bob 'the' Builder"
                         {...register('fullName', {
                             required: 'Full name is required to sign up.',
-                            maxLength: { value: 60, message: 'Name cannot exceed 60 characters.' },
+                            maxLength: { value: 120, message: 'Name cannot exceed 120 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.fullName?.message}</FormErrorMessage>
@@ -44,7 +47,7 @@ export function SignupForm({ onSubmit, isLoading = false, error }: SignupFormPro
                         placeholder="user@example.com"
                         {...register('username', {
                             required: 'Username is required to sign up.',
-                            maxLength: { value: 320, message: 'Username cannot exceed 320 characters.' },
+                            maxLength: { value: 254, message: 'Username cannot exceed 254 characters.' },
                         })}
                     />
                     <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
@@ -58,7 +61,7 @@ export function SignupForm({ onSubmit, isLoading = false, error }: SignupFormPro
                         {...register('password', {
                             required: 'Password is required to sign up.',
                             minLength: { value: 8, message: 'Password has to contain at least 8 characters.' },
-                            maxLength: { value: 32, message: 'Password cannot exceed 32 characters.' },
+                            maxLength: { value: 60, message: 'Password cannot exceed 60 characters.' },
                             pattern: {
                                 value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                                 message:
@@ -71,6 +74,7 @@ export function SignupForm({ onSubmit, isLoading = false, error }: SignupFormPro
                     </FormErrorMessage>
                 </FormControl>
 
+                {/* Api Error */}
                 <FormControl isInvalid={!!error}>
                     <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
+import { AuthRoles } from "../../../frontend/src/utils/Auth";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
@@ -22,16 +23,24 @@ const router: Router = Router();
 router.get("", canAccessAnonymous, async (req: Request, res: Response) => {
   try {
     const token = req.body?.token;
-    if (!token) {
-      log.trace(`No access token, Returning all public listings`);
-      return res.send(await ListingsService.findByIsPublic());
+    if (token && token.role == Role.admin) {
+      return res.send(await ListingsService.findAll());
     }
-    if (token && token.role != Role.admin) {
-      log.trace(`Access role: User, Returning all public listings and listings of user ${token.userId}`);
-      return res.send(await ListingsService.findByCreatedByOrPublic(token.userId as string));
+    return res.send(await ListingsService.findByIsPublic());
+  } catch (error) {
+    log.error(`Failed to get all listings!`, error);
+    return res.status(403).send({ message: "Forbidden" });
+  }
+});
+
+router.get("/user/:id", canAccessRoleUser, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const token = req.body?.token;
+    if (token && (token.role == Role.admin || (token.userId as string) === id)) {
+      return res.send(await ListingsService.findAllByCreatedBy(id));
     }
-    log.trace(`Access role: Admin, Returning all listings`);
-    return res.send(await ListingsService.findAll());
+    return res.send(await ListingsService.findPublicByCreatedBy(id));
   } catch (error) {
     log.error(`Failed to get all listings!`, error);
     return res.status(403).send({ message: "Forbidden" });
@@ -57,22 +66,24 @@ router.get("/:id", canAccessAnonymous, validateUuidFromParams, async (req: Reque
 
       log.trace(`Getting access token from request body`);
       const token = req.body?.token;
-      if (!token && foundListing.isPublic) {
-        log.trace(`Returning the public listing`);
-        return res.send({ listing: foundListing, comments });
-      }
-
-      if (token && token.role != Role.admin) {
-        if (foundListing.createdBy === token.userId) {
-          log.trace(`Returning the listing that belongs to ${token.userId}`);
+      try {
+        const comments = await CommentsService.findByListingId(foundListing.listingId as string);
+        if (foundListing.isPublic) {
           return res.send({ listing: foundListing, comments });
         }
-        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
-        return res.status(403).send({ message: "Forbidden" });
-      }
-      if (token && token.role === Role.admin) {
-        log.trace(`Returning the listing for the admin user`);
+        if (!token && foundListing.isPublic) {
+          return res.send({ listing: foundListing, comments });
+        }
+        if (token && token.role != Role.admin) {
+          if (foundListing.createdBy === token.userId) {
+            return res.send({ listing: foundListing, comments });
+          }
+          log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
+          return res.status(403).send({ message: "Forbidden" });
+        }
         return res.send({ listing: foundListing, comments });
+      } catch (error) {
+        log.error(`An error occurred while getting the comments`, error);
       }
     }
   } catch (error) {
@@ -138,13 +149,15 @@ router.post("", canAccessRoleUser, async (req: Request, res: Response) => {
         const listingId = uuidv4();
         const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
         log.trace(`Creating listing with id ${listingId}`);
+        const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
+        log.trace(`Creating listing by ${createdBy}`);
         const listing = await ListingsService.create({
           listingId,
           name,
           description,
           isPublic,
           imageUrl,
-          createdBy: token!.userId,
+          createdBy,
         });
         // Upload the file
         log.trace(`Uploading file for listing ${listing.listingId}`);
@@ -238,7 +251,7 @@ router.put("/:id/file", validateUuidFromParams, canAccessRoleUser, async (req: R
     } catch (error) {
       log.error(`An error occurred while uploading a file!`, error);
     }
-    log.warn(`Failed to update a listing file`)
+    log.warn(`Failed to update a listing file`);
     return res.status(403).send({ message: "Forbidden" });
   });
 });

@@ -1,33 +1,38 @@
 import React from 'react';
 import { VStack, StackProps } from '@chakra-ui/react';
-import { User } from '../fake-api/users';
-import { Profilebar } from './Profilebar';
-import { Searchbar } from './Searchbar';
-import { MainNavbar } from './MainNavbar';
+import { Profilebar } from './navbar/Profilebar';
+import { Searchbar } from './navbar/Searchbar';
+import { MainNavbar } from './navbar/MainNavbar';
+import { hasAdminPrivileges } from '../utils/Auth';
+import { UserResponse } from '../api/UserApi';
+import { ListingResponse } from '../api/ListingApi';
 
 interface LayoutProps {
-    isLoading?: boolean;
-    isAdmin?: boolean;
-    user?: User;
     useSearchbar?: boolean;
     useProfilebar?: boolean;
+    userId?: string;
+    searchItems?: UserResponse[] | ListingResponse[];
+    setSearchItems?: (items: UserResponse[] | ListingResponse[]) => void;
 }
 
-// TODO: Replace isAdmin and user with UserDetails Context
+/**
+ * Creates a component that renders the base layout of each page.
+ * It displays the navbar at the top, followed by whatever children are passed down to it.
+ */
 export function Layout({
-    isLoading = false,
-    user = { fullName: '', username: '', password: '' },
-    isAdmin = false,
     useSearchbar = true,
+    searchItems = [],
+    setSearchItems = () => null,
     useProfilebar = false,
+    userId,
     children,
     ...rest
 }: StackProps & LayoutProps) {
     return (
         <VStack width="100%" height="100vh" spacing="0" {...rest}>
-            <MainNavbar isAdmin={isAdmin} />
-            {useProfilebar && <Profilebar user={user} isLoading={isLoading} />}
-            {useSearchbar && <Searchbar />}
+            <MainNavbar isAdmin={hasAdminPrivileges()} />
+            {useProfilebar && <Profilebar userId={userId} />}
+            {useSearchbar && <Searchbar items={searchItems} setItems={setSearchItems} />}
 
             {children}
         </VStack>

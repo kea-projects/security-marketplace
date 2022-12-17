@@ -11,6 +11,14 @@ export class ListingsService {
     return Listing.findAll({ where: { [Op.or]: [{ createdBy }, { isPublic: true }] } });
   }
 
+  static async findPublicByCreatedBy(createdBy: string): Promise<IListing[]> {
+    return Listing.findAll({ where: { createdBy, isPublic: true } });
+  }
+
+  static async findAllByCreatedBy(createdBy: string): Promise<IListing[]> {
+    return Listing.findAll({ where: { createdBy } });
+  }
+
   static async findByIsPublic(): Promise<IListing[]> {
     return Listing.findAll({ where: { isPublic: true } });
   }
