@@ -3,6 +3,11 @@ import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
 import { log } from "../utils/logger";
 
+/**
+ * Call Auth Service API to validate the token.
+ * @param req the express request object.
+ * @returns the decoded token or an error.
+ */
 const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
   // validate that the request contains the jwt access token
   if (!req.headers || !req.headers.authorization) {

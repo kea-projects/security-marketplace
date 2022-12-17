@@ -10,24 +10,22 @@ const router: Router = Router();
 router.post("", validateCreateCommentRequestBody, canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     const token = req.body?.token;
-    try {
-      const foundListing = await ListingsService.findOne(req.body.commentedOn);
-      if (!foundListing) {
-        log.info(`Failed comment creation since no matching listing was found!`);
-        return res.status(404).send({ message: "Listing not found" });
-      }
-      if (!foundListing.isPublic && foundListing.createdBy !== (token?.userId as string)) {
-        log.warn(`User tried to comment on another users private listing!`);
-        return res.status(404).send({ message: "Listing not found" });
-      }
-    } catch (error) {
-      log.error(`Failed to find listing for a comment!`, error);
-      return res.status(403).send({ message: "Forbidden" });
+
+    const foundListing = await ListingsService.findOne(req.body.commentedOn);
+    if (!foundListing) {
+      log.info(`Failed comment creation since no matching listing was found!`);
+      return res.status(404).send({ message: "Listing not found" });
     }
+
+    if (!foundListing.isPublic && foundListing.createdBy !== (token?.userId as string)) {
+      log.warn(`User tried to comment on another users private listing!`);
+      return res.status(404).send({ message: "Listing not found" });
+    }
+
     return res.status(201).send(await CommentsService.create({ ...req.body, createdBy: token?.userId as string }));
   } catch (error) {
     log.error(`Failed to create a comment!`, error);
-    return res.status(403).send({ message: "Forbidden" });
+    return res.status(500).send({ message: "Internal Server Error - failed to create a comment." });
   }
 });
 

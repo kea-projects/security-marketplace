@@ -28,11 +28,8 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
     }
 
     // Create a token pair
-    let tokens;
-    try {
-      log.trace(`Creating a token pair for user ${foundUser.userId}`);
-      tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
-    } catch {}
+    log.trace(`Creating a token pair for user ${foundUser.userId}`);
+    const tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
     if (!tokens) {
       log.warn(`Failed to create token pair for user ${foundUser.userId}`);
       return res
@@ -43,7 +40,7 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
     return res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
   } catch (error) {
     log.error(`An error has occurred while logging in a user!`, error);
-    return res.status(500).send({ message: "Failed to login due to an internal error. Please try again later." });
+    return res.status(500).send({ message: "Internal Server Error - failed to log in." });
   }
 });
 
@@ -85,9 +82,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
     return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
   } catch (error) {
     log.error(`An error has occurred while signing up!`, error);
-    return res
-      .status(500)
-      .send({ message: "Failed to create the user due to an internal error. Please try again later." });
+    return res.status(500).send({ message: "Internal Server Error - failed to register a new user." });
   }
 });
 
@@ -112,7 +107,7 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
     return res.status(202).send({ message: "Your access has been revoked" });
   } catch (error) {
     log.error(`An error has occurred while logging the user out!`, error);
-    return res.status(500).send({ message: "Failed to log you out. Please try again later." });
+    return res.status(500).send({ message: "Internal Server Error - failed to log you out." });
   }
 });
 
@@ -151,7 +146,7 @@ router.post("/refresh", canAccessRoleUser, async (req: Request, res: Response) =
     return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
   } catch (error) {
     log.error(`An error has occurred refreshing a token!`, error);
-    return res.status(401).send({ message: "Unauthorized" });
+    return res.status(500).send({ message: "Internal Server Error - failed to refresh the token." });
   }
 });
 
@@ -188,7 +183,7 @@ router.post("/validate", async (req: Request, res: Response) => {
     return res.status(200).send({ message: "Token is valid", token: AuthenticationService.decodeToken(token) });
   } catch (error) {
     log.error(`An error occurred while validating a token!`, error);
-    return res.status(401).send({ message: "Unauthorized" });
+    return res.status(500).send({ message: "Internal Server Error - failed to validate the token." });
   }
 });
 
