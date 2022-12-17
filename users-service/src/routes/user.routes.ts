@@ -13,7 +13,7 @@ import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
 const router: Router = Router();
-// Allow preflight and options requests
+// Add options requests
 router.options("*", cors(corsOptionsConfig));
 
 router.get("/users", cors(corsGetConfig), canAccessRoleAdmin, async (_req: Request, res: Response) => {
