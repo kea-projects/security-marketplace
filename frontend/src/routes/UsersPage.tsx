@@ -32,7 +32,7 @@ export function UsersPage() {
     const getGridItems = (users: UserResponse[] = []) => {
         return users.map((user, index) => {
             return (
-                <Container key={index}>
+                <Container key={isLoading ? index : user.userId}>
                     <Link to={`/profile/${user?.userId}`}>
                         <UserBadge
                             fullName={user?.name}

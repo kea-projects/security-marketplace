@@ -39,7 +39,13 @@ export function ProfilePage() {
 
     const getGridItems = (listings: ListingResponse[] = []) => {
         return listings.map((listing, index) => {
-            return <Listing isLoading={isLoading} key={index} listingData={{ ...listing }} />;
+            return (
+                <Listing
+                    isLoading={isLoading}
+                    key={isLoading ? index : listing.listingId}
+                    listingData={{ ...listing }}
+                />
+            );
         });
     };
 

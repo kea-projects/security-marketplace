@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Center, Skeleton, Container, HStack, Text, VStack, Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { ListingApi, ListingResponse } from '../../api/ListingApi';
-import { hasAdminPrivileges, isOwnProfile } from '../../utils/Auth';
+import { hasAdminPrivileges, isOwnProfile, hasUserPrivileges } from '../../utils/Auth';
 
-interface ListingProps {
+export interface ListingProps {
     isLoading: boolean;
     listingData: ListingResponse;
+    useStatusToggle?: boolean;
 }
-// TODO: Discuss whether the API should return the listing or not if it set to private
-export function Listing({ isLoading = false, listingData }: ListingProps) {
+
+export function Listing({ isLoading = false, listingData, useStatusToggle = true }: ListingProps) {
     // States
     const [listing, setListing] = useState<ListingResponse | undefined>(undefined);
 
@@ -40,7 +41,7 @@ export function Listing({ isLoading = false, listingData }: ListingProps) {
     };
 
     return (
-        <Center height="15vh" boxShadow="md" rounded="md">
+        <Center height="15vh" boxShadow="md" rounded="md" width="100%">
             {isLoading ? (
                 <Skeleton height="100%" width="100%" rounded="md" />
             ) : (
@@ -63,14 +64,17 @@ export function Listing({ isLoading = false, listingData }: ListingProps) {
                     </VStack>
 
                     <VStack paddingRight="10px">
-                        {((listing?.createdBy && isOwnProfile(listing?.createdBy)) || hasAdminPrivileges()) && (
+                        {((useStatusToggle && listing?.createdBy && isOwnProfile(listing?.createdBy)) ||
+                            hasAdminPrivileges()) && (
                             <Button colorScheme="accent" variant="solid" onClick={handleToggleIsPublic}>
                                 {!isLoading && (listing?.isPublic ? 'Public' : 'Private')}
                             </Button>
                         )}
-                        <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
-                            See More
-                        </Button>
+                        {hasUserPrivileges() && (
+                            <Button colorScheme="accent" variant="solid" onClick={handleSeeMore}>
+                                See More
+                            </Button>
+                        )}
                     </VStack>
                 </HStack>
             )}
