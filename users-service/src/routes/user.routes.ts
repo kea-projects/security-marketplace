@@ -28,22 +28,28 @@ router.get("/users", cors(corsGetConfig), canAccessRoleAdmin, async (_req: Reque
   }
 });
 
-router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  log.trace(`Attempting to retrieve a User by id: '${userId}'`);
-  try {
-    const user: User | null = await User.findByPk(userId);
-    if (!user) {
-      log.warn(`Failed to find a user with id ${userId}`);
-      return res.status(404).send({ message: "User not found" });
+router.get(
+  "/users/:id",
+  cors(corsGetConfig),
+  paramUuidValidator,
+  canAccessLoggedIn,
+  async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    log.trace(`Attempting to retrieve a User by id: '${userId}'`);
+    try {
+      const user: User | null = await User.findByPk(userId);
+      if (!user) {
+        log.warn(`Failed to find a user with id ${userId}`);
+        return res.status(404).send({ message: "User not found" });
+      }
+      log.trace(`User was found, returning the user.`);
+      return res.status(200).send(user);
+    } catch (error) {
+      log.error(`An error occurred while getting user`, error);
+      return res.status(500).send(new InternalServerError(`Internal Server Error - failed to get the user.`));
     }
-    log.trace(`User was found, returning the user.`);
-    return res.status(200).send(user);
-  } catch (error) {
-    log.error(`An error occurred while getting user`, error);
-    return res.status(500).send(new InternalServerError(`Internal Server Error - failed to get the user.`));
   }
-});
+);
 
 router.post(
   "/users",

@@ -192,21 +192,7 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
       }
 
       // Upload the file
-      log.trace(`Uploading file for listing ${listing.listingId}`);
       try {
-        const listingId = uuidv4();
-        const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
-        log.trace(`Creating listing with id ${listingId}`);
-        const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
-        log.trace(`Creating listing by ${createdBy}`);
-        const listing = await ListingsService.create({
-          listingId,
-          name,
-          description,
-          isPublic,
-          imageUrl,
-          createdBy,
-        });
         // Upload the file
         log.trace(`Uploading file for listing ${listing.listingId}`);
         try {

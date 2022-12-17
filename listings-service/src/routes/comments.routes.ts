@@ -1,7 +1,7 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
 import { AuthRoles } from "../../../frontend/src/utils/Auth";
-import { corsPostConfig } from "../config/cors.config";
+import { corsOptionsConfig, corsPostConfig } from "../config/cors.config";
 import { validateCreateCommentRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";
@@ -9,6 +9,8 @@ import { ListingsService } from "../services/listings.service";
 import { log } from "../utils/logger";
 
 const router: Router = Router();
+// Allow preflight and options requests
+router.options("*", cors(corsOptionsConfig));
 
 router.post(
   "",
