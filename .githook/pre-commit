@@ -1,5 +1,4 @@
 #!/bin/sh
-#!/bin/sh
 
 ROOT_DIR=$PWD
 
@@ -10,9 +9,9 @@ eslint . > /tmp/eslint.log 2>&1
 eslint_result=$?
 
 if [ $eslint_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: ESLint returned a non-zero value on frontend: '$eslint_result'!\n" \
-			"        Please check the ESLint output.\n" \
-			"        ESLint output is:\n"
+	echo "[ERROR]  Aborting commit creation: ESLint returned a non-zero value on frontend: '$eslint_result'!"
+		 "        Please check the ESLint output.\n" \
+		 "        ESLint output is:\n"
 	# Print the result of npm audit
 	cat /tmp/eslint.log
 	exit $eslint_result
@@ -25,9 +24,9 @@ eslint . > /tmp/eslint.log 2>&1
 eslint_result=$?
 
 if [ $eslint_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: ESLint returned a non-zero value on auth-service: '$eslint_result'!\n" \
-			"        Please check the ESLint output.\n" \
-			"        ESLint output is:\n"
+	echo "[ERROR]  Aborting commit creation: ESLint returned a non-zero value on auth-service: '$eslint_result'!"
+		 "        Please check the ESLint output.\n" \
+		 "        ESLint output is:\n"
 	# Print the result of npm audit
 	cat /tmp/eslint.log
 	exit $eslint_result
@@ -40,9 +39,9 @@ eslint . > /tmp/eslint.log 2>&1
 eslint_result=$?
 
 if [ $eslint_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: ESLint returned a non-zero value on listings-service: '$eslint_result'!\n" \
-			"        Please check the ESLint output.\n" \
-			"        ESLint output is:\n"
+	echo "[ERROR]  Aborting commit creation: ESLint returned a non-zero value on listings-service: '$eslint_result'!"
+		 "        Please check the ESLint output.\n" \
+		 "        ESLint output is:\n"
 	# Print the result of npm audit
 	cat /tmp/eslint.log
 	exit $eslint_result
@@ -56,9 +55,9 @@ eslint . > /tmp/eslint.log 2>&1
 eslint_result=$?
 
 if [ $eslint_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: ESLint returned a non-zero value on users-service: '$eslint_result'!\n" \
-			"        Please check the ESLint output.\n" \
-			"        ESLint output is:\n"
+	echo "[ERROR] Aborting commit creation: ESLint returned a non-zero value on users-service: '$eslint_result'!"
+		 "        Please check the ESLint output.\n" \
+		 "        ESLint output is:\n"
 	# Print the result of npm audit
 	cat /tmp/eslint.log
 	exit $eslint_result
