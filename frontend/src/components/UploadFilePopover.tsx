@@ -43,7 +43,7 @@ export function UploadFilePopover({
         if (files) {
             for (const file of files) {
                 elements.push(
-                    <HStack wrap="wrap">
+                    <HStack wrap="wrap" key={file.name + file.size}>
                         <Badge colorScheme="purple">{file.name}</Badge>
                         <Text>Size: {(file.size / 1024).toFixed(0)}KB</Text>
                     </HStack>,
