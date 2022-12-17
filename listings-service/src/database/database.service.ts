@@ -21,6 +21,7 @@ async function initializeDb(): Promise<boolean> {
     dialect: "postgres",
     logging: false,
   });
+
   // Check the connection
   try {
     await sequelize.authenticate();
@@ -29,6 +30,7 @@ async function initializeDb(): Promise<boolean> {
     log.error(`Database connection error!`, error);
     return false;
   }
+
   // Load the models
   try {
     loadDbModels(sequelize);
@@ -38,11 +40,12 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
-      alter: getEnvVar("LISTINGS_POSTGRES_SYNC", false) === "true",
+      force: getEnvVar("LISTINGS_POSTGRES_SYNC") === "true",
+      alter: getEnvVar("LISTINGS_POSTGRES_SYNC") === "true",
     });
     log.info(`The schema has been synced`);
   } catch (error) {
@@ -50,10 +53,11 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Populate the database
-  if (getEnvVar("LISTINGS_POSTGRES_POPULATE", false) === "true") {
+  if (getEnvVar("LISTINGS_POSTGRES_POPULATE") === "true") {
     try {
-      if (getEnvVar("LISTINGS_LINODE_POPULATE", false) === "true") {
+      if (getEnvVar("LISTINGS_LINODE_POPULATE") === "true") {
         log.info(`Populating Linode object storage, may take a minute`);
 
         // The file that will be uploaded to Linode
@@ -73,10 +77,13 @@ async function initializeDb(): Promise<boolean> {
           }
         }
       } else {
+        // Adjust the listing imageUrl but don't upload the file
         for (const listing of listings) {
           listing.imageUrl = FilesService.getResourceUrl(listing.listingId, "image.jpg");
         }
       }
+
+      // Create the database data
       await Listing.bulkCreate([...listings], {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,

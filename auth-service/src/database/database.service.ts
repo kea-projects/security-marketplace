@@ -17,6 +17,7 @@ async function initializeDb(): Promise<boolean> {
     dialect: "postgres",
     logging: false,
   });
+
   // Check the connection
   try {
     await sequelize.authenticate();
@@ -25,6 +26,7 @@ async function initializeDb(): Promise<boolean> {
     log.error(`Database connection error`, error);
     return false;
   }
+
   // Load the models
   try {
     loadDbModels(sequelize);
@@ -34,11 +36,12 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
-      alter: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
+      force: getEnvVar("AUTH_POSTGRES_SYNC") === "true",
+      alter: getEnvVar("AUTH_POSTGRES_SYNC") === "true",
     });
     log.info(`The schema has been synced`);
   } catch (error) {
@@ -46,6 +49,7 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Populate the database
   if (getEnvVar("AUTH_POSTGRES_POPULATE")) {
     try {
