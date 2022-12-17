@@ -6,6 +6,7 @@ import { BsGithub } from 'react-icons/bs';
 import { Navbar } from '../themed/Navbar';
 import { UserContext } from '../../context/UserContextProvider';
 import { hasUserPrivileges } from '../../utils/Auth';
+import { AuthApi } from '../../api/AuthApi';
 
 interface MainNavbarProps {
     isAdmin: boolean;
@@ -28,6 +29,7 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
      */
     const handleLogout = () => {
         setUserData({});
+        AuthApi.logout();
     };
 
     /**
