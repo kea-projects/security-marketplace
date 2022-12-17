@@ -5,7 +5,7 @@ import { Role } from "../interfaces";
 import { log } from "../utils/logger";
 import { TokenService } from "./token.service";
 
-const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
+const secret = getEnvVar("AUTH_SECRET") || "changeMe";
 
 export class AuthenticationService {
   /**

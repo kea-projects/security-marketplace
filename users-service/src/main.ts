@@ -1,6 +1,6 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import { getEnvOrExit } from "./config/secrets";
+import { getEnvVar } from "./config/secrets";
 import { logger } from "./middleware/logging.middleware";
 import { userRouter } from "./routes/user.routes";
 import { initializeDb } from "./utils/init-database";
@@ -30,7 +30,7 @@ app.all("*", (req: Request, res: Response) => {
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(getEnvOrExit("USERS_PORT") || 5000);
+const PORT: number = Number(getEnvVar("USERS_PORT") || 5000);
 
 const main = async () => {
   await initializeDb();

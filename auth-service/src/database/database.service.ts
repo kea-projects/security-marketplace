@@ -37,8 +37,8 @@ async function initializeDb(): Promise<boolean> {
   // Sync the database schema with the models
   try {
     await sequelize.sync({
-      force: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
-      alter: getEnvVar("AUTH_POSTGRES_SYNC", false) === "true",
+      force: getEnvVar("AUTH_POSTGRES_SYNC") === "true",
+      alter: getEnvVar("AUTH_POSTGRES_SYNC") === "true",
     });
     log.info(`The schema has been synced`);
   } catch (error) {

@@ -18,12 +18,12 @@ export class AuthUserService {
       let result: IAuthUser | null = null;
       result = await AuthUser.create({ email: params.email, password: hashedPassword }, { transaction });
       // Call the users service to create the corresponding user object
-      if (!getEnvVar("USERS_SERVICE_URL", false)) {
+      if (!getEnvVar("USERS_SERVICE_URL")) {
         log.warn(`Unable to call Users Service to create a user due to the env variable missing!`);
       } else {
         try {
           const accessToken = await AuthenticationService.createAccessToken(result.email, result.userId, Role.admin);
-          const response = await fetch(`${getEnvVar("USERS_SERVICE_URL", false)}`, {
+          const response = await fetch(`${getEnvVar("USERS_SERVICE_URL")}`, {
             method: "POST",
             headers: new Headers({
               Authorization: `Bearer ${accessToken?.accessToken}`,
@@ -37,12 +37,12 @@ export class AuthUserService {
           });
           if (response.status !== 201) {
             log.warn(
-              `The users service at ${getEnvVar("USERS_SERVICE_URL", false)} has responded with status code ${
+              `The users service at ${getEnvVar("USERS_SERVICE_URL")} has responded with status code ${
                 response.status
               } to the create user request!`
             );
             throw new Error(
-              `The users service at ${getEnvVar("USERS_SERVICE_URL", false)} has responded with status code ${
+              `The users service at ${getEnvVar("USERS_SERVICE_URL")} has responded with status code ${
                 response.status
               } to the create user request!`
             );

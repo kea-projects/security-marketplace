@@ -1,5 +1,4 @@
 import cors from "cors";
-import "dotenv/config";
 import express from "express";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";

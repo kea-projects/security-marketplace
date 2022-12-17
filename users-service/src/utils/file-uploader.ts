@@ -1,5 +1,5 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getEnvOrExit } from "../config/secrets";
+import { getEnvVar } from "../config/secrets";
 import { log } from "./logger";
 
 class FilesService {
@@ -12,10 +12,10 @@ class FilesService {
    * @throws InvalidAccessKeyIdError | UploadFailedError
    */
   static async uploadFile(dataBuffer: Buffer, filename: string, silentLog = false): Promise<{ url: string }> {
-    const CLUSTER_ID = getEnvOrExit("USERS_LINODE_STORAGE_CLUSTER_ID");
-    const BUCKET_ID = getEnvOrExit("USERS_LINODE_STORAGE_BUCKET_ID");
-    const ACCESS_KEY = getEnvOrExit("USERS_LINODE_STORAGE_ACCESS_KEY");
-    const SECRET_KEY = getEnvOrExit("USERS_LINODE_STORAGE_SECRET_KEY");
+    const CLUSTER_ID = getEnvVar("USERS_LINODE_STORAGE_CLUSTER_ID") as string;
+    const BUCKET_ID = getEnvVar("USERS_LINODE_STORAGE_BUCKET_ID") as string;
+    const ACCESS_KEY = getEnvVar("USERS_LINODE_STORAGE_ACCESS_KEY") as string;
+    const SECRET_KEY = getEnvVar("USERS_LINODE_STORAGE_SECRET_KEY") as string;
 
     try {
       const s3 = new S3Client({
@@ -74,8 +74,8 @@ class FilesService {
    * @returns for example https://documents.eu-central-1.linodeobjects.com/35342b75-0cab-439b-ac6c-e0c3c176e9a7.png
    */
   static getResourceUrl(listingId: string, filename: string): string {
-    const CLUSTER_ID = getEnvOrExit("USERS_LINODE_STORAGE_CLUSTER_ID");
-    const BUCKET_ID = getEnvOrExit("USERS_LINODE_STORAGE_BUCKET_ID");
+    const CLUSTER_ID = getEnvVar("USERS_LINODE_STORAGE_CLUSTER_ID") as string;
+    const BUCKET_ID = getEnvVar("USERS_LINODE_STORAGE_BUCKET_ID") as string;
     return `https://${BUCKET_ID}.${CLUSTER_ID}.linodeobjects.com/${this.getFilename(listingId, filename)}`;
   }
 }
