@@ -1,5 +1,6 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
+import { corsAcceptAll } from "./config/cors.config";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
 import { authRouter } from "./routes/auth.routes";
@@ -8,18 +9,13 @@ import { log } from "./utils/logger";
 const app = express();
 app.use(express.json());
 app.use(logger);
-// -----------------------CORS-------------------------
-const corsOptions = {
-  origin: "*", // TODO - discuss the the cors rules
-};
-app.use(cors(corsOptions));
 
 // ---------------------Routers------------------------
 app.use("/auth", authRouter);
 
 // ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", (req: Request, res: Response) => {
+app.all("*", cors(corsAcceptAll), (req: Request, res: Response) => {
   log.info(`Invalid request: ${req.method} ${req.url}.`);
   log.info(`Request body: ${JSON.stringify(req.body)}`);
   log.info("Rejecting request.");

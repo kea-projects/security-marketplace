@@ -1,4 +1,6 @@
+import cors from "cors";
 import { Request, Response, Router } from "express";
+import { corsGetConfig, corsPostConfig } from "../config/cors.config";
 import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/bodyValidators";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthUserService } from "../services/auth-user.service";
@@ -11,7 +13,7 @@ const router: Router = Router();
 /**
  * Validate that the provided credentials are valid, and return a access token pair if they do match a user.
  */
-router.post("/login", validateLoginRequestBody, async (req: Request, res: Response) => {
+router.post("/login", cors(corsPostConfig), validateLoginRequestBody, async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     // Check that the user exists
@@ -44,7 +46,7 @@ router.post("/login", validateLoginRequestBody, async (req: Request, res: Respon
   }
 });
 
-router.post("/signup", validateSignupRequestBody, async (req: Request, res: Response) => {
+router.post("/signup", cors(corsPostConfig), validateSignupRequestBody, async (req: Request, res: Response) => {
   try {
     // TODO - emails can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
     // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
@@ -86,7 +88,7 @@ router.post("/signup", validateSignupRequestBody, async (req: Request, res: Resp
   }
 });
 
-router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => {
+router.get("/logout", cors(corsGetConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     const accessToken = AuthenticationService.getTokenFromRequest(req);
     // Check if the token is valid
@@ -111,7 +113,7 @@ router.get("/logout", canAccessRoleUser, async (req: Request, res: Response) => 
   }
 });
 
-router.post("/refresh", canAccessRoleUser, async (req: Request, res: Response) => {
+router.post("/refresh", cors(corsPostConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     log.trace(`Refreshing a token pair`);
     // Remove old access token pair
