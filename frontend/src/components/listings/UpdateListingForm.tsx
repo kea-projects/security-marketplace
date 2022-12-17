@@ -33,8 +33,8 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
                     <FormLabel>Listing Name</FormLabel>
                     <Input
                         type="text"
-                        placeholder="Used Toyota"
-                        value={listing?.name}
+                        placeholder={listing?.name}
+                        _placeholder={{ color: 'textDark' }}
                         {...register('name', {
                             required: 'The name is required to post the listing.',
                             maxLength: { value: 150, message: 'Name cannot exceed 150 characters.' },
@@ -46,8 +46,7 @@ export function UpdateListingForm({ onSubmit, isLoading = false, error, listing 
                 <FormControl isInvalid={!!errors.description}>
                     <FormLabel>Description</FormLabel>
                     <Textarea
-                        placeholder="Write a description of the item."
-                        value={listing?.description}
+                        placeholder={listing?.description}
                         {...register('description', {
                             required: 'The description is required to post the listing.',
                             maxLength: { value: 1000, message: 'Description cannot exceed 1000 characters.' },
