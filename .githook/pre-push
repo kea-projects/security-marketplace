@@ -9,9 +9,9 @@ npm audit > /tmp/audit.log 2>&1
 audit_result=$?
 
 if [ $audit_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on frontend: '$audit_result'!\n" \
-			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
-			"        NPM audit output is:\n"
+	echo "[ERROR]  Aborting push: NPM audit returned a non-zero value on frontend: '$audit_result'!"
+		 "         Please run 'npm audit fix' to resolve any potential vulnerabilities."
+		 "         NPM audit output is:"
 	# Print the result of npm audit
 	cat /tmp/audit.log
 	exit $audit_result
@@ -24,9 +24,9 @@ npm audit > /tmp/audit.log 2>&1
 audit_result=$?
 
 if [ $audit_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on auth-service: '$audit_result'!\n" \
-			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
-			"        NPM audit output is:\n"
+	echo "[ERROR]  Aborting push: NPM audit returned a non-zero value on auth-service: '$audit_result'!"
+		 "         Please run 'npm audit fix' to resolve any potential vulnerabilities."
+		 "         NPM audit output is:\n"
 	# Print the result of npm audit
 	cat /tmp/audit.log
 	exit $audit_result
@@ -39,9 +39,9 @@ npm audit > /tmp/audit.log 2>&1
 audit_result=$?
 
 if [ $audit_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on listings-service: '$audit_result'!\n" \
-			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
-			"        NPM audit output is:\n"
+	echo "[ERROR]  Aborting push: NPM audit returned a non-zero value on listings-service: '$audit_result'!"
+	echo "         Please run 'npm audit fix' to resolve any potential vulnerabilities."
+	echo "         NPM audit output is:"
 	# Print the result of npm audit
 	cat /tmp/audit.log
 	exit $audit_result
@@ -55,9 +55,9 @@ npm audit > /tmp/audit.log 2>&1
 audit_result=$?
 
 if [ $audit_result -ne 0 ]; then
-	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on users-service: '$audit_result'!\n" \
-			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
-			"        NPM audit output is:\n"
+	echo "[ERROR]  Aborting push: NPM audit returned a non-zero value on users-service: '$audit_result'!\n"
+	echo "         Please run 'npm audit fix' to resolve any potential vulnerabilities.\n"
+	echo "         NPM audit output is:\n"
 	# Print the result of npm audit
 	cat /tmp/audit.log
 	exit $audit_result
