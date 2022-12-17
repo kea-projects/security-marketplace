@@ -9,7 +9,7 @@ import { TokenService } from "../services/token.service";
 import { log } from "../utils/logger";
 
 const router: Router = Router();
-// Allow preflight and options requests
+// Add options requests
 router.options("*", cors(corsOptionsConfig));
 
 /**

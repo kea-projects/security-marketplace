@@ -9,7 +9,7 @@ import { ListingsService } from "../services/listings.service";
 import { log } from "../utils/logger";
 
 const router: Router = Router();
-// Allow preflight and options requests
+// Add options requests
 router.options("*", cors(corsOptionsConfig));
 
 router.post(

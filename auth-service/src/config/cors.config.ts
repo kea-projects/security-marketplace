@@ -37,10 +37,9 @@ export const corsDeleteConfig: CorsOptions = {
 };
 
 export const corsOptionsConfig: CorsOptions = {
-  methods: "OPTIONS",
+  methods: ["OPTIONS"],
   origin: allowedOrigin,
   allowedHeaders,
-  preflightContinue: true,
 };
 
 /**

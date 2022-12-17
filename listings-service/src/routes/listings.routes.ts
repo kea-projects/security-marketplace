@@ -31,7 +31,7 @@ const uploadSingleImage = multerSingleImage.single("file");
 const uploadLargeRequest = multerLargeRequest.single("file");
 
 const router: Router = Router();
-// Allow preflight and options requests
+// Add options requests
 router.options("*", cors(corsOptionsConfig));
 
 router.get("", cors(corsGetConfig), canAccessAnonymous, async (req: Request, res: Response) => {
@@ -111,32 +111,6 @@ router.get(
     } catch (error) {
       log.error(`An error has occurred while getting a listing with id ${req.params.id}`, error);
       return res.status(500).send({ message: "Internal Server Error - failed to get the listing." });
-    }
-  }
-);
-
-router.patch(
-  "/:id",
-  cors(corsPatchConfig),
-  validateUuidFromParams,
-  validateUpdateListingRequestBody,
-  canAccessRoleUser,
-  async (req: Request, res: Response) => {
-    try {
-      log.trace(`Updating listing ${req.params.id}`);
-
-      const foundListing = await ListingsService.findOne(req.params.id);
-      const token = req.body?.token;
-      if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
-        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
-        return res.status(403).send({ message: "Forbidden" });
-      }
-
-      log.info(`Updating listing ${req.params.id}`);
-      return res.send(await ListingsService.update(req.params.id, req.body));
-    } catch (error) {
-      log.error(`Failed to get a listing by id ${req.params.id}!`, error);
-      return res.status(500).send({ message: "Internal Server Error - failed to update the listing." });
     }
   }
 );
@@ -222,6 +196,32 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
     }
   });
 });
+
+router.patch(
+  "/:id",
+  cors(corsPatchConfig),
+  validateUuidFromParams,
+  validateUpdateListingRequestBody,
+  canAccessRoleUser,
+  async (req: Request, res: Response) => {
+    try {
+      log.trace(`Updating listing ${req.params.id}`);
+
+      const foundListing = await ListingsService.findOne(req.params.id);
+      const token = req.body?.token;
+      if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
+        log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
+      log.info(`Updating listing ${req.params.id}`);
+      return res.send(await ListingsService.update(req.params.id, req.body));
+    } catch (error) {
+      log.error(`Failed to get a listing by id ${req.params.id}!`, error);
+      return res.status(500).send({ message: "Internal Server Error - failed to update the listing." });
+    }
+  }
+);
 
 router.delete(
   "/:id",
