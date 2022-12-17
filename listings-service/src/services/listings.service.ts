@@ -10,8 +10,8 @@ export class ListingsService {
   static async findAll(): Promise<IListing[]> {
     return Listing.findAll();
   }
+
   /**
-   *
    * Query the database to get all listing entities by the user who created them or that are public.
    * @param createdBy the userId of the creator user.
    * @returns a promise of a list of the listings.
@@ -20,14 +20,28 @@ export class ListingsService {
     return Listing.findAll({ where: { [Op.or]: [{ createdBy }, { isPublic: true }] } });
   }
 
+  /**
+   * Query the database to get all listings of a given user that are public.
+   * @param createdBy the user id.
+   * @returns a promise of a list of the user's public listings,
+   */
   static async findPublicByCreatedBy(createdBy: string): Promise<IListing[]> {
     return Listing.findAll({ where: { createdBy, isPublic: true } });
   }
 
+  /**
+   * Query the database to get all listings of a given user.
+   * @param createdBy the user id.
+   * @returns a promise of a list of the user's listings.
+   */
   static async findAllByCreatedBy(createdBy: string): Promise<IListing[]> {
     return Listing.findAll({ where: { createdBy } });
   }
 
+  /**
+   * Query the database to get all listings that are public.
+   * @returns a promise of a list of public listings.
+   */
   static async findByIsPublic(): Promise<IListing[]> {
     return Listing.findAll({ where: { isPublic: true } });
   }

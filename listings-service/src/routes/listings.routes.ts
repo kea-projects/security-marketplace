@@ -3,6 +3,14 @@ import { Request, Response, Router } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { AuthRoles } from "../../../frontend/src/utils/Auth";
+import {
+  corsDeleteConfig,
+  corsGetConfig,
+  corsOptionsConfig,
+  corsPatchConfig,
+  corsPostConfig,
+  corsPutConfig,
+} from "../config/cors.config";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
 import {
@@ -39,7 +47,7 @@ router.get("", cors(corsGetConfig), canAccessAnonymous, async (req: Request, res
   }
 });
 
-router.get("/user/:id", canAccessRoleUser, async (req: Request, res: Response) => {
+router.get("/user/:id", cors(corsGetConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const token = req.body?.token;
@@ -79,25 +87,18 @@ router.get(
       // Check if the user is authorized to access the given listing
       log.trace(`Getting access token from request body`);
       const token = req.body?.token;
-      try {
-        const comments = await CommentsService.findByListingId(foundListing.listingId as string);
-        if (foundListing.isPublic) {
-          return res.send({ listing: foundListing, comments });
-        }
-        if (!token && foundListing.isPublic) {
-          return res.send({ listing: foundListing, comments });
-        }
-        if (token && token.role != Role.admin) {
-          if (foundListing.createdBy === token.userId) {
-            return res.send({ listing: foundListing, comments });
-          }
-          log.warn(`User with id ${token?.userId} tried to access a listing of another user!`);
-          return res.status(403).send({ message: "Forbidden" });
-        }
+
+      // The listing is public - return the listing
+      if (foundListing.isPublic) {
         return res.send({ listing: foundListing, comments });
-      } catch (error) {
-        log.error(`An error occurred while getting the comments`, error);
       }
+
+      // The user is an admin - return the listing
+      if (token && token.role === Role.admin) {
+        log.trace(`Returning the listing that belongs to ${token.userId} as an admin`);
+        return res.send({ listing: foundListing, comments });
+      }
+
       // The user owns the listing - return the listing
       if (token && token.role != Role.admin && foundListing.createdBy === token.userId) {
         log.trace(`Returning the listing that belongs to ${token.userId}`);
@@ -171,8 +172,9 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
       }
 
       // Create a listing
-      log.trace(`Creating a listing`);
       const { name, description, isPublic } = req.body;
+      const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
+      log.trace(`Creating a listing for ${createdBy}`);
       const listingId = uuidv4();
       const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
       log.trace(`Creating listing with id ${listingId}`);
@@ -182,7 +184,7 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
         description,
         isPublic,
         imageUrl,
-        createdBy: token!.userId,
+        createdBy,
       });
       if (!listing) {
         log.error(`Failed to create a listing!`);
@@ -329,12 +331,8 @@ router.put(
         log.error(`An error occurred while uploading a file for listing with id ${req.params.id}!`, error);
         return res.status(500).send({ message: "Internal Server Error - failed to update the listing's file." });
       }
-    } catch (error) {
-      log.error(`An error occurred while uploading a file!`, error);
-    }
-    log.warn(`Failed to update a listing file`);
-    return res.status(403).send({ message: "Forbidden" });
-  });
-});
+    });
+  }
+);
 
 export { router as listingsRouter };

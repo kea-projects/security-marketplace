@@ -39,7 +39,7 @@ async function populateDb() {
   // Populate the database
   if (getEnvVar("USERS_POSTGRES_POPULATE")) {
     try {
-      if (getEnv("USERS_LINODE_POPULATE")) {
+      if (getEnvVar("USERS_LINODE_POPULATE")) {
         log.info(`Populating Linode object storage, may take a minute`);
 
         // The file that will be uploaded to Linode
