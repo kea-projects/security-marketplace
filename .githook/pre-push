@@ -4,7 +4,7 @@ ROOT_DIR=$PWD
 
 echo "[INFO]   Running NPM audit on 'frontend'"
 cd $ROOT_DIR/frontend
-pnpm audit > /tmp/audit.log 2>&1
+npm audit > /tmp/audit.log 2>&1
 # Store exit code of npm audit
 audit_result=$?
 
@@ -19,7 +19,7 @@ fi
 
 echo "[INFO]   Running NPM audit on 'auth-service'"
 cd $ROOT_DIR/auth-service
-pnpm audit > /tmp/audit.log 2>&1
+npm audit > /tmp/audit.log 2>&1
 # Store exit code of npm audit
 audit_result=$?
 
@@ -34,7 +34,7 @@ fi
 
 echo "[INFO]   Running NPM audit on 'listings-service'"
 cd $ROOT_DIR/listings-service
-pnpm audit > /tmp/audit.log 2>&1
+npm audit > /tmp/audit.log 2>&1
 # Store exit code of npm audit
 audit_result=$?
 
@@ -50,7 +50,7 @@ fi
 
 echo "[INFO]   Running NPM audit on 'users-service'"
 cd $ROOT_DIR/users-service
-pnpm audit > /tmp/audit.log 2>&1
+npm audit > /tmp/audit.log 2>&1
 # Store exit code of npm audit
 audit_result=$?
 
