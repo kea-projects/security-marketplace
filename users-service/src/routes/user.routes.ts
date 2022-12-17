@@ -25,26 +25,25 @@ router.get("/users", canAccessRoleAdmin, async (_req: Request, res: Response) =>
     log.trace("Returning the list of users, may be empty.");
     return res.status(200).send(userList);
   } catch (error) {
-    log.error(`Error occurred while getting user`, error);
-    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+    log.error(`Error occurred while getting all users`, error);
+    return res.status(500).send(new InternalServerError(`Internal Server Error - failed to get users.`));
   }
 });
 
 router.get("/users/:id", paramUuidValidator, canAccessLoggedIn, async (req: Request, res: Response) => {
-  const userId = req.body.token.userId;
-  log.trace(`Attempting to retrieve a User by id: '${userId}'`);
   try {
-    const user: User | null = await User.findByPk(userId);
-    if (user) {
-      log.trace(`User was found, returning the user.`);
-      return res.status(200).send(user);
-    } else {
-      log.warn(`User not was found, returning 404.`);
-      return res.status(404).send(new NotFoundError(`User with id: '${userId}' was not found in the database.`));
+    const userId = req.body.token.userId;
+    log.trace(`Attempting to retrieve a User by id: '${userId}'`);
+    // Get the user by id.
+    const user = await User.findByPk(userId);
+    if (!user) {
+      log.warn(`Failed to find a user with ${userId}`);
+      return res.status(404).send(`User not found`);
     }
+    return res.status(200).send(user);
   } catch (error) {
-    log.error(`Error occurred while getting user`, error);
-    return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+    log.error(`An error occurred while getting user`, error);
+    return res.status(500).send(new InternalServerError(`Internal Server Error - failed to get the user.`));
   }
 });
 
@@ -56,6 +55,7 @@ router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Reques
     return res.status(400).send(new ValidationError(`Provided UUID: '${user.userId}' is not a valid UUIDv4.`));
   }
 
+  // Create the user entity
   try {
     await user.validate();
     const result = await user.save();
@@ -67,19 +67,21 @@ router.post("/users", cleanUserObjFields, canAccessRoleAdmin, async (req: Reques
       return res.status(400).send(new ValidationError(error.errors[0]));
     } else {
       log.error(`An error occurred while saving the new user`, error);
-      return res.status(500).send(new InternalServerError());
+      return res.status(500).send(new InternalServerError(`Internal Server Error - failed to create a user.`));
     }
   }
 });
 
 router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, async (req: Request, res: Response) => {
+  // Validate that the user is authorized to update the given user
   if (req.body.token.role === Role.user && req.params.id !== req.body.token.userId) {
     log.warn(
       `User: '${req.body.token.userId}' was attempting to change a picture of user: '${req.body.token.userId}'.`
     );
     res.status(400).send(new UnauthorizedError());
   }
-  // TODO: csrf token, this is a form!
+
+  // Process the image upload
   const token = req.body.token;
   uploadSingleImage(req, res, async (err: any) => {
     if (err) {
@@ -98,32 +100,35 @@ router.put("/users/:id/pictures", paramUuidValidator, canAccessMinRoleUser, asyn
         .status(500)
         .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
     }
+
     const userId = token.userId;
     const fileName = req.file!.originalname;
     const fileBuffer = req.file!.buffer;
     const pictureUrl = FilesService.getResourceUrl(userId, fileName);
-    const user: User | null = await User.findByPk(userId);
 
+    const user = await User.findByPk(userId);
     if (!user) {
       log.warn(`User with id: ${userId} not found!.`);
       return res.status(404).send(new NotFoundError(`User with id: ${userId} not found!.`));
     }
 
+    // Upload the new image
     try {
       const uploadedPicture = FilesService.uploadFile(fileBuffer, FilesService.getFilename(userId, fileName));
       if (!uploadedPicture) throw new Error("Failed to upload the file");
     } catch (error) {
       log.error(`An unknown error has occurred while uploading file`, error);
-      return res.status(500).send(new InternalServerError("An unknown error has occurred while uploading file"));
+      return res.status(500).send(new InternalServerError(`Internal Server Error - failed to update the users images`));
     }
 
+    // Update the user's picture url
     try {
       user.set({ pictureUrl });
       user.save();
       return res.status(202).send(user);
     } catch (error) {
-      log.error(`Error occurred while updating the user's image url`, error);
-      return res.status(500).send(new InternalServerError(`Unable to reach database.`));
+      log.error(`An error occurred while updating the user's image url`, error);
+      return res.status(500).send(new InternalServerError(`Internal Server Error - failed to update the users image.`));
     }
   });
 });

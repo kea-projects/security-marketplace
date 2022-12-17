@@ -1,6 +1,6 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import { getEnvVar } from "./config/secrets";
+import { getEnvVar } from "./config/config.service";
 import { logger } from "./middleware/logging.middleware";
 import { userRouter } from "./routes/user.routes";
 import { UnauthorizedError } from "./utils/error-messages";
@@ -35,6 +35,7 @@ const PORT: number = Number(getEnvVar("USERS_PORT") || 5000);
 
 const main = async () => {
   await initializeDb();
+
   app.listen(PORT, () => {
     log.info(`Backend App is running on port: ${PORT}`);
   });

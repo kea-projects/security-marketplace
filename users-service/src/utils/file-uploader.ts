@@ -1,5 +1,5 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getEnvVar } from "../config/secrets";
+import { getEnvVar } from "../config/config.service";
 import { log } from "./logger";
 
 class FilesService {

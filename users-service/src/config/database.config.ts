@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 import { log } from "../utils/logger";
-import { getEnvVar } from "./secrets";
+import { getEnvVar } from "./config.service";
 
 const log_flag = JSON.parse(getEnvVar("USERS_POSTGRES_LOG") || "false") ? console.log : false;
 
