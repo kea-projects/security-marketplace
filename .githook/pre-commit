@@ -1,0 +1,69 @@
+#!/bin/sh
+#!/bin/sh
+
+ROOT_DIR=$PWD
+
+echo "[INFO]   Running ESLint on 'frontend'"
+cd $ROOT_DIR/frontend
+eslint . > /tmp/eslint.log 2>&1
+# Store exit code of npm audit
+eslint_result=$?
+
+if [ $eslint_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on frontend: '$eslint_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/eslint.log
+	exit $eslint_result
+fi
+
+echo "[INFO]   Running ESLint on 'auth-service'"
+cd $ROOT_DIR/auth-service
+eslint . > /tmp/eslint.log 2>&1
+# Store exit code of npm audit
+eslint_result=$?
+
+if [ $eslint_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on auth-service: '$eslint_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/eslint.log
+	exit $eslint_result
+fi
+
+echo "[INFO]   Running ESLint on 'listings-service'"
+cd $ROOT_DIR/listings-service
+eslint . > /tmp/eslint.log 2>&1
+# Store exit code of npm audit
+eslint_result=$?
+
+if [ $eslint_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on listings-service: '$eslint_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/eslint.log
+	exit $eslint_result
+fi
+
+
+echo "[INFO]   Running ESLint on 'users-service'"
+cd $ROOT_DIR/users-service
+eslint . > /tmp/eslint.log 2>&1
+# Store exit code of npm audit
+eslint_result=$?
+
+if [ $eslint_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on users-service: '$eslint_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/eslint.log
+	exit $eslint_result
+fi
+
+
+echo "[INFO]   ESLint returned exit code: '$eslint_result', everything seems to be good."
+exit 0

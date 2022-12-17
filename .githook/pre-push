@@ -1,0 +1,68 @@
+#!/bin/sh
+
+ROOT_DIR=$PWD
+
+echo "[INFO]   Running NPM audit on 'frontend'"
+cd $ROOT_DIR/frontend
+pnpm audit > /tmp/audit.log 2>&1
+# Store exit code of npm audit
+audit_result=$?
+
+if [ $audit_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on frontend: '$audit_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/audit.log
+	exit $audit_result
+fi
+
+echo "[INFO]   Running NPM audit on 'auth-service'"
+cd $ROOT_DIR/auth-service
+pnpm audit > /tmp/audit.log 2>&1
+# Store exit code of npm audit
+audit_result=$?
+
+if [ $audit_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on auth-service: '$audit_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/audit.log
+	exit $audit_result
+fi
+
+echo "[INFO]   Running NPM audit on 'listings-service'"
+cd $ROOT_DIR/listings-service
+pnpm audit > /tmp/audit.log 2>&1
+# Store exit code of npm audit
+audit_result=$?
+
+if [ $audit_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on listings-service: '$audit_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/audit.log
+	exit $audit_result
+fi
+
+
+echo "[INFO]   Running NPM audit on 'users-service'"
+cd $ROOT_DIR/users-service
+pnpm audit > /tmp/audit.log 2>&1
+# Store exit code of npm audit
+audit_result=$?
+
+if [ $audit_result -ne 0 ]; then
+	echo -e "[ERROR]  Aborting push: NPM audit returned a non-zero value on users-service: '$audit_result'!\n" \
+			"        Please run 'npm audit fix' to resolve any potential vulnerabilities.\n" \
+			"        NPM audit output is:\n"
+	# Print the result of npm audit
+	cat /tmp/audit.log
+	exit $audit_result
+fi
+
+
+echo "[INFO]   NPM audit returned exit code: '$audit_result', everything seems to be good."
+exit 0
