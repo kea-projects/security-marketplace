@@ -3,7 +3,10 @@ import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
 import { Role } from "../interfaces";
-import { validateCreateListingRequestBody, validateUpdateListingRequestBody } from "../middleware/bodyValidators";
+import {
+  validateCreateListingRequestBody,
+  validateUpdateListingRequestBody,
+} from "../middleware/body-validators.middleware";
 import { validateUuidFromParams } from "../middleware/path-param-validators";
 import { canAccessAnonymous, canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";

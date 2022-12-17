@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { validateCreateCommentRequestBody } from "../middleware/bodyValidators";
+import { validateCreateCommentRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";
 import { ListingsService } from "../services/listings.service";

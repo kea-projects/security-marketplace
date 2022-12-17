@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { validate as isValidUuid } from "uuid";
 import { uploadSingleImage } from "../config/multer.config";
-import { cleanUserObjFields } from "../middleware/bodyValidators";
+import { cleanUserObjFields } from "../middleware/body-validators.middleware";
 import { paramUuidValidator } from "../middleware/path-param-validators";
 import { canAccessLoggedIn, canAccessMinRoleUser, canAccessRoleAdmin } from "../middleware/validate-access.middleware";
 import { User } from "../models/userModel";
