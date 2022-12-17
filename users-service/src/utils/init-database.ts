@@ -59,10 +59,13 @@ async function populateDb() {
           }
         }
       } else {
+        // Adjust the user pictureUrl but don't upload the file
         for (const user of users) {
           user.pictureUrl = FilesService.getResourceUrl(user.userId, "image.jpg");
         }
       }
+
+      // Create the database data
       await User.bulkCreate([...users], {
         updateOnDuplicate: ["userId", "name", "description", "pictureUrl"],
         returning: true,

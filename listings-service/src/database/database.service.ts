@@ -21,6 +21,7 @@ async function initializeDb(): Promise<boolean> {
     dialect: "postgres",
     logging: false,
   });
+
   // Check the connection
   try {
     await sequelize.authenticate();
@@ -29,6 +30,7 @@ async function initializeDb(): Promise<boolean> {
     log.error(`Database connection error!`, error);
     return false;
   }
+
   // Load the models
   try {
     loadDbModels(sequelize);
@@ -38,6 +40,7 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Sync the database schema with the models
   try {
     await sequelize.sync({
@@ -50,6 +53,7 @@ async function initializeDb(): Promise<boolean> {
     sequelize.close();
     return false;
   }
+
   // Populate the database
   if (getEnvVar("LISTINGS_POSTGRES_POPULATE") === "true") {
     try {
@@ -73,10 +77,13 @@ async function initializeDb(): Promise<boolean> {
           }
         }
       } else {
+        // Adjust the listing imageUrl but don't upload the file
         for (const listing of listings) {
           listing.imageUrl = FilesService.getResourceUrl(listing.listingId, "image.jpg");
         }
       }
+
+      // Create the database data
       await Listing.bulkCreate([...listings], {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
