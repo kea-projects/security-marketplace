@@ -1,7 +1,7 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
 import { corsGetConfig, corsOptionsConfig, corsPostConfig } from "../config/cors.config";
-import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/bodyValidators";
+import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthUserService } from "../services/auth-user.service";
 import { AuthenticationService } from "../services/authentication.service";

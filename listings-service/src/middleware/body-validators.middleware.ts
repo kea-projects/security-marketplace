@@ -29,26 +29,40 @@ import { log } from "../utils/logger";
  * @param next Express NextFunction object
  */
 const validateUpdateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, isPublic } = req.body!;
+  const { name, description, isPublic } = req.body;
   log.trace(`Validating the request.body of Update Listing Request`);
+
+  validateName(name, res);
+  validateDescription(name, res);
+
   if (isPublic === undefined) {
     log.warn(`Request body validation failed: The body was missing the: 'isPublic' attribute`);
     return res.status(400).send(new MissingPropertyError("isPublic"));
-  } else if (
+  }
+  if (
     typeof isPublic === "boolean" ||
     (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
+
     req.body = { name, description, isPublic: convertedIsPublic };
-    next();
-    return;
+    if (res.writableEnded) {
+      return;
+    }
+    return next();
   }
   log.warn(`Request body validation failed: The body contained invalid 'isPublic' attribute: ${isPublic}`);
   return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
 };
 
 const validateCreateListingRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, isPublic, createdBy } = req.body!;
+  const { name, description, isPublic, createdBy } = req.body;
+
+  if (createdBy !== undefined && !isValidUuid(createdBy)) {
+    log.warn(`Request body validation failed: The body contained invalid 'createdBy' attribute: ${createdBy}`);
+    return res.status(400).send(new ValidationError("The provided UUID was not valid."));
+  }
+
   log.trace(`Validating the request.body of Create Listing Request`);
   if (!name) {
     log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
@@ -58,6 +72,10 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
     log.warn(`Request body validation failed: The body was missing the: 'description' attribute`);
     return res.status(400).send(new MissingPropertyError("description"));
   }
+
+  validateName(name, res);
+  validateDescription(name, res);
+
   if (isPublic === undefined) {
     log.warn(`Request body validation failed: The body was missing the: 'isPublic' attribute`);
     return res.status(400).send(new MissingPropertyError("isPublic"));
@@ -67,28 +85,31 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
     req.body = { name, description, isPublic: convertedIsPublic, createdBy };
-    next();
-    return;
+    if (res.writableEnded) {
+      return;
+    }
+    return next();
   }
   log.warn(`Request body validation failed: The body contained invalid 'isPublic' attribute: ${isPublic}`);
   return res.status(400).send(new ValidationError("The provided Boolean isPublic field was not valid."));
 };
 
 const validateCreateCommentRequestBody = (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, comment, commentedOn } = req.body!;
+  const { name, email, comment, commentedOn } = req.body;
   log.trace(`Validating the request.body of Update Comment Request`);
   if (!name) {
     log.warn(`Request body validation failed: The body was missing the: 'name' attribute`);
     return res.status(400).send(new MissingPropertyError("name"));
   }
-  if (!email) {
-    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
-    return res.status(400).send(new MissingPropertyError("email"));
-  }
   if (!comment) {
     log.warn(`Request body validation failed: The body was missing the: 'comment' attribute`);
     return res.status(400).send(new MissingPropertyError("comment"));
   }
+
+  validateComment(comment, res);
+  validateEmail(email, res);
+  validateName(name, res);
+
   if (!commentedOn) {
     log.warn(`Request body validation failed: The body was missing the: 'commentedOn' attribute`);
     return res.status(400).send(new MissingPropertyError("commentedOn"));
@@ -97,8 +118,90 @@ const validateCreateCommentRequestBody = (req: Request, res: Response, next: Nex
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
   req.body = { name, email, comment, commentedOn };
-  next();
-  return;
+  if (res.writableEnded) {
+    return;
+  }
+  return next();
 };
+
+function validateName(name: unknown, res: Response) {
+  if (name !== undefined && typeof name !== "string") {
+    log.warn(`Request body validation failed: The attribute 'name' is not a string.`);
+    return res
+      .status(400)
+      .send(new ValidationError("Request body validation failed: The attribute 'name' is not a string."));
+  }
+
+  if ((name as string).length > 150) {
+    log.warn(`Request body validation failed: The attribute 'name' is too long. Please get a shorter name.`);
+    return res
+      .status(400)
+      .send(
+        new ValidationError(
+          "Request body validation failed: The attribute 'name' is too long. Please get a shorter name."
+        )
+      );
+  }
+
+  return null;
+}
+
+function validateDescription(description: unknown, res: Response) {
+  if (description !== undefined && typeof description !== "string") {
+    log.warn(`Request body validation failed: The attribute 'description' is not a string.`);
+    return res
+      .status(400)
+      .send(new ValidationError("Request body validation failed: The attribute 'description' is not a string."));
+  }
+
+  if ((description as string).length > 1000) {
+    log.warn(`Request body validation failed: The attribute 'description' is too long.`);
+    return res
+      .status(400)
+      .send(new ValidationError("Request body validation failed: The attribute 'description' is too long."));
+  }
+
+  return null;
+}
+
+function validateComment(comment: unknown, res: Response) {
+  if (comment !== undefined && typeof comment !== "string") {
+    log.warn(`Request body validation failed: The attribute 'comment' is not a string.`);
+    return res
+      .status(400)
+      .send(new ValidationError("Request body validation failed: The attribute 'comment' is not a string."));
+  }
+
+  if ((comment as string).length > 500) {
+    log.warn(`Request body validation failed: The attribute 'comment' is too long.`);
+    return res
+      .status(400)
+      .send(new ValidationError("Request body validation failed: The attribute 'comment' is too long."));
+  }
+
+  return null;
+}
+
+function validateEmail(email: unknown, res: Response) {
+  // Email exists
+  if (!email) {
+    log.warn(`Request body validation failed: The body was missing the: 'email' attribute`);
+    return res.status(400).send(new MissingPropertyError("email"));
+  }
+
+  // Email is a string, and matches email regex
+  if (typeof email !== "string" || !email.match(/^[A-Z0-9+_.-]+@[A-Z0-9.-]+$/i)) {
+    log.warn(`Request body validation failed: The 'email' attribute is not a valid email.`);
+    return res.status(400).send(new ValidationError(`The 'email' attribute is not a valid email.`));
+  }
+
+  // Email has proper length
+  if (email.length > 254) {
+    log.warn(`Request body validation failed: The 'email' attribute is too long.`);
+    return res.status(400).send(new ValidationError(`The 'email' attribute is too long. Maximum 254 characters.`));
+  }
+
+  return null;
+}
 
 export { validateUpdateListingRequestBody, validateCreateListingRequestBody, validateCreateCommentRequestBody };
