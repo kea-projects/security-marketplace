@@ -46,6 +46,9 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
 
     req.body = { name, description, isPublic: convertedIsPublic };
+    if (res.writableEnded) {
+      return;
+    }
     return next();
   }
   log.warn(`Request body validation failed: The body contained invalid 'isPublic' attribute: ${isPublic}`);
@@ -82,6 +85,9 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
     req.body = { name, description, isPublic: convertedIsPublic, createdBy };
+    if (res.writableEnded) {
+      return;
+    }
     return next();
   }
   log.warn(`Request body validation failed: The body contained invalid 'isPublic' attribute: ${isPublic}`);
@@ -112,8 +118,10 @@ const validateCreateCommentRequestBody = (req: Request, res: Response, next: Nex
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
   req.body = { name, email, comment, commentedOn };
-  next();
-  return null;
+  if (res.writableEnded) {
+    return;
+  }
+  return next();
 };
 
 function validateName(name: unknown, res: Response) {

@@ -36,6 +36,9 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
   validatePassword(password, res);
 
   req.body = { name, email, password };
+  if (res.writableEnded) {
+    return;
+  }
   return next();
 };
 
@@ -47,6 +50,9 @@ const validateLoginRequestBody = (req: Request, res: Response, next: NextFunctio
   validatePassword(password, res);
 
   req.body = { email, password };
+  if (res.writableEnded) {
+    return;
+  }
   return next();
 };
 
