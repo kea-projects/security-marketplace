@@ -126,7 +126,7 @@ router.get(
   }
 );
 
-router.post("", createLimiter, cors(corsPostConfig), canAccessRoleUser, async (req: Request, res: Response) => {
+router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (req: Request, res: Response) => {
   const token = req.body.token;
   uploadLargeRequest(req, res, async function (err: any) {
     validateCreateListingRequestBody(req, res, () => {});
@@ -210,8 +210,8 @@ router.post("", createLimiter, cors(corsPostConfig), canAccessRoleUser, async (r
 
 router.patch(
   "/:id",
-  updateLimiter,
   cors(corsPatchConfig),
+  updateLimiter,
   validateUuidFromParams,
   validateUpdateListingRequestBody,
   canAccessRoleUser,
@@ -237,8 +237,8 @@ router.patch(
 
 router.delete(
   "/:id",
-  deleteLimiter,
   cors(corsDeleteConfig),
+  deleteLimiter,
   validateUuidFromParams,
   canAccessRoleUser,
   async (req: Request, res: Response) => {
@@ -281,8 +281,8 @@ router.delete(
 
 router.put(
   "/:id/file",
-  updateLimiter,
   cors(corsPutConfig),
+  updateLimiter,
   validateUuidFromParams,
   canAccessRoleUser,
   async (req: Request, res: Response) => {

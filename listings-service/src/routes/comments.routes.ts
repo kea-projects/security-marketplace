@@ -19,8 +19,8 @@ router.options("*", cors(corsOptionsConfig));
 
 router.post(
   "",
-  createLimiter,
   cors(corsPostConfig),
+  createLimiter,
   validateCreateCommentRequestBody,
   canAccessRoleUser,
   async (req: Request, res: Response) => {

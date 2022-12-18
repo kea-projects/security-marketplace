@@ -22,8 +22,8 @@ router.options("*", cors(corsOptionsConfig));
  */
 router.post(
   "/login",
-  loginLimiter,
   cors(corsPostConfig),
+  loginLimiter,
   validateLoginRequestBody,
   async (req: Request, res: Response) => {
     try {
@@ -61,8 +61,8 @@ router.post(
 
 router.post(
   "/signup",
-  signupLimiter,
   cors(corsPostConfig),
+  signupLimiter,
   validateSignupRequestBody,
   async (req: Request, res: Response) => {
     try {

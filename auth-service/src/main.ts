@@ -18,7 +18,7 @@ app.use("/auth", authRouter);
 
 // ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", unknownLimiter, cors(corsAcceptAll), (req: Request, res: Response) => {
+app.all("*", cors(corsAcceptAll), unknownLimiter, (req: Request, res: Response) => {
   log.info(`Invalid request: ${req.method} ${req.url}.`);
   log.info(`Request body: ${JSON.stringify(req.body)}`);
   log.info("Rejecting request.");

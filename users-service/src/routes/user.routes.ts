@@ -90,8 +90,8 @@ router.post(
 
 router.put(
   "/users/:id/pictures",
-  updateLimiter,
   cors(corsPutConfig),
+  updateLimiter,
   paramUuidValidator,
   canAccessMinRoleUser,
   async (req: Request, res: Response) => {
