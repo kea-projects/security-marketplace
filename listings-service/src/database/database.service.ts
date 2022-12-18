@@ -1,13 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Sequelize } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 import { getEnvVar } from "../config/config.service";
 import { FilesService } from "../services/files.service";
 import { log } from "../utils/logger";
-import { comments } from "./comments.constant";
+import { rawComments } from "./comments.constant";
 import { listings } from "./listings.constant";
 import { Comment, CommentInit } from "./models/comment.model";
 import { Listing, ListingInit } from "./models/listing.model";
+import { users } from "./users.constant";
 
 let sequelize: Sequelize;
 
@@ -88,7 +90,31 @@ async function initializeDb(): Promise<boolean> {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
       });
-      await Comment.bulkCreate([...comments], {
+
+      function getRandom(array: any[]): unknown[] {
+        return array[Math.floor(Math.random() * array.length)];
+      }
+
+      const commentsAmount = 500;
+      const generatedComments: any[] = [];
+
+      for (let i = 0; i < commentsAmount; i++) {
+        const user = getRandom(users) as unknown as {
+          userId: string;
+          name: string;
+          email: string;
+        };
+        generatedComments.push({
+          commentId: uuidv4(),
+          comment: getRandom(rawComments) as unknown as string,
+          name: user.name,
+          email: user.email,
+          createdBy: user.userId,
+          commentedOn: (getRandom(listings) as unknown as { listingId: string }).listingId,
+          createdAt: new Date("11/29/2000 11:22:33").toISOString(),
+        });
+      }
+      await Comment.bulkCreate([...generatedComments], {
         updateOnDuplicate: ["commentId", "name", "email", "comment", "createdBy", "commentedOn", "createdAt"],
         returning: true,
       });

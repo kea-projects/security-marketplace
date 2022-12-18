@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
-import { users } from "../assets/users.contant";
+import { users } from "../assets/users.constant";
 import { getEnvVar } from "../config/config.service";
 import { SequelizeSingleton } from "../config/database.config";
 import { User } from "../models/userModel";
