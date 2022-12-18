@@ -1,4 +1,5 @@
 import * as bcrypt from "bcrypt";
+import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
@@ -14,8 +15,12 @@ export class AuthenticationService {
    * @param req the express request reference.
    * @returns the token string or null if it can't get it.
    */
-  static getTokenFromRequest(req: any): string | null {
+  static getTokenFromRequest(req: Request): string | null {
     try {
+      if (!req.headers || !req.headers.authorization) {
+        log.warn(`The provided request has no authorization header!`);
+        return null;
+      }
       return req.headers.authorization.replace("Bearer ", ""); // extract the token and remove the bearer part
     } catch (error) {
       log.error(`An error has occurred while extracting the access token!`, error);
@@ -28,7 +33,7 @@ export class AuthenticationService {
    * @param req the express request reference.
    * @returns the decoded token object or null if it can't get it.
    */
-  static decodeToken(token: any): JwtPayload | null {
+  static decodeToken(token: string): JwtPayload | null {
     try {
       return jwt.decode(token) as JwtPayload;
     } catch (error) {

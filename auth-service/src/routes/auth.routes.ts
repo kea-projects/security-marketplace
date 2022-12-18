@@ -22,8 +22,8 @@ router.options("*", cors(corsOptionsConfig));
  */
 router.post(
   "/login",
-  loginLimiter,
   cors(corsPostConfig),
+  loginLimiter,
   validateLoginRequestBody,
   async (req: Request, res: Response) => {
     try {
@@ -51,7 +51,7 @@ router.post(
           .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
       }
       log.trace(`Token pair created for user ${foundUser.userId}`);
-      return res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
+      return res.send({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
     } catch (error) {
       log.error(`An error has occurred while logging in a user!`, error);
       return res.status(500).send({ message: "Internal Server Error - failed to log in." });
@@ -61,8 +61,8 @@ router.post(
 
 router.post(
   "/signup",
-  signupLimiter,
   cors(corsPostConfig),
+  signupLimiter,
   validateSignupRequestBody,
   async (req: Request, res: Response) => {
     try {
@@ -115,7 +115,7 @@ router.get("/logout", cors(corsGetConfig), canAccessRoleUser, async (req: Reques
 
     // Delete the token pair
     log.trace(`Trying to delete a token pair as part of the logout process for token: ${accessToken}`);
-    const result = await TokenService.deleteByToken(accessToken!);
+    const result = await TokenService.deleteByToken(accessToken);
     if (!result) {
       log.warn(`Failed to find and/or delete a token pair of token ${accessToken}`);
       return res.status(401).send({ message: "Unauthorized" });
@@ -139,7 +139,7 @@ router.post("/refresh", cors(corsPostConfig), canAccessRoleUser, async (req: Req
       return res.status(401).send({ message: "Unauthorized" });
     }
     log.trace(`Deleting token ${accessToken}`);
-    const result = await TokenService.deleteByToken(accessToken!);
+    const result = await TokenService.deleteByToken(accessToken);
     if (!result) {
       log.warn(`Failed to delete a token pair!`);
       return res.status(401).send({ message: "Unauthorized" });
@@ -147,7 +147,7 @@ router.post("/refresh", cors(corsPostConfig), canAccessRoleUser, async (req: Req
 
     // Create new access token pair
     const token = AuthenticationService.decodeToken(accessToken);
-    const foundUser = await AuthUserService.findOneByEmail(token!.sub!);
+    const foundUser = await AuthUserService.findOneByEmail(token?.sub as string);
     if (!foundUser) {
       log.warn(`Failed to create a new token since the related user was not found in the database`);
       return res.status(401).send({ message: "Unauthorized" });
@@ -193,8 +193,8 @@ router.post("/validate", async (req: Request, res: Response) => {
     // TODO - revisit this logic and decide on the exact condition
     if (!isValid || !foundTokens) {
       const decodedToken = AuthenticationService.decodeToken(token);
-      await TokenService.deleteAllOfUser(decodedToken!.sub!);
-      log.warn(`Removed all tokens of a user: ${decodedToken!.sub}`);
+      await TokenService.deleteAllOfUser(decodedToken?.sub as string);
+      log.warn(`Removed all tokens of a user: ${decodedToken?.sub as string}`);
       return res.status(401).send({ message: "Unauthorized" });
     }
 

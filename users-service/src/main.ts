@@ -21,7 +21,7 @@ app.use(userRouter);
 
 // ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", unknownLimiter, cors(corsAcceptAll), (req: Request, res: Response) => {
+app.all("*", cors(corsAcceptAll), unknownLimiter, (req: Request, res: Response) => {
   log.info(`Invalid request: ${req.method} ${req.url}.`);
   log.info(`Request body: ${JSON.stringify(req.body)}`);
   log.info("Rejecting request.");
@@ -30,7 +30,7 @@ app.all("*", unknownLimiter, cors(corsAcceptAll), (req: Request, res: Response) 
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(getEnvVar("USERS_PORT") || 5000);
+const PORT = Number(getEnvVar("USERS_PORT") || 5000);
 
 const main = async () => {
   await initializeDb();

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request } from "express";
 import { log } from "../utils/logger";
 import { getEnvVar } from "./config.service";
 
@@ -9,7 +9,7 @@ const maxFailed404Requests = Number(getEnvVar("LISTINGS_RATE_LIMIT_404")) || 3;
 const maxGlobalRequests = Number(getEnvVar("LISTINGS_RATE_LIMIT_GLOBAL")) || 2000;
 const rateLimitDuration = Number(getEnvVar("LISTINGS_RATE_LIMIT_DURATION")) || 5; // in minutes
 
-let enableRateLimit = getEnvVar("GLOBAL_RATE_LIMIT_ENABLED") === "true";
+const enableRateLimit = getEnvVar("GLOBAL_RATE_LIMIT_ENABLED") === "true";
 log.info(`Rate limiting enabled: ${enableRateLimit}`);
 
 // ===============
@@ -20,7 +20,7 @@ const genericConfig = {
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   skipSuccessfulRequests: true,
-  skip: (_req: Request, _res: Response) => !enableRateLimit, // Whether the rate limiting should apply at all
+  skip: () => !enableRateLimit, // Whether the rate limiting should apply at all
 };
 
 /** Limits how many requests in X minutes can be made to the given endpoint */
@@ -28,7 +28,7 @@ export const rateLimiterCreateConfig = {
   ...genericConfig,
   max: maxCreateRequests, // Limit each IP to 100 requests per `window`
   skipSuccessfulRequests: false,
-  message: async (req: Request, _res: Response) => {
+  message: async (req: Request) => {
     log.warn(`Rate limited user ${req.ip} tried to access ${req.url}`);
     return {
       error: "TooManyRequests",
@@ -42,7 +42,7 @@ export const rateLimiterUpdateConfig = {
   ...genericConfig,
   max: maxUpdateRequests, // Limit each IP to 100 requests per `window`
   skipSuccessfulRequests: false,
-  message: async (req: Request, _res: Response) => {
+  message: async (req: Request) => {
     log.warn(`Rate limited user ${req.ip} tried to access ${req.url}`);
     return {
       error: "TooManyRequests",
@@ -56,7 +56,7 @@ export const rateLimiterDeleteConfig = {
   ...genericConfig,
   max: maxDeleteRequests, // Limit each IP to 100 requests per `window`
   skipSuccessfulRequests: false,
-  message: async (req: Request, _res: Response) => {
+  message: async (req: Request) => {
     log.warn(`Rate limited user ${req.ip} tried to access ${req.url}`);
     return {
       error: "TooManyRequests",
@@ -68,7 +68,7 @@ export const rateLimiterDeleteConfig = {
 export const rateLimiter404Config = {
   ...genericConfig,
   max: maxFailed404Requests, // Limit each IP to X requests per `window`
-  message: async (req: Request, _res: Response) => {
+  message: async (req: Request) => {
     log.warn(`Rate limited user ${req.ip} tried to access ${req.url}`);
     return {
       error: "TooManyRequests",
@@ -85,7 +85,7 @@ export const rateLimiterGlobalConfig = {
   windowMs: 1 * 60 * 1000, // X minutes `window`
   max: maxGlobalRequests, // Limit each IP to X requests per `window`
   skipSuccessfulRequests: false,
-  message: async (req: Request, _res: Response) => {
+  message: async (req: Request) => {
     log.warn(`Rate limited user ${req.ip} tried to access ${req.url}`);
     return {
       error: "TooManyRequests",
