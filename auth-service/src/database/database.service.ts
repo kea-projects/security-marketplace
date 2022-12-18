@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import { getEnvVar } from "../config/config.service";
+import { AuthenticationService } from "../services/authentication.service";
 import { log } from "../utils/logger";
 import { AuthUser, AuthUserInit } from "./models/auth-user.model";
 import { TokenInit } from "./models/token.model";
@@ -53,6 +54,10 @@ async function initializeDb(): Promise<boolean> {
   // Populate the database
   if (getEnvVar("AUTH_POSTGRES_POPULATE")) {
     try {
+      const hashedPassword = await AuthenticationService.encodePassword(`abcDEF123!`);
+      users.forEach((user) => {
+        user.password = hashedPassword;
+      });
       await AuthUser.bulkCreate(users, {
         updateOnDuplicate: ["userId", "email", "password", "role"],
         returning: true,
