@@ -30,7 +30,6 @@ export function Profilebar({ userId }: ProfilebarProps) {
             setIsLoading(true);
             if (userId) {
                 const { data } = await UserApi.getUser(userId);
-                console.log(data);
                 setUser(data);
                 setIsLoading(false);
             }
