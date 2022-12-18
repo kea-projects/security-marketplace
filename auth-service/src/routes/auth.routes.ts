@@ -12,7 +12,8 @@ import { log } from "../utils/logger";
 
 const router: Router = Router();
 // Configure rate limiting
-const apiLimiter = rateLimit(rateLimiterAuthConfig);
+const loginLimiter = rateLimit(rateLimiterAuthConfig);
+const signupLimiter = rateLimit(rateLimiterAuthConfig);
 // Add options requests
 router.options("*", cors(corsOptionsConfig));
 
@@ -21,7 +22,7 @@ router.options("*", cors(corsOptionsConfig));
  */
 router.post(
   "/login",
-  apiLimiter,
+  loginLimiter,
   cors(corsPostConfig),
   validateLoginRequestBody,
   async (req: Request, res: Response) => {
@@ -60,7 +61,7 @@ router.post(
 
 router.post(
   "/signup",
-  apiLimiter,
+  signupLimiter,
   cors(corsPostConfig),
   validateSignupRequestBody,
   async (req: Request, res: Response) => {
