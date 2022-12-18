@@ -32,8 +32,6 @@ const requestInterceptor = async (config: AxiosRequestConfig) => {
 
     if (accessToken && refreshToken) {
         if (tokenIsExpired(accessToken) && !tokenIsExpired(refreshToken) && !authHeader) {
-            console.log('Axios Config', 'Preparing to refresh token...');
-
             const { data } = await AuthApi.refresh();
             LocalStorage.updateUser({ accessToken: data.accessToken, refreshToken: data.refreshToken });
         } else if (tokenIsExpired(refreshToken)) {

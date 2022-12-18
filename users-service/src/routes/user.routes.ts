@@ -3,7 +3,7 @@ import { Request, Response, Router } from "express";
 import { validate as isValidUuid } from "uuid";
 import { corsGetConfig, corsOptionsConfig, corsPostConfig, corsPutConfig } from "../config/cors.config";
 import { uploadSingleImage } from "../config/multer.config";
-import { cleanUserObjFields } from "../middleware/body-validators.middleware";
+import { validateUserObjFields } from "../middleware/body-validators.middleware";
 import { paramUuidValidator } from "../middleware/path-param-validators";
 import { canAccessLoggedIn, canAccessMinRoleUser, canAccessRoleAdmin } from "../middleware/validate-access.middleware";
 import { User } from "../models/userModel";
@@ -54,7 +54,7 @@ router.get(
 router.post(
   "/users",
   cors(corsPostConfig),
-  cleanUserObjFields,
+  validateUserObjFields,
   canAccessRoleAdmin,
   async (req: Request, res: Response) => {
     const user = req.body.user;

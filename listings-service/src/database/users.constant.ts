@@ -36,6 +36,12 @@ export const users = [
     pictureUrl: "http://dummyimage.com/195x100.png/dddddd/000000",
   },
   {
+    userId: "bd471418-4ea4-4415-964a-4ed9df0867df",
+    email: "user7@example.com",
+    name: "SecuriManz",
+    pictureUrl: "http://dummyimage.com/195x100.png/dddddd/000000",
+  },
+  {
     userId: "9e3988ba-2b27-4474-82a3-30a52968f4ac",
     email: "admin@example.com",
     name: "God",

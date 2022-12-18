@@ -1,13 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Sequelize } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 import { getEnvVar } from "../config/config.service";
 import { FilesService } from "../services/files.service";
 import { log } from "../utils/logger";
-import { comments } from "./comments.constant";
+import { rawComments } from "./comments.constant";
 import { listings } from "./listings.constant";
 import { Comment, CommentInit } from "./models/comment.model";
 import { Listing, ListingInit } from "./models/listing.model";
+import { users } from "./users.constant";
 
 let sequelize: Sequelize;
 
@@ -56,18 +58,25 @@ async function initializeDb(): Promise<boolean> {
 
   // Populate the database
   if (getEnvVar("LISTINGS_POSTGRES_POPULATE") === "true") {
+    function getRandom(array: any[]): unknown[] {
+      return array[Math.floor(Math.random() * array.length)];
+    }
     try {
       if (getEnvVar("LISTINGS_LINODE_POPULATE") === "true") {
         log.info(`Populating Linode object storage, may take a minute`);
 
-        // The file that will be uploaded to Linode
-        const documentBuffer = fs.readFileSync(path.join(__dirname, "/assets/image.jpg"));
+        // The files that will be uploaded to Linode. There are currently 17 assets prepared
+        const documentsBuffer: Buffer[] = [];
+        for (let i = 1; i <= 17; i++) {
+          documentsBuffer.push(fs.readFileSync(path.join(__dirname, `/assets/padlock${i}.jpg`)));
+        }
+
         // Upload a file for each listing
         let count = 0;
         for (const listing of listings) {
           const uploadedFile = await FilesService.uploadFile(
-            documentBuffer,
-            FilesService.getFilename(listing.listingId, "image.jpg"),
+            getRandom(documentsBuffer) as unknown as Buffer,
+            FilesService.getFilename(listing.listingId, "padlock1.jpg"),
             true
           );
           listing.imageUrl = uploadedFile.url;
@@ -88,7 +97,26 @@ async function initializeDb(): Promise<boolean> {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
       });
-      await Comment.bulkCreate([...comments], {
+      const commentsAmount = 500;
+      const generatedComments: any[] = [];
+
+      for (let i = 0; i < commentsAmount; i++) {
+        const user = getRandom(users) as unknown as {
+          userId: string;
+          name: string;
+          email: string;
+        };
+        generatedComments.push({
+          commentId: uuidv4(),
+          comment: getRandom(rawComments) as unknown as string,
+          name: user.name,
+          email: user.email,
+          createdBy: user.userId,
+          commentedOn: (getRandom(listings) as unknown as { listingId: string }).listingId,
+          createdAt: new Date("11/29/2000 11:22:33").toISOString(),
+        });
+      }
+      await Comment.bulkCreate([...generatedComments], {
         updateOnDuplicate: ["commentId", "name", "email", "comment", "createdBy", "commentedOn", "createdAt"],
         returning: true,
       });

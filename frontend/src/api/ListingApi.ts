@@ -58,22 +58,18 @@ export class ListingApi {
     // --- LISTINGS ---
 
     public static async getListings(): Promise<AxiosResponse<ListingResponse[]>> {
-        console.log('Listing Api', 'Requesting all listings...');
         return listingApi.get('/listings');
     }
 
     public static async getUserListings(userId: string): Promise<AxiosResponse<ListingResponse[]>> {
-        console.log('Listing Api', 'Requesting all user listings...');
         return listingApi.get(`/listings/user/${userId}`);
     }
 
     public static async getListingById(listingId: string): Promise<AxiosResponse<ListingByIdResponse>> {
-        console.log('Listing Api', 'Requesting listing...');
         return listingApi.get(`/listings/${listingId}`);
     }
 
     public static async createListing(body: CreateListingRequestBody): Promise<AxiosResponse<ListingResponse>> {
-        console.log('Listing Api', 'Requesting listing creation...');
         return listingApi.postForm('/listings', { ...body });
     }
 
@@ -81,19 +77,16 @@ export class ListingApi {
         body: UpdateListingRequestBody,
         listingId: string,
     ): Promise<AxiosResponse<ListingResponse>> {
-        console.log('Listing Api', 'Requesting listing update...');
         return listingApi.patch(`/listings/${listingId}`, body);
     }
 
     public static async deleteListing(listingId: string) {
-        console.log('Listing Api', 'Requesting listing deletion...');
         return listingApi.delete(`/listings/${listingId}`);
     }
 
     // --- COMMENTS ---
 
     public static async createComment(body: CreateCommentRequestBody): Promise<AxiosResponse<CommentResponse>> {
-        console.log('Listing Api', 'Requesting comment creation...');
         return listingApi.post('/comments', body);
     }
 }

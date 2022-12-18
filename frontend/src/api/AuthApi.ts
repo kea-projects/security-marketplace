@@ -23,17 +23,14 @@ interface TokenResponse {
  */
 export class AuthApi {
     public static async login(body: LoginRequestBody): Promise<AxiosResponse<TokenResponse>> {
-        console.log('Auth Api', 'Requesting login...');
         return authApi.post('/auth/login', { ...body });
     }
 
     public static async signup(body: SignupRequestBody): Promise<AxiosResponse<TokenResponse>> {
-        console.log('Auth Api', 'Requesting signup...');
         return authApi.post('/auth/signup', { ...body });
     }
 
     public static async refresh(): Promise<AxiosResponse<TokenResponse>> {
-        console.log('Auth Api', 'Requesting refresh...');
         return authApi.post(
             '/auth/refresh',
             {},
@@ -46,7 +43,6 @@ export class AuthApi {
     }
 
     public static async logout(): Promise<AxiosResponse<TokenResponse>> {
-        console.log('Auth Api', 'Requesting logout...');
         return authApi.post('/auth/logout', {});
     }
 }

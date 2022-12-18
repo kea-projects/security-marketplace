@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
-import { users } from "../assets/users.contant";
+import { users } from "../assets/users.constant";
 import { getEnvVar } from "../config/config.service";
 import { SequelizeSingleton } from "../config/database.config";
 import { User } from "../models/userModel";
@@ -42,13 +42,11 @@ async function populateDb() {
       if (getEnvVar("USERS_LINODE_POPULATE")) {
         log.info(`Populating Linode object storage, may take a minute`);
 
-        // The file that will be uploaded to Linode
-        const documentBuffer = fs.readFileSync(path.join(__dirname, "../assets/image.jpg"));
         // Upload a file for each listing
         let count = 0;
         for (const user of users) {
           const uploadedFile = await FilesService.uploadFile(
-            documentBuffer,
+            fs.readFileSync(path.join(__dirname, `../assets/knight${count + 1}.jpg`)),
             FilesService.getFilename(user.userId, "image.jpg"),
             true
           );

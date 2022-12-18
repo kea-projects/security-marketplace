@@ -42,7 +42,6 @@ export function LoginPage() {
             });
             setLoginError(undefined);
         } catch (error) {
-            // TODO: Discuss if we want to return this message or not.
             setLoginError('Wrong credentials.');
         } finally {
             setIsLoading(false);
