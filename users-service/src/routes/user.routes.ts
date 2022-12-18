@@ -12,6 +12,12 @@ import { FilesService } from "../utils/file-uploader";
 import { log } from "../utils/logger";
 import { Role } from "../utils/role.enum";
 
+import rateLimit from "express-rate-limit";
+import { rateLimiterUpdateConfig } from "../config/rate-limiter.config";
+
+// Rate Limiting setup
+const updateLimiter = rateLimit(rateLimiterUpdateConfig);
+
 const router: Router = Router();
 // Add options requests
 router.options("*", cors(corsOptionsConfig));
@@ -84,6 +90,7 @@ router.post(
 
 router.put(
   "/users/:id/pictures",
+  updateLimiter,
   cors(corsPutConfig),
   paramUuidValidator,
   canAccessMinRoleUser,
