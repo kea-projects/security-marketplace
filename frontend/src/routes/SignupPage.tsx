@@ -42,7 +42,6 @@ export function SignupPage() {
             });
             setSignupError(undefined);
         } catch (error) {
-            // TODO: Discuss if we want to return this message or not.
             setSignupError('We encountered an error while creating your account.');
         } finally {
             setIsLoading(false);

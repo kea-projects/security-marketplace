@@ -52,7 +52,6 @@ export function CommentList({ listingId, comments, setComments, parentIsLoading 
                 setPostCommentError('We encountered an error while retrieving your user.');
             }
         } catch (error) {
-            // TODO: Discuss if we want to return this message or not.
             setPostCommentError('We encountered an error while posting your comment.');
         } finally {
             setIsLoading(false);

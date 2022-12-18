@@ -50,12 +50,9 @@ router.post("/login", cors(corsPostConfig), validateLoginRequestBody, async (req
 
 router.post("/signup", cors(corsPostConfig), validateSignupRequestBody, async (req: Request, res: Response) => {
   try {
-    // TODO - emails can only have: utf-8-mb4, dashes, spaces, apostrophe. No russian or ukrainian or belarus
-    // TODO - passwords must have one lowercase, one uppercase, one number, one special. min 8, 32 max.
     const { name, email, password } = req.body;
     // Check if there is already a registered user with the same email
     if (await AuthUserService.findOneByEmail(email)) {
-      // TODO - discuss how to handle signup failed due to the email already being used, and the security implications of exposing this information
       log.warn(`Signup attempt failed due to the email already being in use: ${email}`);
       return res.status(409).send({
         message: "The email is already in use",

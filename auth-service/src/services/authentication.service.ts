@@ -6,6 +6,7 @@ import { log } from "../utils/logger";
 import { TokenService } from "./token.service";
 
 const secret = getEnvVar("AUTH_SECRET") || "changeMe";
+const pepper = getEnvVar("AUTH_PEPPER") || "AlsoChangeMe";
 
 export class AuthenticationService {
   /**
@@ -84,9 +85,8 @@ export class AuthenticationService {
    * @returns encoded password.
    */
   static async encodePassword(password: string): Promise<string> {
-    const saltOrRounds = 10;
-    // TODO - add a pepper to the password
-    return await bcrypt.hash(password, saltOrRounds);
+    const rounds = 10;
+    return await bcrypt.hash(password + pepper, rounds);
   }
 
   /**
@@ -96,6 +96,6 @@ export class AuthenticationService {
    * @returns whether the strings match.
    */
   static async compareHashes(password: string, hash: string): Promise<boolean> {
-    return await bcrypt.compare(password, hash);
+    return await bcrypt.compare(password + pepper, hash);
   }
 }
