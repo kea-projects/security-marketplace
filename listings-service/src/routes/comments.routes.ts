@@ -1,7 +1,7 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
-import { AuthRoles } from "../../../frontend/src/utils/Auth";
 import { corsOptionsConfig, corsPostConfig } from "../config/cors.config";
+import { Role } from "../interfaces";
 import { validateCreateCommentRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";
@@ -27,7 +27,7 @@ router.post(
         return res.status(404).send({ message: "Listing not found" });
       }
       if (
-        token?.role !== AuthRoles.ADMIN &&
+        token?.role !== Role.admin &&
         !foundListing.isPublic &&
         foundListing.createdBy !== (token?.userId as string)
       ) {
