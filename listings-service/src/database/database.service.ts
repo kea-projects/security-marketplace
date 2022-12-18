@@ -58,18 +58,25 @@ async function initializeDb(): Promise<boolean> {
 
   // Populate the database
   if (getEnvVar("LISTINGS_POSTGRES_POPULATE") === "true") {
+    function getRandom(array: any[]): unknown[] {
+      return array[Math.floor(Math.random() * array.length)];
+    }
     try {
       if (getEnvVar("LISTINGS_LINODE_POPULATE") === "true") {
         log.info(`Populating Linode object storage, may take a minute`);
 
-        // The file that will be uploaded to Linode
-        const documentBuffer = fs.readFileSync(path.join(__dirname, "/assets/image.jpg"));
+        // The files that will be uploaded to Linode. There are currently 17 assets prepared
+        const documentsBuffer: Buffer[] = [];
+        for (let i = 1; i <= 17; i++) {
+          documentsBuffer.push(fs.readFileSync(path.join(__dirname, `/assets/padlock${i}.jpg`)));
+        }
+
         // Upload a file for each listing
         let count = 0;
         for (const listing of listings) {
           const uploadedFile = await FilesService.uploadFile(
-            documentBuffer,
-            FilesService.getFilename(listing.listingId, "image.jpg"),
+            getRandom(documentsBuffer) as unknown as Buffer,
+            FilesService.getFilename(listing.listingId, "padlock1.jpg"),
             true
           );
           listing.imageUrl = uploadedFile.url;
@@ -90,11 +97,6 @@ async function initializeDb(): Promise<boolean> {
         updateOnDuplicate: ["listingId", "name", "description", "imageUrl", "createdBy", "isPublic"],
         returning: true,
       });
-
-      function getRandom(array: any[]): unknown[] {
-        return array[Math.floor(Math.random() * array.length)];
-      }
-
       const commentsAmount = 500;
       const generatedComments: any[] = [];
 

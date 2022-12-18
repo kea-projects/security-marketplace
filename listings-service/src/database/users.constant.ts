@@ -1,4 +1,3 @@
-// Copy of the User Service users seed data for the purposes of seeding comments
 export const users = [
   {
     userId: "1929b579-2f32-4822-96a5-aa2980a6b5ed",
@@ -34,6 +33,12 @@ export const users = [
     userId: "bd471418-4ea4-4415-964a-4ed9df0867de",
     email: "user6@example.com",
     name: "WhatsThatMelody",
+    pictureUrl: "http://dummyimage.com/195x100.png/dddddd/000000",
+  },
+  {
+    userId: "bd471418-4ea4-4415-964a-4ed9df0867df",
+    email: "user7@example.com",
+    name: "SecuriManz",
     pictureUrl: "http://dummyimage.com/195x100.png/dddddd/000000",
   },
   {

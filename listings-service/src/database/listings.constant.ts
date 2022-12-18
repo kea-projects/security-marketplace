@@ -32,7 +32,7 @@ export const listings = [
     isPublic: true,
   },
   {
-    listingId: "d54d698a-af15-415b-bba8-5fec15503367",
+    listingId: "d54d698a-af15-415b-bba8-5fec15503368",
     name: "Diomedea irrorata",
     description: "Galapagos albatross",
     imageUrl: "http://dummyimage.com/154x100.png/dddddd/000000",
@@ -48,7 +48,7 @@ export const listings = [
     isPublic: false,
   },
   {
-    listingId: "8409db78-ba39-41d9-a67e-833eb839a876",
+    listingId: "8409db78-ba39-41d9-a67e-833eb839a877",
     name: "Felis wiedi or Leopardus weidi",
     description: "Cat, long-tailed spotted",
     imageUrl: "http://dummyimage.com/199x100.png/5fa2dd/ffffff",

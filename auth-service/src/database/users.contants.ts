@@ -38,6 +38,12 @@ export const users = [
     role: Role.user,
   },
   {
+    userId: "bd471418-4ea4-4415-964a-4ed9df0867df",
+    email: "user7@example.com",
+    password: "$2b$10$rkWJvI9l5OYMlvNoCdpUEuBkcIXY6iTzj3GmbCYoEpKGgriXq8s5W",
+    role: Role.user,
+  },
+  {
     userId: "9e3988ba-2b27-4474-82a3-30a52968f4ac",
     email: "admin@example.com",
     password: "$2b$10$rkWJvI9l5OYMlvNoCdpUEuBkcIXY6iTzj3GmbCYoEpKGgriXq8s5W",
