@@ -1,5 +1,6 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
+import rateLimit from "express-rate-limit";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { AuthRoles } from "../../../frontend/src/utils/Auth";
@@ -12,6 +13,11 @@ import {
   corsPutConfig,
 } from "../config/cors.config";
 import { multerConfigLargeRequest, multerConfigSingleFile } from "../config/multer.config";
+import {
+  rateLimiterCreateConfig,
+  rateLimiterDeleteConfig,
+  rateLimiterUpdateConfig,
+} from "../config/rate-limiter.config";
 import { Role } from "../interfaces";
 import {
   validateCreateListingRequestBody,
@@ -29,6 +35,11 @@ const multerSingleImage = multer(multerConfigSingleFile);
 const multerLargeRequest = multer(multerConfigLargeRequest);
 const uploadSingleImage = multerSingleImage.single("file");
 const uploadLargeRequest = multerLargeRequest.single("file");
+
+// Rate Limiting setup
+const createLimiter = rateLimit(rateLimiterCreateConfig);
+const updateLimiter = rateLimit(rateLimiterUpdateConfig);
+const deleteLimiter = rateLimit(rateLimiterDeleteConfig);
 
 const router: Router = Router();
 // Add options requests
@@ -115,7 +126,7 @@ router.get(
   }
 );
 
-router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, res: Response) => {
+router.post("", createLimiter, cors(corsPostConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   const token = req.body.token;
   uploadLargeRequest(req, res, async function (err: any) {
     validateCreateListingRequestBody(req, res, () => {});
@@ -199,6 +210,7 @@ router.post("", cors(corsPostConfig), canAccessRoleUser, async (req: Request, re
 
 router.patch(
   "/:id",
+  updateLimiter,
   cors(corsPatchConfig),
   validateUuidFromParams,
   validateUpdateListingRequestBody,
@@ -225,6 +237,7 @@ router.patch(
 
 router.delete(
   "/:id",
+  deleteLimiter,
   cors(corsDeleteConfig),
   validateUuidFromParams,
   canAccessRoleUser,
@@ -268,6 +281,7 @@ router.delete(
 
 router.put(
   "/:id/file",
+  updateLimiter,
   cors(corsPutConfig),
   validateUuidFromParams,
   canAccessRoleUser,
