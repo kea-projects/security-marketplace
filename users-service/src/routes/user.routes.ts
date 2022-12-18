@@ -104,6 +104,7 @@ router.put(
     }
 
     // Process the image upload
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     uploadSingleImage(req, res, async (err: any) => {
       if (err) {
         log.warn(`An invalid file was uploaded: ${err.message}`);
@@ -122,9 +123,14 @@ router.put(
           .send(new InternalServerError("Unexpected error occurred while trying to upload the file."));
       }
       try {
+        if (!req.file) {
+          log.warn(`The request does not contain the file object!`);
+          throw new Error(`The request does not contain the file object!`);
+        }
+
         const userId = req.params.id;
-        const fileName = req.file!.originalname;
-        const fileBuffer = req.file!.buffer;
+        const fileName = req.file.originalname;
+        const fileBuffer = req.file.buffer;
         const pictureUrl = FilesService.getResourceUrl(userId, fileName);
 
         const user = await User.findByPk(userId);

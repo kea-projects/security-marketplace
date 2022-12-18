@@ -58,7 +58,8 @@ async function initializeDb(): Promise<boolean> {
 
   // Populate the database
   if (getEnvVar("LISTINGS_POSTGRES_POPULATE") === "true") {
-    function getRandom(array: any[]): unknown[] {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function getRandom(array: unknown[]): unknown {
       return array[Math.floor(Math.random() * array.length)];
     }
     try {
@@ -98,6 +99,7 @@ async function initializeDb(): Promise<boolean> {
         returning: true,
       });
       const commentsAmount = 500;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const generatedComments: any[] = [];
 
       for (let i = 0; i < commentsAmount; i++) {

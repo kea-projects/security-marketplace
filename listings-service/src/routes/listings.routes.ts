@@ -128,8 +128,9 @@ router.get(
 
 router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (req: Request, res: Response) => {
   const token = req.body.token;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   uploadLargeRequest(req, res, async function (err: any) {
-    validateCreateListingRequestBody(req, res, () => {});
+    validateCreateListingRequestBody(req, res, () => null);
     // Check if the validation has responded to the HTTP call due to errors with request body
     if (res.writableEnded) {
       return;
@@ -149,6 +150,10 @@ router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (r
         }
         return res.status(403).send({ message: "Forbidden" });
       }
+      if (!req.file) {
+        log.warn(`The request does not contain the file object!`);
+        throw new Error(`The request does not contain the file object!`);
+      }
 
       // Validate that the user is authenticated
       if (!token || !token?.userId) {
@@ -158,7 +163,7 @@ router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (r
 
       // Create a listing
       const { name, description, isPublic } = req.body;
-      const createdBy = token!.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token!.userId;
+      const createdBy = token.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token.userId;
       log.trace(`Creating a listing for ${createdBy}`);
       const listingId = uuidv4();
       const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);
@@ -182,8 +187,8 @@ router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (r
         log.trace(`Uploading file for listing ${listing.listingId}`);
         try {
           const uploadedFile = FilesService.uploadFile(
-            req.file!.buffer,
-            FilesService.getFilename(listingId, req.file!.originalname)
+            req.file.buffer,
+            FilesService.getFilename(listingId, req.file.originalname)
           );
           if (!uploadedFile) {
             throw new Error("Failed to upload the file");
@@ -246,10 +251,14 @@ router.delete(
       log.trace(`Deleting a listing with id ${req.params.id}`);
       // Fetch the listing
       const foundListing = await ListingsService.findOne(req.params.id);
+      if (!foundListing) {
+        log.warn(`Failed to find a listing with id ${req.params.id}`);
+        return res.status(404).send({ message: "Listing not found" });
+      }
 
       // Check if the user is authorized to modify the listing
       const token = req.body?.token;
-      if (token?.role != Role.admin && token?.userId != foundListing?.createdBy) {
+      if (token?.role != Role.admin && token?.userId != foundListing.createdBy) {
         log.warn(`User with id ${token?.userId} tried to delete a listing of another user!`);
         return res.status(403).send({ message: "Forbidden" });
       }
@@ -267,9 +276,9 @@ router.delete(
 
       // Delete the associated file
       try {
-        await FilesService.deleteFile(FilesService.extractFilenameFromUrl(foundListing!.imageUrl));
+        await FilesService.deleteFile(FilesService.extractFilenameFromUrl(foundListing.imageUrl));
       } catch (error) {
-        log.error(`Failed to delete file along with its listing: ${foundListing?.imageUrl}`, error);
+        log.error(`Failed to delete file along with its listing: ${foundListing.imageUrl}`, error);
       }
       return res.status(202).send({ message: "Deleted" });
     } catch (error) {
@@ -287,7 +296,8 @@ router.put(
   canAccessRoleUser,
   async (req: Request, res: Response) => {
     const token = req.body.token;
-    uploadSingleImage(req, res, async function (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    uploadSingleImage(req, res, async function (err: any) {
       try {
         // Handle file upload errors
         if (err) {
@@ -303,6 +313,10 @@ router.put(
           }
           return res.status(403).send({ message: "Forbidden" });
         }
+        if (!req.file) {
+          log.warn(`The request does not contain the file object!`);
+          throw new Error(`The request does not contain the file object!`);
+        }
 
         // Fetch the listing
         const listingId = req.params.id;
@@ -313,15 +327,15 @@ router.put(
         }
 
         // Validate that the user is authorized to update the given listing
-        if (!token || (token.role !== Role.admin && listing!.createdBy !== token!.userId)) {
+        if (!token || (token.role !== Role.admin && listing.createdBy !== token.userId)) {
           log.warn(`User with id of ${token?.userId} tried to update a listing file they don't have access to!`);
           return res.status(403).send({ message: "Forbidden" });
         }
 
         // Upload the new file
         log.trace(`Updating listing file with id ${req.params.id}`);
-        const filename = FilesService.getFilename(listingId, req.file!.originalname);
-        const result = await FilesService.uploadFile(req.file!.buffer, filename);
+        const filename = FilesService.getFilename(listingId, req.file.originalname);
+        const result = await FilesService.uploadFile(req.file.buffer, filename);
 
         // Update the listings pictureUrl
         await ListingsService.update(listingId, { ...listing, imageUrl: result.url });

@@ -30,7 +30,7 @@ app.all("*", cors(corsAcceptAll), unknownLimiter, (req: Request, res: Response) 
 });
 
 // -------------------App-Launch-----------------------
-const PORT: number = Number(getEnvVar("USERS_PORT") || 5000);
+const PORT = Number(getEnvVar("USERS_PORT") || 5000);
 
 const main = async () => {
   await initializeDb();

@@ -7,7 +7,6 @@ const log_flag = JSON.parse(getEnvVar("USERS_POSTGRES_LOG") || "false") ? consol
 class SequelizeSingleton {
   private static instance: Sequelize;
 
-  private constructor() {}
   public static getInstance(): Sequelize {
     if (!SequelizeSingleton.instance) {
       log.info("Connecting to database...");

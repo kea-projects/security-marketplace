@@ -2,7 +2,9 @@ import { CorsOptions } from "cors";
 import { log } from "../utils/logger";
 import { getEnvVar } from "./config.service";
 
-const allowedOrigin = getEnvVar("GLOBAL_CORS_ALLOW_ANY_ORIGIN") ? "*" : getEnvVar("GLOBAL_CORS_ALLOW_ORIGIN", true) as string;
+const allowedOrigin = getEnvVar("GLOBAL_CORS_ALLOW_ANY_ORIGIN")
+  ? "*"
+  : (getEnvVar("GLOBAL_CORS_ALLOW_ORIGIN", true) as string);
 log.info(`CORS allowed origin: ${allowedOrigin}`);
 const allowedHeaders = ["Content-Type", "Authorization"];
 
