@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: ./configs/gateway/gateway.Dockerfile
     networks: [ sec-net ]
-    ports: [ 80:80, 3000:3000 ]
+    ports: [ 80:80, 443:443 ]
 
   users-service:
     container_name: users-service
