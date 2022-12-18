@@ -8,9 +8,12 @@ import { ProfilePage } from '../routes/ProfilePage';
 import { SignupPage } from '../routes/SignupPage';
 import { UsersPage } from '../routes/UsersPage';
 import { ListingDetailsPage } from '../routes/ListingDetailsPage';
-import { RouterGuard } from '../components/RouterGuard';
+import { RouterGuard } from '../components/auth/RouterGuard';
 import { isNotLoggedIn, hasUserPrivileges, hasAdminPrivileges } from './Auth';
 
+/**
+ * Creates a browser router with all of our used routes.
+ */
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -34,9 +37,9 @@ export const router = createBrowserRouter([
         ),
     },
     {
-        path: '/profile',
+        path: '/profile/:userId',
         element: (
-            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/">
                 <ProfilePage />
             </RouterGuard>
         ),
@@ -44,7 +47,7 @@ export const router = createBrowserRouter([
     {
         path: '/users',
         element: (
-            <RouterGuard condition={hasAdminPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasAdminPrivileges} redirectTo="/">
                 <UsersPage />
             </RouterGuard>
         ),
@@ -52,7 +55,7 @@ export const router = createBrowserRouter([
     {
         path: '/listing-details/:listingId',
         element: (
-            <RouterGuard condition={hasUserPrivileges} redirectTo="/login">
+            <RouterGuard condition={hasUserPrivileges} redirectTo="/">
                 <ListingDetailsPage />
             </RouterGuard>
         ),

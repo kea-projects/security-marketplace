@@ -5,7 +5,8 @@ import { Role } from "../interfaces";
 import { log } from "../utils/logger";
 import { TokenService } from "./token.service";
 
-const secret = getEnvVar("AUTH_SECRET", false) || "changeMe";
+const secret = getEnvVar("AUTH_SECRET") || "changeMe";
+const pepper = getEnvVar("AUTH_PEPPER") || "AlsoChangeMe";
 
 export class AuthenticationService {
   /**
@@ -21,6 +22,7 @@ export class AuthenticationService {
       return null;
     }
   }
+
   /**
    * Extracts the JWT token out of the request.
    * @param req the express request reference.
@@ -55,11 +57,11 @@ export class AuthenticationService {
       refreshToken,
       expiresAt: new Date(refreshExpirationDate * 1000),
     });
-    if (savedToken) {
-      return { accessToken, refreshToken };
+    if (!savedToken) {
+      log.warn(`The created token is null!`);
+      return null;
     }
-    log.warn(`The created token is null!`);
-    return null;
+    return { accessToken, refreshToken };
   }
 
   /**
@@ -72,6 +74,7 @@ export class AuthenticationService {
       jwt.verify(token, secret);
       return true;
     } catch (error) {
+      log.error(`An error occurred while verifying a token`, error);
       return false;
     }
   }
@@ -82,9 +85,8 @@ export class AuthenticationService {
    * @returns encoded password.
    */
   static async encodePassword(password: string): Promise<string> {
-    const saltOrRounds = 10;
-    // TODO - add a pepper to the password
-    return await bcrypt.hash(password, saltOrRounds);
+    const rounds = 10;
+    return await bcrypt.hash(password + pepper, rounds);
   }
 
   /**
@@ -94,6 +96,6 @@ export class AuthenticationService {
    * @returns whether the strings match.
    */
   static async compareHashes(password: string, hash: string): Promise<boolean> {
-    return await bcrypt.compare(password, hash);
+    return await bcrypt.compare(password + pepper, hash);
   }
 }

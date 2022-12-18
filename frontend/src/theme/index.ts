@@ -5,6 +5,7 @@ import { Input } from './components/input';
 import { Navbar } from './components/navbar';
 
 export const theme = extendTheme({
+    // Custom colors used globally in the theme our application.
     colors: {
         background: '#EDF2F7',
         primary: '#A0AEC0',
@@ -13,12 +14,20 @@ export const theme = extendTheme({
         accent: {
             100: '#CBD5E0',
             500: '#319795',
+            600: '#CBD5E0',
+        },
+        layerBtn: {
+            100: '#CBD5E0',
+            500: '#4A5568',
+            600: '#CBD5E0',
         },
         text: '#fefefe',
         textDark: '#4A5568',
         link: '#E6FFFA',
     },
+    // Custom themed components.
     components: { Card, Input, Navbar },
+    // Global styles.
     styles: {
         global: () => ({
             body: {
@@ -28,13 +37,3 @@ export const theme = extendTheme({
         }),
     },
 });
-
-/* 
-Teo Theme
-
-Red: #E63946 action options aka buttons and links
-light: #F1FAEE background 
-light-blue: #A8DADC highlighted background like for a post or container
-blue: #457B9D navbar and secondary action items
-dark-blue: #1D3557 Second navbar or searchbars. Dark blue can also be the text color most places. Would test tho
-*/

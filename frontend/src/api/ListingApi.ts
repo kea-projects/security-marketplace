@@ -1,12 +1,27 @@
 import { AxiosResponse } from 'axios';
 import { listingApi } from '../configs/AxiosConfig';
 
+export interface CreateCommentRequestBody {
+    comment: string;
+    email: string;
+    name: string;
+    commentedOn: string;
+    createdBy: string;
+}
+
 interface CreateListingRequestBody {
     name: string;
     description: string;
-    imageUrl: string;
+    file: File;
     createdBy: string;
     isPublic: boolean;
+}
+
+interface UpdateListingRequestBody {
+    name?: string;
+    description?: string;
+    file?: File;
+    isPublic?: boolean;
 }
 
 export interface ListingResponse {
@@ -20,14 +35,58 @@ export interface ListingResponse {
     updatedAt?: Date;
 }
 
+export interface CommentResponse {
+    commentId: string;
+    comment: string;
+    email: string;
+    name: string;
+    commentedOn: string;
+    createdBy: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ListingByIdResponse {
+    listing: ListingResponse;
+    comments: CommentResponse[];
+}
+
+/**
+ * API functions that call Listings Service API endpoints.
+ */
 export class ListingApi {
-    public async getListings(): Promise<AxiosResponse<ListingResponse[]>> {
-        console.log('Listing Api', 'Requesting all listings...');
+    // --- LISTINGS ---
+
+    public static async getListings(): Promise<AxiosResponse<ListingResponse[]>> {
         return listingApi.get('/listings');
     }
 
-    public async createListing(body: CreateListingRequestBody) {
-        console.log('Listing Api', 'Requesting listing creation...');
+    public static async getUserListings(userId: string): Promise<AxiosResponse<ListingResponse[]>> {
+        return listingApi.get(`/listings/user/${userId}`);
+    }
+
+    public static async getListingById(listingId: string): Promise<AxiosResponse<ListingByIdResponse>> {
+        return listingApi.get(`/listings/${listingId}`);
+    }
+
+    public static async createListing(body: CreateListingRequestBody): Promise<AxiosResponse<ListingResponse>> {
         return listingApi.postForm('/listings', { ...body });
+    }
+
+    public static async updateListing(
+        body: UpdateListingRequestBody,
+        listingId: string,
+    ): Promise<AxiosResponse<ListingResponse>> {
+        return listingApi.patch(`/listings/${listingId}`, body);
+    }
+
+    public static async deleteListing(listingId: string) {
+        return listingApi.delete(`/listings/${listingId}`);
+    }
+
+    // --- COMMENTS ---
+
+    public static async createComment(body: CreateCommentRequestBody): Promise<AxiosResponse<CommentResponse>> {
+        return listingApi.post('/comments', body);
     }
 }

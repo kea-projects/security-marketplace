@@ -2,23 +2,33 @@ import React, { useContext, useState } from 'react';
 import { Center, Text, Link } from '@chakra-ui/react';
 import { Link as Navigate } from 'react-router-dom';
 
-import { Card } from '../components/Card';
-import { LoginForm, LoginFormFields } from '../components/LoginForm';
+import { Card } from '../components/themed/Card';
+import { LoginForm, LoginFormFields } from '../components/auth/LoginForm';
 import { AuthApi } from '../api/AuthApi';
 import { getTokenData } from '../utils/Auth';
 import { UserContext } from '../context/UserContextProvider';
 
+/**
+ * Creates a `Page` component for the login form.
+ */
 export function LoginPage() {
-    const { setUserData } = useContext(UserContext);
+    // States
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [loginError, setLoginError] = useState<string | undefined>(undefined);
-    const authApi = new AuthApi();
 
+    // Context
+    const { setUserData } = useContext(UserContext);
+
+    /**
+     * Calls the Api and attempts to log the user in.
+     * If it succeeds, it will set the user data in the local storage.
+     * @param formFields
+     */
     const submitLogin = async (formFields: LoginFormFields) => {
         setIsLoading(true);
 
         try {
-            const { data } = await authApi.login({
+            const { data } = await AuthApi.login({
                 email: formFields.username,
                 password: formFields.password,
             });
@@ -32,7 +42,6 @@ export function LoginPage() {
             });
             setLoginError(undefined);
         } catch (error) {
-            // TODO: Discuss if we want to return this message or not.
             setLoginError('Wrong credentials.');
         } finally {
             setIsLoading(false);

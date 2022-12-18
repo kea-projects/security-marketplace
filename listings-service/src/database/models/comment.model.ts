@@ -32,7 +32,7 @@ export const CommentInit = (sequelize: Sequelize) => {
         allowNull: false,
       },
       email: {
-        type: DataTypes.STRING(256),
+        type: DataTypes.STRING(254),
         allowNull: false,
       },
       comment: {

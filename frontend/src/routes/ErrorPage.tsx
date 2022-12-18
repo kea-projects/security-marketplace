@@ -2,13 +2,16 @@ import React from 'react';
 import { useRouteError, useNavigate } from 'react-router-dom';
 import { Center, Text, VStack, Button } from '@chakra-ui/react';
 
-import { Card } from '../components/Card';
+import { Card } from '../components/themed/Card';
 
 interface ErrorResponse {
     statusText: string;
     message: string;
 }
 
+/**
+ * Creates a `Page` component that displays the error page in case an error occurs.
+ */
 export function ErrorPage() {
     const error = useRouteError() as ErrorResponse;
     const navigate = useNavigate();

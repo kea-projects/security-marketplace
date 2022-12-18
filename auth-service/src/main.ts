@@ -1,26 +1,32 @@
 import cors from "cors";
-import "dotenv/config";
-import express from "express";
+import express, { Request, Response } from "express";
+import rateLimit from "express-rate-limit";
+import { corsAcceptAll } from "./config/cors.config";
+import { rateLimiter404Config } from "./config/rate-limiter.config";
 import { initializeDb } from "./database/database.service";
 import { logger } from "./middleware/logging.middleware";
 import { authRouter } from "./routes/auth.routes";
 import { log } from "./utils/logger";
 
+const unknownLimiter = rateLimit(rateLimiter404Config);
 const app = express();
 app.use(express.json());
 app.use(logger);
-// -----------------------CORS-------------------------
-const corsOptions = {
-  origin: "*", // TODO - discuss the the cors rules
-};
-app.use(cors(corsOptions));
 
 // ---------------------Routers------------------------
 app.use("/auth", authRouter);
 
+// ---------------------Default------------------------
 // Reject all non defined paths
-app.all("*", (_req, res) => {
-  res.status(401).send({ message: "Unauthorized" });
+app.all("*", unknownLimiter, cors(corsAcceptAll), (req: Request, res: Response) => {
+  log.info(`Invalid request: ${req.method} ${req.url}.`);
+  log.info(`Request body: ${JSON.stringify(req.body)}`);
+  log.info("Rejecting request.");
+
+  res.status(401).send({
+    error: "UnauthorizedError",
+    detail: "Unauthorized",
+  });
 });
 
 // -------------------App-Launch-----------------------
