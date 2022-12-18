@@ -1,6 +1,8 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
+import rateLimit from "express-rate-limit";
 import { corsGetConfig, corsOptionsConfig, corsPostConfig } from "../config/cors.config";
+import { rateLimiterAuthConfig } from "../config/rate-limiter.config";
 import { validateLoginRequestBody, validateSignupRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { AuthUserService } from "../services/auth-user.service";
@@ -9,83 +11,97 @@ import { TokenService } from "../services/token.service";
 import { log } from "../utils/logger";
 
 const router: Router = Router();
+// Configure rate limiting
+const apiLimiter = rateLimit(rateLimiterAuthConfig);
 // Add options requests
 router.options("*", cors(corsOptionsConfig));
 
 /**
  * Validate that the provided credentials are valid, and return a access token pair if they do match a user.
  */
-router.post("/login", cors(corsPostConfig), validateLoginRequestBody, async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    // Check that the user exists
-    const foundUser = await AuthUserService.findOneByEmail(email);
-    if (!foundUser) {
-      log.warn(`Login attempt failed since no matching user was found: ${email}`);
-      res.status(401).send({ message: "Unauthorized" });
-      return;
-    }
+router.post(
+  "/login",
+  apiLimiter,
+  cors(corsPostConfig),
+  validateLoginRequestBody,
+  async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      // Check that the user exists
+      const foundUser = await AuthUserService.findOneByEmail(email);
+      if (!foundUser) {
+        log.warn(`Login attempt failed since no matching user was found: ${email}`);
+        res.status(401).send({ message: "Unauthorized" });
+        return;
+      }
 
-    if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
-      log.warn(`Login attempt failed since the password hashes don't match: ${foundUser.userId}`);
-      return res.status(401).send({ message: "Unauthorized" });
-    }
+      if (!(await AuthenticationService.compareHashes(password, foundUser.password))) {
+        log.warn(`Login attempt failed since the password hashes don't match: ${foundUser.userId}`);
+        return res.status(401).send({ message: "Unauthorized" });
+      }
 
-    // Create a token pair
-    log.trace(`Creating a token pair for user ${foundUser.userId}`);
-    const tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
-    if (!tokens) {
-      log.warn(`Failed to create token pair for user ${foundUser.userId}`);
-      return res
-        .status(500)
-        .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+      // Create a token pair
+      log.trace(`Creating a token pair for user ${foundUser.userId}`);
+      const tokens = await AuthenticationService.createAccessToken(foundUser.email, foundUser.userId, foundUser.role);
+      if (!tokens) {
+        log.warn(`Failed to create token pair for user ${foundUser.userId}`);
+        return res
+          .status(500)
+          .send({ message: "Failed to authenticate the user due to an internal error. Please try again later." });
+      }
+      log.trace(`Token pair created for user ${foundUser.userId}`);
+      return res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
+    } catch (error) {
+      log.error(`An error has occurred while logging in a user!`, error);
+      return res.status(500).send({ message: "Internal Server Error - failed to log in." });
     }
-    log.trace(`Token pair created for user ${foundUser.userId}`);
-    return res.send({ accessToken: tokens!.accessToken, refreshToken: tokens!.refreshToken });
-  } catch (error) {
-    log.error(`An error has occurred while logging in a user!`, error);
-    return res.status(500).send({ message: "Internal Server Error - failed to log in." });
   }
-});
+);
 
-router.post("/signup", cors(corsPostConfig), validateSignupRequestBody, async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body;
-    // Check if there is already a registered user with the same email
-    if (await AuthUserService.findOneByEmail(email)) {
-      log.warn(`Signup attempt failed due to the email already being in use: ${email}`);
-      return res.status(409).send({
-        message: "The email is already in use",
-      });
+router.post(
+  "/signup",
+  apiLimiter,
+  cors(corsPostConfig),
+  validateSignupRequestBody,
+  async (req: Request, res: Response) => {
+    try {
+      const { name, email, password } = req.body;
+      // Check if there is already a registered user with the same email
+      if (await AuthUserService.findOneByEmail(email)) {
+        log.warn(`Signup attempt failed due to the email already being in use: ${email}`);
+        return res.status(409).send({
+          message: "The email is already in use",
+        });
+      }
+
+      // Register a new user
+      log.trace(`Creating a user as part of the signup process`);
+      const createdUser = await AuthUserService.create({ name, email, password });
+      if (!createdUser) {
+        log.warn("Failed to create a auth user object!");
+        return res.status(401).send({ message: "Unauthorized" });
+      }
+
+      // Create a access token pair
+      log.trace(`Creating a token pair for user ${createdUser.userId}`);
+      const tokens = await AuthenticationService.createAccessToken(
+        createdUser.email,
+        createdUser.userId,
+        createdUser.role
+      );
+      if (!tokens) {
+        log.warn("Failed to create a token pair for a newly registered user!");
+        return res.status(401).send({ message: "Unauthorized" });
+      }
+
+      log.trace(`User ${createdUser.userId} has been signed up`);
+      return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
+    } catch (error) {
+      log.error(`An error has occurred while signing up!`, error);
+      return res.status(500).send({ message: "Internal Server Error - failed to register a new user." });
     }
-
-    // Register a new user
-    log.trace(`Creating a user as part of the signup process`);
-    const createdUser = await AuthUserService.create({ name, email, password });
-    if (!createdUser) {
-      log.warn("Failed to create a auth user object!");
-      return res.status(401).send({ message: "Unauthorized" });
-    }
-
-    // Create a access token pair
-    log.trace(`Creating a token pair for user ${createdUser.userId}`);
-    const tokens = await AuthenticationService.createAccessToken(
-      createdUser.email,
-      createdUser.userId,
-      createdUser.role
-    );
-    if (!tokens) {
-      log.warn("Failed to create a token pair for a newly registered user!");
-      return res.status(401).send({ message: "Unauthorized" });
-    }
-
-    log.trace(`User ${createdUser.userId} has been signed up`);
-    return res.send({ accessToken: tokens?.accessToken, refreshToken: tokens?.refreshToken });
-  } catch (error) {
-    log.error(`An error has occurred while signing up!`, error);
-    return res.status(500).send({ message: "Internal Server Error - failed to register a new user." });
   }
-});
+);
 
 router.get("/logout", cors(corsGetConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   try {
