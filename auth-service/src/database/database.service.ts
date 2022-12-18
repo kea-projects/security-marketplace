@@ -4,7 +4,7 @@ import { AuthenticationService } from "../services/authentication.service";
 import { log } from "../utils/logger";
 import { AuthUser, AuthUserInit } from "./models/auth-user.model";
 import { TokenInit } from "./models/token.model";
-import { users } from "./users.contants";
+import { users } from "./users.constants";
 
 let sequelize: Sequelize;
 
