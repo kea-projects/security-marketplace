@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { getEnvVar } from "../config/config.service";
 import { Role } from "../interfaces";
+import { AuthenticationService } from "../services/authentication.service";
+import { TokenService } from "../services/token.service";
 import { log } from "../utils/logger";
 
 const validateToken = async (req: Request): Promise<{ sub: string; userId: string; role: Role }> => {
@@ -9,29 +10,34 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
     throw new Error("Authorization token missing from header");
   }
 
-  if (!getEnvVar("AUTH_USERS_SERVICE_URL")) {
-    log.warn(`Unable to call Auth Users Service to validate an access token`);
-    throw new Error("Unable to call auth user service due to a missing ENV variable");
+  // Check if token is valid. If not, see if it exists in the DB and wipe all tokens of the given user
+  const token = req.headers.authorization.replace(`Bearer `, "");
+  const isValid = AuthenticationService.isValidToken(token);
+  if (!isValid) {
+    log.warn(`Failed validation for an invalid token!`);
   }
 
-  // Call Auth Service and validate the token
-  try {
-    log.trace(`Calling auth-service with the token to attempt to validate...`);
-    const response = await fetch(`${getEnvVar("AUTH_USERS_SERVICE_URL")}/validate`, {
-      method: "POST",
-      headers: new Headers({
-        Authorization: req.headers.authorization,
-      }),
-    });
-    if (response.status === 200) {
-      log.trace("Token was validated, returning it in the body.");
-      const { sub, userId, role } = (await response.json()).token;
-      return { sub, userId, role };
-    }
+  // Check if token exists in the database
+  const foundTokens = await TokenService.findByToken(token);
+  if (!foundTokens) {
+    log.warn(`Validated token that doesn't exist in the database! ${token}`);
+  }
+
+  const decodedToken = AuthenticationService.decodeToken(token);
+
+  // Remove all tokens of given user if previous validation has failed
+  if (!isValid || !foundTokens) {
+    await TokenService.deleteAllOfUser(decodedToken?.sub as string);
+    log.warn(`Token wasn't valid, removed all tokens of a user: ${decodedToken?.sub as string}`);
     throw new Error("Authorization token is invalid");
-  } catch (error) {
-    log.error(`An unknown error has occurred while validating an access token!`, error);
-    throw new Error("An unknown error has occurred while validating an access token");
+  }
+
+  if (decodedToken && decodedToken.sub && decodedToken.userId && decodedToken.role) {
+    log.trace("Token was validated, returning it.");
+    return { sub: decodedToken.sub, userId: decodedToken.userId, role: decodedToken.role };
+  } else {
+    log.warn(`The valid token was missing on of its properties: ${token}`);
+    throw new Error("The valid token was missing on of its properties");
   }
 };
 
