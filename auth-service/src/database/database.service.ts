@@ -17,6 +17,7 @@ async function initializeDb(): Promise<boolean> {
     database: getEnvVar("AUTH_POSTGRES_DATABASE", true) as string,
     dialect: "postgres",
     logging: false,
+    schema: "sec_auth",
   });
 
   // Check the connection

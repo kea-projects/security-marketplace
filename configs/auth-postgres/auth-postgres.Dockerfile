@@ -1,7 +1,7 @@
 FROM postgres
 
 ARG AUTH_POSTGRES_USER
-ARG AUTH_POSTGRES_USER
+ARG AUTH_POSTGRES_PASSWORD
 ARG AUTH_POSTGRES_DATABASE
 
 COPY ./configs/auth-postgres/docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/

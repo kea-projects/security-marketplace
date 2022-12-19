@@ -19,7 +19,7 @@ class SequelizeSingleton {
           port: Number(getEnvVar("USERS_POSTGRES_PORT", true) as string),
           dialect: "postgres",
           logging: log_flag,
-          schema: "sec_auth",
+          schema: "sec_main",
         }
       );
       log.info("Sequelize connection created.");
