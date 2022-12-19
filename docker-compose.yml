@@ -1,8 +1,208 @@
 version: '3'
 
 services:
+  gateway:
+    restart: always
+    container_name: gateway
+    build:
+      context: .
+      dockerfile: ./configs/gateway/gateway.Dockerfile
+    networks: [ sec-net ]
+    ports: [ 80:80, 443:443 ]
+
   users-service:
     container_name: users-service
     build:
       context: .
       dockerfile: ./configs/users-service/users-service.Dockerfile
+    environment:
+      - USERS_POSTGRES_HOST=$USERS_POSTGRES_HOST
+      - USERS_POSTGRES_PORT=$USERS_POSTGRES_PORT
+      - USERS_POSTGRES_USER=$USERS_POSTGRES_USER
+      - USERS_POSTGRES_PASSWORD=$USERS_POSTGRES_PASSWORD
+      - USERS_POSTGRES_DATABASE=$USERS_POSTGRES_DATABASE
+      - USERS_POSTGRES_SYNC=$USERS_POSTGRES_SYNC
+      - USERS_POSTGRES_POPULATE=$USERS_POSTGRES_POPULATE
+      - USERS_LINODE_POPULATE=$USERS_LINODE_POPULATE
+      - USERS_POSTGRES_LOG=$USERS_POSTGRES_LOG
+      - USERS_PORT=$USERS_PORT
+      - AUTH_USERS_SERVICE_URL=$AUTH_USERS_SERVICE_URL
+      - USERS_LINODE_STORAGE_CLUSTER_ID=$USERS_LINODE_STORAGE_CLUSTER_ID
+      - USERS_LINODE_STORAGE_BUCKET_ID=$USERS_LINODE_STORAGE_BUCKET_ID
+      - USERS_LINODE_STORAGE_ACCESS_KEY=$USERS_LINODE_STORAGE_ACCESS_KEY
+      - USERS_LINODE_STORAGE_SECRET_KEY=$USERS_LINODE_STORAGE_SECRET_KEY
+      - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
+      - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
+      - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
+      - USERS_RATE_LIMIT_UPDATE=$USERS_RATE_LIMIT_UPDATE
+      - USERS_RATE_LIMIT_404=$USERS_RATE_LIMIT_404
+      - USERS_RATE_LIMIT_GLOBAL=$USERS_RATE_LIMIT_GLOBAL
+      - USERS_RATE_LIMIT_DURATION=$USERS_RATE_LIMIT_DURATION
+    networks: [ sec-net, main-db-net ]
+    restart: on-failure
+    depends_on:
+      main-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  listings-service:
+    container_name: listings-service
+    build:
+      context: .
+      dockerfile: ./configs/listings-service/listings-service.Dockerfile
+    environment:
+      - LISTINGS_POSTGRES_HOST=$LISTINGS_POSTGRES_HOST
+      - LISTINGS_POSTGRES_PORT=$LISTINGS_POSTGRES_PORT
+      - LISTINGS_POSTGRES_USER=$LISTINGS_POSTGRES_USER
+      - LISTINGS_POSTGRES_PASSWORD=$LISTINGS_POSTGRES_PASSWORD
+      - LISTINGS_POSTGRES_DATABASE=$LISTINGS_POSTGRES_DATABASE
+      - LISTINGS_POSTGRES_SYNC=$LISTINGS_POSTGRES_SYNC
+      - LISTINGS_POSTGRES_POPULATE=$LISTINGS_POSTGRES_POPULATE
+      - LISTINGS_LINODE_POPULATE=$LISTINGS_LINODE_POPULATE
+      - LISTINGS_PORT=$LISTINGS_PORT
+      - AUTH_USERS_SERVICE_URL=$AUTH_USERS_SERVICE_URL
+      - LISTINGS_LINODE_STORAGE_CLUSTER_ID=$LISTINGS_LINODE_STORAGE_CLUSTER_ID
+      - LISTINGS_LINODE_STORAGE_BUCKET_ID=$LISTINGS_LINODE_STORAGE_BUCKET_ID
+      - LISTINGS_LINODE_STORAGE_ACCESS_KEY=$LISTINGS_LINODE_STORAGE_ACCESS_KEY
+      - LISTINGS_LINODE_STORAGE_SECRET_KEY=$LISTINGS_LINODE_STORAGE_SECRET_KEY
+      - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
+      - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
+      - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
+      - LISTINGS_RATE_LIMIT_CREATE=50
+      - LISTINGS_RATE_LIMIT_UPDATE=$LISTINGS_RATE_LIMIT_UPDATE
+      - LISTINGS_RATE_LIMIT_DELETE=$LISTINGS_RATE_LIMIT_DELETE
+      - LISTINGS_RATE_LIMIT_404=$LISTINGS_RATE_LIMIT_404
+      - LISTINGS_RATE_LIMIT_GLOBAL=$LISTINGS_RATE_LIMIT_GLOBAL
+      - LISTINGS_RATE_LIMIT_DURATION=$LISTINGS_RATE_LIMIT_DURATION
+    networks: [ sec-net, main-db-net ]
+    restart: on-failure
+    depends_on:
+      main-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./configs/auth-service/auth-service.Dockerfile
+    environment:
+      - AUTH_POSTGRES_HOST=$AUTH_POSTGRES_HOST
+      - AUTH_POSTGRES_PORT=$AUTH_POSTGRES_PORT
+      - AUTH_POSTGRES_USER=$AUTH_POSTGRES_USER
+      - AUTH_POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
+      - AUTH_POSTGRES_DATABASE=$AUTH_POSTGRES_DATABASE
+      - AUTH_POSTGRES_SYNC=$AUTH_POSTGRES_SYNC
+      - AUTH_POSTGRES_POPULATE=$AUTH_POSTGRES_POPULATE
+      - AUTH_SECRET=$AUTH_SECRET
+      - AUTH_PORT=$AUTH_PORT
+      - USERS_SERVICE_URL=$USERS_SERVICE_URL
+      - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
+      - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
+      - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
+      - AUTH_RATE_LIMIT_LOGIN_SIGNUP=$AUTH_RATE_LIMIT_LOGIN_SIGNUP
+      - AUTH_RATE_LIMIT_404=$USERS_RATE_LIMIT_404
+      - AUTH_RATE_LIMIT_DURATION=$USERS_RATE_LIMIT_DURATION
+    networks: [ sec-net, auth-db-net ]
+    restart: on-failure
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
+
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: ./configs/frontend/frontend.Dockerfile
+      args:
+      - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
+      - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
+      - REACT_APP_USER_SERVICE_URL=$REACT_APP_USER_SERVICE_URL
+    environment:
+      - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
+      - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
+      - REACT_APP_USER_SERVICE_URL=$REACT_APP_USER_SERVICE_URL
+    networks: [ sec-net ]
+    restart: on-failure
+    depends_on:
+      - auth-service
+      - listings-service
+      - users-service
+
+  auth-postgres:
+    container_name: auth-postgres
+    build:
+      context: .
+      dockerfile: ./configs/auth-postgres/auth-postgres.Dockerfile
+      args:
+        - AUTH_POSTGRES_USER=$AUTH_POSTGRES_USER
+        - AUTH_POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
+        - AUTH_POSTGRES_DATABASE=$AUTH_POSTGRES_DATABASE
+    environment:
+      - POSTGRES_USER=$AUTH_POSTGRES_SUPER_USER
+      - POSTGRES_PASSWORD=$AUTH_POSTGRES_SUPER_PASSWORD
+      - POSTGRES_DB=$AUTH_POSTGRES_SUPER_DB
+      - AUTH_POSTGRES_USER=$AUTH_POSTGRES_USER
+      - AUTH_POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
+      - AUTH_POSTGRES_DATABASE=$AUTH_POSTGRES_DATABASE
+    networks: [ auth-db-net ]
+    # Remove ports before deployment.
+    # ports:
+      # - 5432:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${AUTH_POSTGRES_SUPER_USER} -d ${AUTH_POSTGRES_SUPER_DB}'"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+  main-postgres:
+    container_name: main-postgres
+    build:
+      context: .
+      dockerfile: ./configs/main-postgres/main-postgres.Dockerfile
+      args:
+        - LISTINGS_POSTGRES_USER=$LISTINGS_POSTGRES_USER
+        - LISTINGS_POSTGRES_PASSWORD=$LISTINGS_POSTGRES_PASSWORD
+        - LISTINGS_POSTGRES_DATABASE=$LISTINGS_POSTGRES_DATABASE
+        - USERS_POSTGRES_USER=$USERS_POSTGRES_USER
+        - USERS_POSTGRES_PASSWORD=$USERS_POSTGRES_PASSWORD
+        - USERS_POSTGRES_DATABASE=$USERS_POSTGRES_DATABASE
+    environment:
+      - POSTGRES_USER=$MAIN_POSTGRES_SUPER_USER
+      - POSTGRES_PASSWORD=$MAIN_POSTGRES_SUPER_PASSWORD
+      - POSTGRES_DB=$MAIN_POSTGRES_SUPER_DB
+      - LISTINGS_POSTGRES_USER=$LISTINGS_POSTGRES_USER
+      - LISTINGS_POSTGRES_PASSWORD=$LISTINGS_POSTGRES_PASSWORD
+      - LISTINGS_POSTGRES_DATABASE=$LISTINGS_POSTGRES_DATABASE
+      - USERS_POSTGRES_USER=$USERS_POSTGRES_USER
+      - USERS_POSTGRES_PASSWORD=$USERS_POSTGRES_PASSWORD
+      - USERS_POSTGRES_DATABASE=$USERS_POSTGRES_DATABASE
+    networks: [ main-db-net ]
+    # Remove ports before deployment.
+    ports:
+      - 5433:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${MAIN_POSTGRES_SUPER_USER} -d ${MAIN_POSTGRES_SUPER_DB}'"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+# ---------------------------------
+# ------------ NETWORK ------------
+networks:
+  sec-net:
+    name: sec-net
+  auth-db-net:
+    name: auth-db-net
+  main-db-net:
+    name: main-db-net

@@ -3,7 +3,7 @@ import { Request, Response, Router } from "express";
 import rateLimit from "express-rate-limit";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import { AuthRoles } from "../../../frontend/src/utils/Auth";
+
 import {
   corsDeleteConfig,
   corsGetConfig,
@@ -163,7 +163,7 @@ router.post("", cors(corsPostConfig), createLimiter, canAccessRoleUser, async (r
 
       // Create a listing
       const { name, description, isPublic } = req.body;
-      const createdBy = token.role == AuthRoles.ADMIN && req.body.createdBy ? req.body.createdBy : token.userId;
+      const createdBy = token.role == Role.admin && req.body.createdBy ? req.body.createdBy : token.userId;
       log.trace(`Creating a listing for ${createdBy}`);
       const listingId = uuidv4();
       const imageUrl = FilesService.getResourceUrl(listingId, req.file?.originalname as string);

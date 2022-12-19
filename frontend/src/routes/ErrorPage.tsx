@@ -1,8 +1,6 @@
 import React from 'react';
 import { useRouteError, useNavigate } from 'react-router-dom';
-import { Center, Text, VStack, Button } from '@chakra-ui/react';
-
-import { Card } from '../components/themed/Card';
+import { Center, Text, VStack, Button, Card } from '@chakra-ui/react';
 
 interface ErrorResponse {
     statusText: string;
@@ -18,7 +16,16 @@ export function ErrorPage() {
 
     return (
         <Center width="100%" height="100vh">
-            <Card id="error-page">
+            <Card
+                id="error-page"
+                minWidth="300px"
+                maxWidth="18vw"
+                backgroundColor="primary"
+                color="text"
+                padding="18px"
+                boxShadow="xl"
+                gap="15"
+            >
                 <VStack>
                     <Text fontSize="xl" as="b">
                         Oops!

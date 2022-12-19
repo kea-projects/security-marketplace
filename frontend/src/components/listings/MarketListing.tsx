@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { HStack, Image, Text, VStack } from '@chakra-ui/react';
+import { HStack, Image, Text, VStack, Card } from '@chakra-ui/react';
 import { ListingResponse } from '../../api/ListingApi';
 import { UserApi, UserResponse } from '../../api/UserApi';
 
-import { Card } from '../themed/Card';
 import { Listing } from './Listing';
 import { hasUserPrivileges } from '../../utils/Auth';
 
