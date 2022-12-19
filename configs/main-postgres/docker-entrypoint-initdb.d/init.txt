@@ -1,0 +1,96 @@
+DROP ROLE IF EXISTS USERS_POSTGRES_USER;
+
+CREATE ROLE USERS_POSTGRES_USER 
+WITH 
+    PASSWORD 'USERS_POSTGRES_PASSWORD'
+    LOGIN
+    CONNECTION LIMIT 50 
+    NOSUPERUSER
+    NOCREATEDB
+    NOCREATEROLE
+    NOINHERIT
+    NOREPLICATION;
+
+DROP ROLE IF EXISTS LISTINGS_POSTGRES_USER;
+
+CREATE ROLE LISTINGS_POSTGRES_USER 
+WITH 
+    PASSWORD 'LISTINGS_POSTGRES_PASSWORD'
+    LOGIN
+    CONNECTION LIMIT 50 
+    NOSUPERUSER
+    NOCREATEDB
+    NOCREATEROLE
+    NOINHERIT
+    NOREPLICATION;
+
+DROP DATABASE IF EXISTS USERS_POSTGRES_DATABASE;
+
+CREATE DATABASE USERS_POSTGRES_DATABASE;
+
+\connect USERS_POSTGRES_DATABASE;
+
+DROP SCHEMA IF EXISTS sec_auth;
+
+CREATE SCHEMA sec_auth;
+
+SET search_path TO sec_auth;
+
+CREATE TABLE IF NOT EXISTS users
+(
+    user_id     uuid                     NOT NULL
+        PRIMARY KEY,
+    email       VARCHAR(256)             NOT NULL
+        UNIQUE,
+    name        VARCHAR(120)             NOT NULL,
+    picture_url VARCHAR(500),
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS listings
+(
+    "listingId" uuid                     NOT NULL
+        PRIMARY KEY,
+    name        VARCHAR(150)             NOT NULL,
+    description VARCHAR(1000)            NOT NULL,
+    "imageUrl"  VARCHAR(500)             NOT NULL,
+    "createdBy" uuid                     NOT NULL,
+    "isPublic"  boolean                  NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    "commentId"   uuid                     NOT NULL
+        PRIMARY KEY,
+    name          VARCHAR(120)             NOT NULL,
+    email         VARCHAR(256)             NOT NULL,
+    comment       VARCHAR(500)             NOT NULL,
+    "createdBy"   uuid                     NOT NULL,
+    "commentedOn" uuid                     NOT NULL,
+    "createdAt"   TIMESTAMP WITH TIME ZONE NOT NULL,
+    "updatedAt"   TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+REVOKE ALL 
+ON ALL TABLES IN SCHEMA sec_auth
+FROM LISTINGS_POSTGRES_USER;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON listings
+TO LISTINGS_POSTGRES_USER;
+
+GRANT SELECT, INSERT
+ON comments
+TO LISTINGS_POSTGRES_USER;
+
+REVOKE ALL 
+ON ALL TABLES IN SCHEMA sec_auth
+FROM USERS_POSTGRES_USER;
+
+GRANT SELECT, INSERT, UPDATE
+ON users
+TO USERS_POSTGRES_USER;
+

@@ -1,0 +1,66 @@
+DROP ROLE IF EXISTS AUTH_POSTGRES_USER;
+
+CREATE ROLE AUTH_POSTGRES_USER 
+WITH 
+    PASSWORD 'AUTH_POSTGRES_PASSWORD'
+    LOGIN
+    CONNECTION LIMIT 50 
+    NOSUPERUSER
+    NOCREATEDB
+    NOCREATEROLE
+    NOINHERIT
+    NOREPLICATION;
+
+
+DROP DATABASE IF EXISTS AUTH_POSTGRES_DATABASE;
+
+CREATE DATABASE AUTH_POSTGRES_DATABASE;
+
+\connect AUTH_POSTGRES_DATABASE;
+
+
+DROP SCHEMA IF EXISTS sec_auth;
+
+CREATE SCHEMA sec_auth;
+
+SET search_path TO sec_auth;
+
+CREATE TYPE enum_auth_users_role AS ENUM ('user', 'admin');
+
+DROP TABLE IF EXISTS auth_users;
+
+CREATE TABLE IF NOT EXISTS auth_users
+(
+    "userId"    uuid                                                      NOT NULL
+        PRIMARY KEY,
+    email       VARCHAR(254)                                              NOT NULL
+        UNIQUE,
+    PASSWORD    VARCHAR(60)                                               NOT NULL,
+    ROLE        enum_auth_users_role DEFAULT 'user'::enum_auth_users_role NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE                                  NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE                                  NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tokens
+(
+    "tokenId"      uuid                     NOT NULL
+        PRIMARY KEY,
+    "accessToken"  VARCHAR(2048)            NOT NULL,
+    "refreshToken" VARCHAR(2048)            NOT NULL,
+    "expiresAt"    TIMESTAMP WITH TIME ZONE NOT NULL,
+    "createdAt"    TIMESTAMP WITH TIME ZONE NOT NULL,
+    "updatedAt"    TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+REVOKE ALL 
+ON ALL TABLES IN SCHEMA sec_auth
+FROM AUTH_POSTGRES_USER;
+
+GRANT SELECT, INSERT
+ON auth_users
+TO AUTH_POSTGRES_USER;
+
+GRANT SELECT, INSERT, DELETE
+ON tokens
+TO AUTH_POSTGRES_USER;
+
