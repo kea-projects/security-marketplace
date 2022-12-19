@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import fsExtra from "fs-extra"
 
 export function finishWithFail (error: Error): void {
   console.error(error)
@@ -9,7 +10,13 @@ export function finishWithSuccess (message?: string): void {
   if (message != null) {
     console.info(message)
   }
-  process.exit(0)
+  console.info('Adding database assets...')
+  fsExtra.copy('./src/assets/', './dist/assets/', function (err) {
+    if (err) return console.error(err)
+    console.log('Assets added successfully!')
+
+    process.exit(0)
+  });
 }
 
 export async function run (command: string): Promise<string> {
