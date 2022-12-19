@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { Center, Text, Link } from '@chakra-ui/react';
+import { Center, Text, Link, Card } from '@chakra-ui/react';
 import { Link as Navigate } from 'react-router-dom';
 
-import { Card } from '../components/themed/Card';
 import { SignupForm, SignupFormFields } from '../components/auth/SignupForm';
 import { AuthApi } from '../api/AuthApi';
 import { UserContext } from '../context/UserContextProvider';
@@ -50,7 +49,15 @@ export function SignupPage() {
 
     return (
         <Center width="100%" height="100vh">
-            <Card variant="rounded" minWidth="300px" maxWidth="18vw">
+            <Card
+                minWidth="300px"
+                maxWidth="18vw"
+                backgroundColor="primary"
+                color="text"
+                padding="18px"
+                boxShadow="xl"
+                gap="15"
+            >
                 <Text fontSize="3xl">Signup</Text>
 
                 <SignupForm onSubmit={submitSignup} isLoading={isLoading} error={signupError} />

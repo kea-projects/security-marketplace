@@ -1,8 +1,6 @@
 import React from 'react';
 import { useRouteError, useNavigate } from 'react-router-dom';
-import { Center, Text, VStack, Button } from '@chakra-ui/react';
-
-import { Card } from '../components/themed/Card';
+import { Center, Text, VStack, Button, Card } from '@chakra-ui/react';
 
 interface ErrorResponse {
     statusText: string;

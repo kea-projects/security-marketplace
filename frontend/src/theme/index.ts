@@ -1,6 +1,5 @@
 import { extendTheme } from '@chakra-ui/react';
 
-import { Card } from './components/card';
 import { Input } from './components/input';
 import { Navbar } from './components/navbar';
 
@@ -26,7 +25,7 @@ export const theme = extendTheme({
         link: '#E6FFFA',
     },
     // Custom themed components.
-    components: { Card, Input, Navbar },
+    components: { Input, Navbar },
     // Global styles.
     styles: {
         global: () => ({
