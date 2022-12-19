@@ -30,8 +30,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
     });
     if (response.status === 200) {
       log.trace("Token was validated, returning it in the body.");
-      const { sub, userId, role } = await response.json();
-      log.warn(`${{ sub, userId, role }}`);
+      const { sub, userId, role } = (await response.json()).token;
       return { sub, userId, role };
     }
     log.warn("Token failed to validate");
@@ -94,6 +93,7 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
   try {
     log.trace("Attempting to validate user as admin...");
     const token = await validateToken(req);
+    log.error("TOKEN", token);
     if (token.role === Role.admin) {
       req.body.token = token;
       log.trace("Admin successfully validated.");
