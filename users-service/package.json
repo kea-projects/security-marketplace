@@ -30,8 +30,8 @@
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@typescript-eslint/parser": "^5.40.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.20",
     "sequelize-cli": "^6.5.2",
     "ts-node": "^10.9.1",
@@ -48,6 +48,7 @@
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.25.8",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "validator": "^13.7.0"
   }
 }
