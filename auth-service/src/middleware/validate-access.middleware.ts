@@ -23,6 +23,7 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
         Authorization: req.headers.authorization,
       }),
     });
+    log.trace(`AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ${await response.text()}`);
     if (response.status === 200) {
       log.trace("Token was validated, returning it in the body.");
       const body = await response.json();
