@@ -104,7 +104,7 @@ router.post(
   }
 );
 
-router.get("/logout", cors(corsGetConfig), canAccessRoleUser, async (req: Request, res: Response) => {
+router.post("/logout", cors(corsGetConfig), canAccessRoleUser, async (req: Request, res: Response) => {
   try {
     const accessToken = AuthenticationService.getTokenFromRequest(req);
     // Check if the token is valid

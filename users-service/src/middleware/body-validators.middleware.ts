@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import validator from "validator";
 import { User } from "../models/userModel";
 import { MissingPropertyError, ValidationError } from "../utils/error-messages";
 import { log } from "../utils/logger";
@@ -47,7 +48,7 @@ const validateUserObjFields = (req: Request, res: Response, next: NextFunction) 
   log.trace(`All required attributes are present, clearing the body.`);
   req.body = {};
   log.trace(`Setting request.body to only contain User object.`);
-  req.body.user = new User({ userId, email, name });
+  req.body.user = new User({ userId, email: sanitizeEmail(email, "email"), name: sanitizeText(name, "name") });
   if (res.writableEnded) {
     return;
   }
@@ -76,4 +77,34 @@ function validateEmail(email: unknown, res: Response) {
   return null;
 }
 
+/**
+ * Escapes special characters from the text. Logs if it had to sanitize the string.
+ * @param text the text to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized text.
+ */
+function sanitizeText(text: string, fieldName: string): string {
+  const cleanText = validator.escape(validator.trim(text));
+  if (text !== cleanText) {
+    log.warn(`Sanitized ${fieldName} field from '${text}' to '${cleanText}'`);
+  }
+  return cleanText;
+}
+/**
+ * Canonicalizes an email address. Logs if it had to sanitize it.
+ * @param text the email to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized email.
+ */
+function sanitizeEmail(email: string, fieldName: string): string {
+  const cleanEmail = validator.normalizeEmail(email);
+  if (email !== cleanEmail) {
+    log.warn(`Sanitized ${fieldName} field from '${email}' to '${cleanEmail}'`);
+  }
+  if (!cleanEmail) {
+    log.warn(`Failed to sanitize ${fieldName} field as an email!`);
+    throw new Error(`Failed to sanitize ${fieldName} field as an email!`);
+  }
+  return cleanEmail;
+}
 export { validateUserObjFields };
