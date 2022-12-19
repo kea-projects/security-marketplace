@@ -32,8 +32,9 @@ const validateToken = async (req: Request): Promise<{ sub: string; userId: strin
     });
     if (response.status === 200) {
       log.trace("Token was validated, returning it in the body.");
-      const body = await response.json();
-      return { ...body.token };
+      const { sub, userId, role } = await response.json();
+      log.warn(`${{ sub, userId, role }}`);
+      return { sub, userId, role };
     }
     log.warn("Token failed to validate");
     throw new Error("Authorization token is invalid");
