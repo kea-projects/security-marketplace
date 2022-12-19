@@ -21,7 +21,7 @@ class ValidationError extends BaseError {
 }
 
 class InternalServerError extends BaseError {
-  constructor(detail: string = "An unknown error has occurred.") {
+  constructor(detail = "An unknown error has occurred.") {
     super("InternalServerError", detail);
   }
 }
@@ -37,7 +37,6 @@ class UnauthorizedError extends BaseError {
     super("UnauthorizedError", "Unauthorized");
   }
 }
-
 
 class ForbiddenError extends BaseError {
   constructor() {

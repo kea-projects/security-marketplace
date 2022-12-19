@@ -1,12 +1,17 @@
 import cors from "cors";
 import { Request, Response, Router } from "express";
+import rateLimit from "express-rate-limit";
 import { corsOptionsConfig, corsPostConfig } from "../config/cors.config";
+import { rateLimiterCreateConfig } from "../config/rate-limiter.config";
 import { Role } from "../interfaces";
 import { validateCreateCommentRequestBody } from "../middleware/body-validators.middleware";
 import { canAccessRoleUser } from "../middleware/validate-access.middleware";
 import { CommentsService } from "../services/comments.service";
 import { ListingsService } from "../services/listings.service";
 import { log } from "../utils/logger";
+
+// Rate Limiting setup
+const createLimiter = rateLimit(rateLimiterCreateConfig);
 
 const router: Router = Router();
 // Add options requests
@@ -15,6 +20,7 @@ router.options("*", cors(corsOptionsConfig));
 router.post(
   "",
   cors(corsPostConfig),
+  createLimiter,
   validateCreateCommentRequestBody,
   canAccessRoleUser,
   async (req: Request, res: Response) => {

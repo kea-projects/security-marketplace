@@ -7,7 +7,7 @@ dotenv.config({ path: "./.env" });
  * @param exitOnMissing exit the application if the variable is missing. Defaults to false
  * @returns the environment variable if found, or null if not it doesn't exist.
  */
-export const getEnvVar = (varName: string, exitOnMissing: boolean = false) => {
+export const getEnvVar = (varName: string, exitOnMissing = false) => {
   // Check if the necessary environment variables are present
   if (!process.env[varName]) {
     if (exitOnMissing) {

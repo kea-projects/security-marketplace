@@ -1,8 +1,9 @@
+import { NextFunction, Request, Response } from "express";
 import { log } from "../utils/logger";
 
-const logger = (req: any, res: any, next: any) => {
-  let method = req.method;
-  let url = req.url;
+const logger = (req: Request, res: Response, next: NextFunction) => {
+  const method = req.method;
+  const url = req.url;
   const start = process.hrtime();
   next();
   res.on("finish", () => {
@@ -13,7 +14,7 @@ const logger = (req: any, res: any, next: any) => {
   });
 };
 
-const getActualRequestDurationInMilliseconds = (start: any) => {
+const getActualRequestDurationInMilliseconds = (start: [number, number] | undefined) => {
   const NS_PER_SEC = 1e9; //  convert to nanoseconds
   const NS_TO_MS = 1e6; // convert to milliseconds
   const diff = process.hrtime(start);

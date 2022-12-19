@@ -7,7 +7,6 @@ const log_flag = JSON.parse(getEnvVar("USERS_POSTGRES_LOG") || "false") ? consol
 class SequelizeSingleton {
   private static instance: Sequelize;
 
-  private constructor() {}
   public static getInstance(): Sequelize {
     if (!SequelizeSingleton.instance) {
       log.info("Connecting to database...");
@@ -20,7 +19,7 @@ class SequelizeSingleton {
           port: Number(getEnvVar("USERS_POSTGRES_PORT", true) as string),
           dialect: "postgres",
           logging: log_flag,
-          schema: 'sec_auth'
+          schema: "sec_auth",
         }
       );
       log.info("Sequelize connection created.");
