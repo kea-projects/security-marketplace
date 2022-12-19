@@ -16,7 +16,16 @@ export function ErrorPage() {
 
     return (
         <Center width="100%" height="100vh">
-            <Card id="error-page">
+            <Card
+                id="error-page"
+                minWidth="300px"
+                maxWidth="18vw"
+                backgroundColor="primary"
+                color="text"
+                padding="18px"
+                boxShadow="xl"
+                gap="15"
+            >
                 <VStack>
                     <Text fontSize="xl" as="b">
                         Oops!
