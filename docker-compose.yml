@@ -10,6 +10,9 @@ services:
     networks: [ sec-net ]
     restart: on-failure
     ports: [ 80:80, 443:443 ]
+    volumes:
+      - certbot-keys:/etc/letsencrypt:rw
+      - certbot-backups:/var/lib/letsencrypt:rw
 
   users-service:
     container_name: users-service
@@ -183,3 +186,9 @@ networks:
     name: auth-db-net
   main-db-net:
     name: main-db-net
+
+volumes:
+  certbot-keys:
+    name: certbot-keys
+  certbot-backups:
+    name: certbot-backups
