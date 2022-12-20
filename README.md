@@ -39,7 +39,7 @@ The project consists of the following applications:
 
 The backend applications require a running PostgreSQL database. The connection to it is defined through the .env file
 
-Check out the running application at [https://marketplace.hotdeals.dev]([http](https://marketplace.hotdeals.dev)). **Note: will no longer be active after January 15th**
+Check out the running application at [https://marketplace.hotdeals.dev](https://marketplace.hotdeals.dev). **Note: will no longer be active after January 15th**
 
 ### Environment Variables
 The applications utilize environment variables to configure various features and behaviors like database connection, cors rules, and rate limiting.
