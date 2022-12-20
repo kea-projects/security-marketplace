@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { validate as isValidUuid } from "uuid";
+import validator from "validator";
 import { MissingPropertyError, ValidationError } from "../utils/error-messages";
 import { log } from "../utils/logger";
 
@@ -33,7 +34,7 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
   log.trace(`Validating the request.body of Update Listing Request`);
 
   validateName(name, res);
-  validateDescription(name, res);
+  validateDescription(description, res);
 
   if (isPublic === undefined) {
     log.warn(`Request body validation failed: The body was missing the: 'isPublic' attribute`);
@@ -45,7 +46,11 @@ const validateUpdateListingRequestBody = (req: Request, res: Response, next: Nex
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
 
-    req.body = { name, description, isPublic: convertedIsPublic };
+    req.body = {
+      name: sanitizeText(name, "name"),
+      description: sanitizeText(description, "description"),
+      isPublic: convertedIsPublic,
+    };
     if (res.writableEnded) {
       return;
     }
@@ -74,7 +79,7 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
   }
 
   validateName(name, res);
-  validateDescription(name, res);
+  validateDescription(description, res);
 
   if (isPublic === undefined) {
     log.warn(`Request body validation failed: The body was missing the: 'isPublic' attribute`);
@@ -84,7 +89,12 @@ const validateCreateListingRequestBody = (req: Request, res: Response, next: Nex
     (typeof isPublic === "string" && (isPublic.toLowerCase() === "true" || isPublic.toLowerCase() === "false"))
   ) {
     const convertedIsPublic = typeof isPublic === "boolean" ? isPublic : isPublic.toLowerCase() === "true";
-    req.body = { name, description, isPublic: convertedIsPublic, createdBy };
+    req.body = {
+      name: sanitizeText(name, "name"),
+      description: sanitizeText(description, "description"),
+      isPublic: convertedIsPublic,
+      createdBy,
+    };
     if (res.writableEnded) {
       return;
     }
@@ -117,7 +127,12 @@ const validateCreateCommentRequestBody = (req: Request, res: Response, next: Nex
     log.warn(`Request body validation failed: The body contained invalid 'commentedOn' attribute: ${commentedOn}`);
     return res.status(400).send(new ValidationError("The provided UUID was not valid."));
   }
-  req.body = { name, email, comment, commentedOn };
+  req.body = {
+    name: sanitizeText(name, "name"),
+    email: sanitizeEmail(email, "email"),
+    comment: sanitizeText(comment, "comment"),
+    commentedOn,
+  };
   if (res.writableEnded) {
     return;
   }
@@ -202,6 +217,37 @@ function validateEmail(email: unknown, res: Response) {
   }
 
   return null;
+}
+
+/**
+ * Escapes special characters from the text. Logs if it had to sanitize the string.
+ * @param text the text to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized text.
+ */
+function sanitizeText(text: string, fieldName: string): string {
+  const cleanText = validator.escape(validator.trim(text));
+  if (text !== cleanText) {
+    log.warn(`Sanitized ${fieldName} field from '${text}' to '${cleanText}'`);
+  }
+  return cleanText;
+}
+/**
+ * Canonicalizes an email address. Logs if it had to sanitize it.
+ * @param text the email to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized email.
+ */
+function sanitizeEmail(email: string, fieldName: string): string {
+  const cleanEmail = validator.normalizeEmail(email);
+  if (email !== cleanEmail) {
+    log.warn(`Sanitized ${fieldName} field from '${email}' to '${cleanEmail}'`);
+  }
+  if (!cleanEmail) {
+    log.warn(`Failed to sanitize ${fieldName} field as an email!`);
+    throw new Error(`Failed to sanitize ${fieldName} field as an email!`);
+  }
+  return cleanEmail;
 }
 
 export { validateUpdateListingRequestBody, validateCreateListingRequestBody, validateCreateCommentRequestBody };

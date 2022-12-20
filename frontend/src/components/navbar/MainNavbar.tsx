@@ -28,8 +28,9 @@ export function MainNavbar({ isAdmin }: MainNavbarProps) {
      * Removes the local storage entry for user data when the user logs out.
      */
     const handleLogout = async () => {
-        setUserData({});
-        await AuthApi.logout();
+        AuthApi.logout().finally(() => {
+            setUserData({});
+        });
     };
 
     /**

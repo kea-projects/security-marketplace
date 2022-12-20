@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import validator from "validator";
 import { MissingPropertyError, ValidationError } from "../utils/error-messages";
 import { log } from "../utils/logger";
 
@@ -35,7 +36,11 @@ const validateSignupRequestBody = (req: Request, res: Response, next: NextFuncti
   validateEmail(email, res);
   validatePassword(password, res);
 
-  req.body = { name, email, password };
+  req.body = {
+    name: sanitizeText(name, "name"),
+    email: sanitizeEmail(email, "email"),
+    password: sanitizeText(password, "password"),
+  };
   if (res.writableEnded) {
     return;
   }
@@ -49,7 +54,10 @@ const validateLoginRequestBody = (req: Request, res: Response, next: NextFunctio
   validateEmail(email, res);
   validatePassword(password, res);
 
-  req.body = { email, password };
+  req.body = {
+    email: sanitizeEmail(email, "email"),
+    password: sanitizeText(password, "password"),
+  };
   if (res.writableEnded) {
     return;
   }
@@ -129,6 +137,37 @@ function validatePassword(password: unknown, res: Response) {
   }
 
   return null;
+}
+
+/**
+ * Escapes special characters from the text. Logs if it had to sanitize the string.
+ * @param text the text to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized text.
+ */
+function sanitizeText(text: string, fieldName: string): string {
+  const cleanText = validator.escape(validator.trim(text));
+  if (text !== cleanText) {
+    log.warn(`Sanitized ${fieldName} field from '${text}' to '${cleanText}'`);
+  }
+  return cleanText;
+}
+/**
+ * Canonicalizes an email address. Logs if it had to sanitize it.
+ * @param text the email to sanitize.
+ * @param fieldName the field name for logging purposes.
+ * @returns the sanitized email.
+ */
+function sanitizeEmail(email: string, fieldName: string): string {
+  const cleanEmail = validator.normalizeEmail(email);
+  if (email !== cleanEmail) {
+    log.warn(`Sanitized ${fieldName} field from '${email}' to '${cleanEmail}'`);
+  }
+  if (!cleanEmail) {
+    log.warn(`Failed to sanitize ${fieldName} field as an email!`);
+    throw new Error(`Failed to sanitize ${fieldName} field as an email!`);
+  }
+  return cleanEmail;
 }
 
 export { validateSignupRequestBody, validateLoginRequestBody };

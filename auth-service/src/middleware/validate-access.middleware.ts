@@ -77,9 +77,12 @@ const canAccessRoleUser = async (req: Request, res: Response, next: NextFunction
       req.body.token = token;
       log.trace(`User validated as ${req.body.token.role}.`);
       return next();
+    } else {
+      log.warn("Role validation failed: User was NOT admin or user, rejecting.");
+      return res.status(401).send({ message: "Unauthorized" });
     }
   } catch (error) {
-    log.warn("Role validation failed: User was NOT admin or user, rejecting.");
+    log.error("An error has occurred while validating the user", error);
     return res.status(401).send({ message: "Unauthorized" });
   }
 };
