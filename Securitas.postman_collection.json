@@ -1,0 +1,614 @@
+{
+	"info": {
+		"_postman_id": "0e288ae2-2a38-4232-842e-fd7c0ebd68e5",
+		"name": "Securitas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6628993"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"accessToken\", pm.response.json().refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"abcDEF123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/login",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"accessToken\", pm.response.json().refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/refresh",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/validate",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token - invalid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInVzZXJJZCI6IjllMzk4OGJhLTJiMjctNDQ3NC04MmEzLTMwYTUyOTY4ZjRhYyIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNjcwNTk4Njc1LCJpYXQiOjE2NzA1MTIyNzV9.UFxUYkr-1kzy9P9TC1y8_yuPNyV1UhJDFx3g0ooLRCA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/validate",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"accessToken\", pm.response.json().refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testy\",\n    \"email\": \"testy@example.com\",\n    \"password\": \"abcDEF123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/signup",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/logout",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings/d19e5465-dbcd-4d38-8c92-99b2c16fb139",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings",
+								"d19e5465-dbcd-4d38-8c92-99b2c16fb139"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"listingId\": \"123\",\n    \"name\": \"name\",\n    \"description\": \"description\",\n    \"imageUrl\": \"imageUrl\",\n    \"createdBy\": \"00000000-0000-0000-0000-000000000000\",\n    \"isPublic\": true,\n    \"createdAt\": \"createdAt\",\n    \"updatedAt\": \"updatedAt\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings/d19e5465-dbcd-4d38-8c92-99b2c16fb139",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings",
+								"d19e5465-dbcd-4d38-8c92-99b2c16fb139"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "Change Me",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/chris-curry-KrQ4kb5JMSU-unsplash.jpg"
+								},
+								{
+									"key": "name",
+									"value": "Masterlock Padlock",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "The most secure padlock in the world",
+									"type": "text"
+								},
+								{
+									"key": "isPublic",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "createdBy",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings/637a0cf8-9921-4daf-af4d-be9b027e3a12",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings",
+								"637a0cf8-9921-4daf-af4d-be9b027e3a12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testy MacTestface<script>alert('Hi')</script>\",\n    \"email\": \"mactestface@email.com\",\n    \"comment\": \"I like it, very secure. Protected my bike for 7 years\",\n    \"commentedOn\": \"d19e5465-dbcd-4d38-8c92-99b2c16fb139\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{listingsServiceUrl}}/comments",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/document8.pdf",
+									"disabled": true
+								},
+								{
+									"key": "file2",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/20191104_162316 (1).jpg",
+									"disabled": true
+								},
+								{
+									"key": "file3",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/ERD v1@2x (1).png",
+									"disabled": true
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/20191104_162316 (1).jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{listingsServiceUrl}}/listings/d19e5465-dbcd-4d38-8c92-99b2c16fb139/file",
+							"host": [
+								"{{listingsServiceUrl}}"
+							],
+							"path": [
+								"listings",
+								"d19e5465-dbcd-4d38-8c92-99b2c16fb139",
+								"file"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{usersServiceUrl}}/users",
+							"host": [
+								"{{usersServiceUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{usersServiceUrl}}/users/:id",
+							"host": [
+								"{{usersServiceUrl}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1929b579-2f32-4822-96a5-aa2980a6b5ed"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"637a0cf8-9921-4daf-af4d-be9b027e3a16\",\n    \"name\":\"Testy MacTestFace\",\n    \"email\": \"userz3@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{usersServiceUrl}}/users",
+							"host": [
+								"{{usersServiceUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update picture",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/document8.pdf",
+									"disabled": true
+								},
+								{
+									"key": "file2",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/20191104_162316 (1).jpg"
+								},
+								{
+									"key": "file3",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/ERD v1@2x (1).png"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/callibogoryja/Downloads/20191104_162316 (1).jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{usersServiceUrl}}/users/1929b579-2f32-4822-96a5-aa2980a6b5ed/pictures",
+							"host": [
+								"{{usersServiceUrl}}"
+							],
+							"path": [
+								"users",
+								"1929b579-2f32-4822-96a5-aa2980a6b5ed",
+								"pictures"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "authServiceUrl",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "listingsServiceUrl",
+			"value": "localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "usersServiceUrl",
+			"value": "localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "changeMe",
+			"type": "string"
+		},
+		{
+			"key": "authServiceUrl",
+			"value": "https://marketplace.hotdeals.dev/api",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "listingsServiceUrl",
+			"value": "https://marketplace.hotdeals.dev/api",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "usersServiceUrl",
+			"value": "https://marketplace.hotdeals.dev/api",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
