@@ -129,5 +129,5 @@ Set `USERS_LINODE_POPULATE=false` to prevent re-populating of all profile pictur
 
  ### CORS
 
- Set `GLOBAL_CORS_ALLOW_ANY_ORIGIN=true` to allow cors fro anywhere, including localhost. Used only for development
+ Set `GLOBAL_CORS_ALLOW_ANY_ORIGIN=true` to allow cors from anywhere, including localhost. Used only for development
 
