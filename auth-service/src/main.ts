@@ -12,6 +12,7 @@ const unknownLimiter = rateLimit(rateLimiter404Config);
 const app = express();
 app.use(express.json());
 app.use(logger);
+app.set("trust proxy", 1);
 
 // ---------------------Routers------------------------
 app.use("/auth", authRouter);

@@ -1,4 +1,7 @@
-FROM nginx:alpine
+FROM nginx:stable
+
+# Install certbot requirements
+RUN apt-get update && apt-get install certbot python3-certbot-nginx cron -y
 
 # Delete the default config, as we do not want conflicts
 RUN rm /etc/nginx/conf.d/default.conf

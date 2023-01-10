@@ -2,16 +2,21 @@ version: '3'
 
 services:
   gateway:
-    restart: always
     container_name: gateway
+    image: drydish/security_marketplace:gateway
     build:
       context: .
       dockerfile: ./configs/gateway/gateway.Dockerfile
     networks: [ sec-net ]
+    restart: on-failure
     ports: [ 80:80, 443:443 ]
+    volumes:
+      - certbot-keys:/etc/letsencrypt:rw
+      - certbot-backups:/var/lib/letsencrypt:rw
 
   users-service:
     container_name: users-service
+    image: drydish/security_marketplace:users-service
     build:
       context: .
       dockerfile: ./configs/users-service/users-service.Dockerfile
@@ -48,6 +53,7 @@ services:
 
   listings-service:
     container_name: listings-service
+    image: drydish/security_marketplace:listings-service
     build:
       context: .
       dockerfile: ./configs/listings-service/listings-service.Dockerfile
@@ -66,15 +72,15 @@ services:
       - LISTINGS_LINODE_STORAGE_BUCKET_ID=$LISTINGS_LINODE_STORAGE_BUCKET_ID
       - LISTINGS_LINODE_STORAGE_ACCESS_KEY=$LISTINGS_LINODE_STORAGE_ACCESS_KEY
       - LISTINGS_LINODE_STORAGE_SECRET_KEY=$LISTINGS_LINODE_STORAGE_SECRET_KEY
-      - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
-      - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
-      - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
-      - LISTINGS_RATE_LIMIT_CREATE=50
+      - LISTINGS_RATE_LIMIT_CREATE=$LISTINGS_RATE_LIMIT_CREATE
       - LISTINGS_RATE_LIMIT_UPDATE=$LISTINGS_RATE_LIMIT_UPDATE
       - LISTINGS_RATE_LIMIT_DELETE=$LISTINGS_RATE_LIMIT_DELETE
       - LISTINGS_RATE_LIMIT_404=$LISTINGS_RATE_LIMIT_404
       - LISTINGS_RATE_LIMIT_GLOBAL=$LISTINGS_RATE_LIMIT_GLOBAL
       - LISTINGS_RATE_LIMIT_DURATION=$LISTINGS_RATE_LIMIT_DURATION
+      - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
+      - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
+      - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
     networks: [ sec-net, main-db-net ]
     restart: on-failure
     depends_on:
@@ -85,6 +91,7 @@ services:
 
   auth-service:
     container_name: auth-service
+    image: drydish/security_marketplace:auth-service
     build:
       context: .
       dockerfile: ./configs/auth-service/auth-service.Dockerfile
@@ -97,14 +104,15 @@ services:
       - AUTH_POSTGRES_SYNC=$AUTH_POSTGRES_SYNC
       - AUTH_POSTGRES_POPULATE=$AUTH_POSTGRES_POPULATE
       - AUTH_SECRET=$AUTH_SECRET
+      - AUTH_PEPPER=$AUTH_PEPPER
       - AUTH_PORT=$AUTH_PORT
       - USERS_SERVICE_URL=$USERS_SERVICE_URL
+      - AUTH_RATE_LIMIT_LOGIN_SIGNUP=$AUTH_RATE_LIMIT_LOGIN_SIGNUP
+      - AUTH_RATE_LIMIT_404=$AUTH_RATE_LIMIT_404
+      - AUTH_RATE_LIMIT_DURATION=$AUTH_RATE_LIMIT_DURATION
       - GLOBAL_CORS_ALLOW_ANY_ORIGIN=$GLOBAL_CORS_ALLOW_ANY_ORIGIN
       - GLOBAL_CORS_ALLOW_ORIGIN=$GLOBAL_CORS_ALLOW_ORIGIN
       - GLOBAL_RATE_LIMIT_ENABLED=$GLOBAL_RATE_LIMIT_ENABLED
-      - AUTH_RATE_LIMIT_LOGIN_SIGNUP=$AUTH_RATE_LIMIT_LOGIN_SIGNUP
-      - AUTH_RATE_LIMIT_404=$USERS_RATE_LIMIT_404
-      - AUTH_RATE_LIMIT_DURATION=$USERS_RATE_LIMIT_DURATION
     networks: [ sec-net, auth-db-net ]
     restart: on-failure
     depends_on:
@@ -113,13 +121,14 @@ services:
 
   frontend:
     container_name: frontend
+    image: drydish/security_marketplace:frontend
     build:
       context: .
       dockerfile: ./configs/frontend/frontend.Dockerfile
       args:
-      - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
-      - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
-      - REACT_APP_USER_SERVICE_URL=$REACT_APP_USER_SERVICE_URL
+        - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
+        - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
+        - REACT_APP_USER_SERVICE_URL=$REACT_APP_USER_SERVICE_URL
     environment:
       - REACT_APP_AUTH_SERVICE_URL=$REACT_APP_AUTH_SERVICE_URL
       - REACT_APP_LISTING_SERVICE_URL=$REACT_APP_LISTING_SERVICE_URL
@@ -133,6 +142,7 @@ services:
 
   auth-postgres:
     container_name: auth-postgres
+    image: drydish/security_marketplace:auth-postgres
     build:
       context: .
       dockerfile: ./configs/auth-postgres/auth-postgres.Dockerfile
@@ -148,21 +158,15 @@ services:
       - AUTH_POSTGRES_PASSWORD=$AUTH_POSTGRES_PASSWORD
       - AUTH_POSTGRES_DATABASE=$AUTH_POSTGRES_DATABASE
     networks: [ auth-db-net ]
-    # Remove ports before deployment.
-    # ports:
-      # - 5432:5432
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'pg_isready -U ${AUTH_POSTGRES_SUPER_USER} -d ${AUTH_POSTGRES_SUPER_DB}'"
-        ]
+      test: pg_isready -U ${AUTH_POSTGRES_SUPER_USER} -d ${AUTH_POSTGRES_SUPER_DB}
       interval: 3s
       timeout: 3s
       retries: 3
 
   main-postgres:
     container_name: main-postgres
+    image: drydish/security_marketplace:main-postgres
     build:
       context: .
       dockerfile: ./configs/main-postgres/main-postgres.Dockerfile
@@ -184,15 +188,8 @@ services:
       - USERS_POSTGRES_PASSWORD=$USERS_POSTGRES_PASSWORD
       - USERS_POSTGRES_DATABASE=$USERS_POSTGRES_DATABASE
     networks: [ main-db-net ]
-    # Remove ports before deployment.
-    ports:
-      - 5433:5432
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'pg_isready -U ${MAIN_POSTGRES_SUPER_USER} -d ${MAIN_POSTGRES_SUPER_DB}'"
-        ]
+      test: pg_isready -U ${MAIN_POSTGRES_SUPER_USER} -d ${MAIN_POSTGRES_SUPER_DB}
       interval: 3s
       timeout: 3s
       retries: 3
@@ -206,3 +203,9 @@ networks:
     name: auth-db-net
   main-db-net:
     name: main-db-net
+
+volumes:
+  certbot-keys:
+    name: certbot-keys
+  certbot-backups:
+    name: certbot-backups

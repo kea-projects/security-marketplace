@@ -96,6 +96,7 @@ const canAccessRoleAdmin = async (req: Request, res: Response, next: NextFunctio
   try {
     log.trace("Attempting to validate user as admin...");
     const token = await validateToken(req);
+    log.error("TOKEN", token);
     if (token.role === Role.admin) {
       req.body.token = token;
       log.trace("Admin successfully validated.");
